@@ -9,12 +9,48 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TokenstatusRouteImport } from './routes/tokenstatus'
+import { Route as SolicitarRouteImport } from './routes/solicitar'
+import { Route as OperacionalRouteImport } from './routes/operacional'
 import { Route as MvpRouteImport } from './routes/mvp'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as GestorLocalRouteImport } from './routes/gestor-local'
+import { Route as GestorGeralRouteImport } from './routes/gestor-geral'
 import { Route as IndexRouteImport } from './routes/index'
 
+const TokenstatusRoute = TokenstatusRouteImport.update({
+  id: '/tokenstatus',
+  path: '/tokenstatus',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolicitarRoute = SolicitarRouteImport.update({
+  id: '/solicitar',
+  path: '/solicitar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OperacionalRoute = OperacionalRouteImport.update({
+  id: '/operacional',
+  path: '/operacional',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MvpRoute = MvpRouteImport.update({
   id: '/mvp',
   path: '/mvp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GestorLocalRoute = GestorLocalRouteImport.update({
+  id: '/gestor-local',
+  path: '/gestor-local',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GestorGeralRoute = GestorGeralRouteImport.update({
+  id: '/gestor-geral',
+  path: '/gestor-geral',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -25,37 +61,128 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/gestor-geral': typeof GestorGeralRoute
+  '/gestor-local': typeof GestorLocalRoute
+  '/login': typeof LoginRoute
   '/mvp': typeof MvpRoute
+  '/operacional': typeof OperacionalRoute
+  '/solicitar': typeof SolicitarRoute
+  '/tokenstatus': typeof TokenstatusRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/gestor-geral': typeof GestorGeralRoute
+  '/gestor-local': typeof GestorLocalRoute
+  '/login': typeof LoginRoute
   '/mvp': typeof MvpRoute
+  '/operacional': typeof OperacionalRoute
+  '/solicitar': typeof SolicitarRoute
+  '/tokenstatus': typeof TokenstatusRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/gestor-geral': typeof GestorGeralRoute
+  '/gestor-local': typeof GestorLocalRoute
+  '/login': typeof LoginRoute
   '/mvp': typeof MvpRoute
+  '/operacional': typeof OperacionalRoute
+  '/solicitar': typeof SolicitarRoute
+  '/tokenstatus': typeof TokenstatusRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/mvp'
+  fullPaths:
+    | '/'
+    | '/gestor-geral'
+    | '/gestor-local'
+    | '/login'
+    | '/mvp'
+    | '/operacional'
+    | '/solicitar'
+    | '/tokenstatus'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/mvp'
-  id: '__root__' | '/' | '/mvp'
+  to:
+    | '/'
+    | '/gestor-geral'
+    | '/gestor-local'
+    | '/login'
+    | '/mvp'
+    | '/operacional'
+    | '/solicitar'
+    | '/tokenstatus'
+  id:
+    | '__root__'
+    | '/'
+    | '/gestor-geral'
+    | '/gestor-local'
+    | '/login'
+    | '/mvp'
+    | '/operacional'
+    | '/solicitar'
+    | '/tokenstatus'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GestorGeralRoute: typeof GestorGeralRoute
+  GestorLocalRoute: typeof GestorLocalRoute
+  LoginRoute: typeof LoginRoute
   MvpRoute: typeof MvpRoute
+  OperacionalRoute: typeof OperacionalRoute
+  SolicitarRoute: typeof SolicitarRoute
+  TokenstatusRoute: typeof TokenstatusRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tokenstatus': {
+      id: '/tokenstatus'
+      path: '/tokenstatus'
+      fullPath: '/tokenstatus'
+      preLoaderRoute: typeof TokenstatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solicitar': {
+      id: '/solicitar'
+      path: '/solicitar'
+      fullPath: '/solicitar'
+      preLoaderRoute: typeof SolicitarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/operacional': {
+      id: '/operacional'
+      path: '/operacional'
+      fullPath: '/operacional'
+      preLoaderRoute: typeof OperacionalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mvp': {
       id: '/mvp'
       path: '/mvp'
       fullPath: '/mvp'
       preLoaderRoute: typeof MvpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestor-local': {
+      id: '/gestor-local'
+      path: '/gestor-local'
+      fullPath: '/gestor-local'
+      preLoaderRoute: typeof GestorLocalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestor-geral': {
+      id: '/gestor-geral'
+      path: '/gestor-geral'
+      fullPath: '/gestor-geral'
+      preLoaderRoute: typeof GestorGeralRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -70,7 +197,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GestorGeralRoute: GestorGeralRoute,
+  GestorLocalRoute: GestorLocalRoute,
+  LoginRoute: LoginRoute,
   MvpRoute: MvpRoute,
+  OperacionalRoute: OperacionalRoute,
+  SolicitarRoute: SolicitarRoute,
+  TokenstatusRoute: TokenstatusRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
