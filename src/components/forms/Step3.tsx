@@ -15,7 +15,7 @@ export default function Step3() {
             <div className="space-y-6">
                 <input className="input" placeholder="Título do vídeo" />
                 <textarea
-                    className="input min-h-[140px]"
+                    className="input min-h-35"
                     placeholder="Descreva o conteúdo do material"
                 />
                 <input className="input" type="file" />

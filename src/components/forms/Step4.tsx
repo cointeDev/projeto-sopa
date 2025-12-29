@@ -21,7 +21,7 @@ export default function Step4() {
                 />
                 <input className="input" type="file" />
                 <textarea
-                    className="input min-h-[140px]"
+                    className="input min-h-35"
                     placeholder="Observações finais"
                 />
             </div>

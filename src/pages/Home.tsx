@@ -31,7 +31,7 @@ export function Home() {
 
           {/* AÇÕES */}
           <div className="w-full">
-            <div className="max-w-[460px]">
+            <div className="max-w-115">
 
               {/* CTA PRINCIPAL */}
               <Link
@@ -97,7 +97,7 @@ export function Home() {
           <div className="flex items-center gap-8 pt-6 border-t border-white/5 flex-wrap">
             <img
               alt="SEEC RN"
-              className="max-h-[65px] grayscale brightness-200 contrast-150 opacity-90"
+              className="max-h-16.25 grayscale brightness-200 contrast-150 opacity-90"
               src="/assets/brasao_seec_white.png"
             />
 
