@@ -64,7 +64,7 @@ export function QuadroProduction({ visaoQuadro, setVisaoQuadro }: QuadroProps) {
           {colunas.map((col) => (
             <div
               key={col}
-              className="min-w-[300px] bg-[#161825]
+              className="min-w-75 bg-[#161825]
                          border border-white/10
                          rounded-xl p-3"
             >
