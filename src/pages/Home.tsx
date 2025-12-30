@@ -37,11 +37,17 @@ export function Home() {
 							Sistema Organizacional para Produções Audiovisuais
 						</h4>
 
+<<<<<<< HEAD
 						<p className="text-[#B4B9C7] text-lg leading-relaxed max-w-[90%]">
 							Centralize solicitações, gerencie pautas de estúdio e acompanhe o
 							fluxo de produção de mídia da COINTE em um só lugar.
 						</p>
 					</div>
+=======
+          {/* AÇÕES */}
+          <div className="w-full">
+            <div className="max-w-115">
+>>>>>>> 195f90c7c166bb08026010ecb11f2331db6114e2
 
 					{/* AÇÕES */}
 					<div className="w-full">
@@ -114,6 +120,7 @@ export function Home() {
 
 						<span className="h-10 w-px bg-white/10" />
 
+<<<<<<< HEAD
 						<img
 							alt="COINTE"
 							className="max-h-20"
@@ -125,4 +132,39 @@ export function Home() {
 			<Footer />
 		</div>
 	);
+=======
+          <div className="flex items-center gap-8 pt-6 border-t border-white/5 flex-wrap">
+            <img
+              alt="SEEC RN"
+              className="max-h-16.25 grayscale brightness-200 contrast-150 opacity-90"
+              src="/assets/brasao_seec_white.png"
+            />
+
+            <span className="h-10 w-px bg-white/10" />
+
+            <img
+              alt="COINTE"
+              className="max-h-20"
+              src="/assets/logo_cointe_white.png"
+            />
+          </div>
+
+        </footer>
+      </section>
+
+      {/* PAINEL DIREITO */}
+      <div className="relative hidden lg:block">
+        <div
+          className="absolute inset-0 bg-cover bg-center saturate-110"
+          style={{
+            backgroundImage: "url('/assets/bg-estudio.jpg')",
+            maskImage: "linear-gradient(to right, transparent 0%, black 15%)",
+            WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 15%)",
+          }}
+        />
+      </div>
+
+    </div>
+  );
+>>>>>>> 195f90c7c166bb08026010ecb11f2331db6114e2
 }

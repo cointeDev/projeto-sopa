@@ -92,6 +92,7 @@ export default function Step4() {
 				</div>
 			</div>
 
+<<<<<<< HEAD
 			<div className="flex justify-between mt-10">
 				<button
 					className="btn-secundario"
@@ -124,3 +125,37 @@ export default function Step4() {
 		</>
 	);
 }
+=======
+            <div className="space-y-6">
+                <input className="input" type="date" />
+                <input
+                    className="input"
+                    placeholder="Quantidade de pessoas"
+                    type="number"
+                />
+                <input className="input" type="file" />
+                <textarea
+                    className="input min-h-35"
+                    placeholder="Observações finais"
+                />
+            </div>
+
+            <div className="flex justify-between mt-10">
+                <button className="btn-secundario" onClick={() => { setPassoAtual(3); }}>
+                    ← Voltar
+                </button>
+                <button
+                    className="btn-primario"
+                    onClick={() => {
+                        if (!validarPassoAtual()) return;
+                        setPassoAtual(passo + 1);
+                    }}
+                >
+                    Continuar →
+                </button>
+
+            </div>
+        </>
+    );
+}
+>>>>>>> 195f90c7c166bb08026010ecb11f2331db6114e2

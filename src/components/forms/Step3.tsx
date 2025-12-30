@@ -16,6 +16,7 @@ export default function Step3() {
 		} else {
 			novaLista = novaLista.filter((item) => item != "Não se aplica");
 
+<<<<<<< HEAD
 			if (novaLista.includes(opcao)) {
 				novaLista = novaLista.filter((item) => item != opcao);
 			} else {
@@ -24,6 +25,16 @@ export default function Step3() {
 		}
 		updateField("acessibilidade", novaLista);
 	};
+=======
+            <div className="space-y-6">
+                <input className="input" placeholder="Título do vídeo" />
+                <textarea
+                    className="input min-h-35"
+                    placeholder="Descreva o conteúdo do material"
+                />
+                <input className="input" type="file" />
+            </div>
+>>>>>>> 195f90c7c166bb08026010ecb11f2331db6114e2
 
 	return (
 		<>
