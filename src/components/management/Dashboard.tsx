@@ -60,7 +60,7 @@ export default function Dashboard({ cards }: DashboardProps) {
         <div className="space-y-8">
             {/* Filtros */}
             <div className="bg-[#161825] p-6 rounded-2xl border border-white/5 flex flex-wrap gap-6 items-end shadow-2xl">
-                <div className="flex-1 min-w-[200px]">
+                <div className="flex-1 min-w-50">
                     <label className="text-[10px] uppercase font-bold text-[#B4B9C7] mb-2 flex items-center gap-2">
                         <Filter size={12} /> Projeto
                     </label>
@@ -75,7 +75,7 @@ export default function Dashboard({ cards }: DashboardProps) {
                         ))}
                     </select>
                 </div>
-                <div className="flex-1 min-w-[200px]">
+                <div className="flex-1 min-w-50">
                     <label className="text-[10px] uppercase font-bold text-[#B4B9C7] mb-2 block">Polo / Local</label>
                     <select 
                         className="bg-[#0F111A] border border-white/10 text-white p-3 rounded-xl w-full outline-none focus:border-indigo-500" 
@@ -115,7 +115,7 @@ export default function Dashboard({ cards }: DashboardProps) {
 
             {/* Gráficos */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 bg-[#161825] p-8 rounded-2xl border border-white/5 h-[400px]">
+                <div className="lg:col-span-2 bg-[#161825] p-8 rounded-2xl border border-white/5 h-100">
                     <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2"><FileVideo size={20} /> Volume por Tipo</h3>
                     <ResponsiveContainer height="100%" width="100%">
                         <BarChart data={dataGrafico}>
@@ -127,7 +127,7 @@ export default function Dashboard({ cards }: DashboardProps) {
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
-                <div className="bg-[#161825] p-8 rounded-2xl border border-white/5 h-[400px]">
+                <div className="bg-[#161825] p-8 rounded-2xl border border-white/5 h-100">
                     <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2"><LayoutDashboard size={20} /> Distribuição</h3>
                     <ResponsiveContainer height="100%" width="100%">
                         <PieChart>
