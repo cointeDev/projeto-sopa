@@ -66,6 +66,7 @@
     "react-hook-form": "^7.68.0",
     "react-i18next": "^16.4.0",
     "react-router-dom": "^7.11.0",
+    "recharts": "^3.6.0",
     "tippy.js": "^6.3.7",
     "zod": "^4.1.13",
     "zustand": "^5.0.9"
@@ -95,6 +96,7 @@
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "@types/recharts": "^2.0.1",
     "@typescript-eslint/eslint-plugin": "^8.48.1",
     "@typescript-eslint/parser": "^8.48.1",
     "@vitejs/plugin-react-swc": "^4.2.2",
