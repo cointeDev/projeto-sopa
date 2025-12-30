@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { useFormContext } from './FormFunctions';
+import { useFormContext } from "./FormFunctions";
+import { Footer } from "../common/Footer";
 
 const eventoDescricao = `Produção audiovisual de eventos realizados presencialmente, podendo ocorrer em dois contextos:
 - "In loco" (cobertura audiovisual do evento no local de realização)
@@ -45,105 +46,131 @@ const criacaoEdicaoDescricao = `Produção e edição de conteúdos audiovisuais
 ⚠️ Demanda maior tempo de pós-produção.`;
 
 export default function Step2() {
+	const { passo, setPassoAtual, validarPassoAtual, updateField } =
+		useFormContext();
+	const formData = useFormContext().formData;
 
-    const { passo, setPassoAtual, validarPassoAtual, updateField } = useFormContext();
-    const formData = useFormContext().formData;
+	return (
+		<>
+			<h3 className="text-2xl font-extrabold text-white mb-10">
+				Tipo de produção
+			</h3>
 
-    return (
-        <>
-            <h3 className="text-2xl font-extrabold text-white mb-10">
-                Tipo de produção
-            </h3>
+			<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+				{["Evento", "Institucional", "Chamada", "Videoaula", "Edição"].map(
+					(tipo, index) => (
+						<button
+							key={index}
+							className={`rounded-xl border p-4 text-white/80 transition ${
+								tipo === formData.tipo
+									? "border-indigo-400 bg-indigo-500/10"
+									: "border-white/10 hover:border-indigo-400 hover:bg-indigo-500/10"
+							}`}
+							onClick={() => {
+								updateField("tipo", tipo);
+							}}
+						>
+							<strong>{tipo}</strong>
+						</button>
+					)
+				)}
+			</div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {["Evento", "Institucional", "Chamada", "Videoaula", "Edição"].map(
-                    (tipo, index) => (
-                        <button
-                            key={index}
-                            className={`rounded-xl border p-4 text-white/80 transition ${tipo === formData.tipo
-                                    ? "border-indigo-400 bg-indigo-500/10"
-                                    : "border-white/10 hover:border-indigo-400 hover:bg-indigo-500/10"
-                                }`}
-                            onClick={() => { updateField("tipo", tipo); }}
-                        >
-                            <strong>{tipo}</strong>
-                        </button>
-                    )
-                )}
-            </div>
+			{formData.tipo && (
+				<div className="mt-6 rounded-xl bg-white/5 border border-white/10">
+					<div className="p-6">
+						<h4 className="text-white font-semibold mb-3">{formData.tipo}</h4>
+						<div className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
+							{formData.tipo === "Evento" && eventoDescricao}
+							{formData.tipo === "Institucional" && institucionalDescricao}
+							{formData.tipo === "Chamada" && chamadaDescricao}
+							{formData.tipo === "Videoaula" && videoaulaDescricao}
+							{formData.tipo === "Edição" && edicaoDescricao}
+						</div>
+					</div>
+				</div>
+			)}
 
-            {formData.tipo && (
-                <div className="mt-6 rounded-xl bg-white/5 border border-white/10">
-                    <div className="p-6">
-                        <h4 className="text-white font-semibold mb-3">{formData.tipo}</h4>
-                        <div className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
-                            {formData.tipo === "Evento" && eventoDescricao}
-                            {formData.tipo === "Institucional" && institucionalDescricao}
-                            {formData.tipo === "Chamada" && chamadaDescricao}
-                            {formData.tipo === "Videoaula" && videoaulaDescricao}
-                            {formData.tipo === "Edição" && edicaoDescricao}
-                        </div>
-                    </div>
-                </div>
-            )}
+			<h3 className="text-2xl font-extrabold text-white mb-10 mt-10">
+				Formato de produção
+			</h3>
 
-            <h3 className="text-2xl font-extrabold text-white mb-10 mt-10">
-                Formato de produção
-            </h3>
+			<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+				{[
+					"Live pré-gravada",
+					"Live presencial (em estúdio)",
+					"Live remota",
+					"Podcast / Mesacast",
+					"Gravação de programa",
+					"Shorts / Reels",
+					"Animações para eventos in loco",
+					"Criação, edição e animações",
+				].map((formato, index) => (
+					<button
+						key={index}
+						className={`rounded-xl border p-4 text-white/80 transition ${
+							formato === formData.formato
+								? "border-indigo-400 bg-indigo-500/10"
+								: "border-white/10 hover:border-indigo-400 hover:bg-indigo-500/10"
+						}`}
+						onClick={() => {
+							updateField("formato", formato);
+						}}
+					>
+						<strong>{formato}</strong>
+					</button>
+				))}
+			</div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {["Live pré-gravada", "Live presencial (em estúdio)", "Live remota", "Podcast / Mesacast", "Gravação de programa", "Shorts / Reels", "Animações para eventos in loco", "Criação, edição e animações"].map(
-                    (formato, index) => (
-                        <button
-                            key={index}
-                            className={`rounded-xl border p-4 text-white/80 transition ${formato === formData.formato
-                                    ? "border-indigo-400 bg-indigo-500/10"
-                                    : "border-white/10 hover:border-indigo-400 hover:bg-indigo-500/10"
-                                }`}
-                            onClick={() => { updateField("formato", formato); }}
-                        >
-                            <strong>{formato}</strong>
-                        </button>
-                    )
-                )}
-            </div>
+			{formData.formato && (
+				<div className="mt-6 rounded-xl bg-white/5 border border-white/10">
+					<div className="p-6">
+						<h4 className="text-white font-semibold mb-3">
+							{formData.formato}
+						</h4>
+						<div className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
+							{formData.formato === "Live pré-gravada" && liveDescricao}
+							{formData.formato === "Live presencial (em estúdio)" &&
+								livePresencialDescricao}
+							{formData.formato === "Live remota" && liveRemotaDescricao}
+							{formData.formato === "Podcast / Mesacast" && podcastDescricao}
+							{formData.formato === "Gravação de programa" && programaDescricao}
+							{formData.formato === "Shorts / Reels" && shortsReelsDescricao}
+							{formData.formato === "Animações para eventos in loco" &&
+								animacoesDescricao}
+							{formData.formato === "Criação, edição e animações" &&
+								criacaoEdicaoDescricao}
+						</div>
+					</div>
+				</div>
+			)}
 
-            {formData.formato && (
-                <div className="mt-6 rounded-xl bg-white/5 border border-white/10">
-                    <div className="p-6">
-                        <h4 className="text-white font-semibold mb-3">{formData.formato}</h4>
-                        <div className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
-                            {formData.formato === "Live pré-gravada" && liveDescricao}
-                            {formData.formato === "Live presencial (em estúdio)" && livePresencialDescricao}
-                            {formData.formato === "Live remota" && liveRemotaDescricao}
-                            {formData.formato === "Podcast / Mesacast" && podcastDescricao}
-                            {formData.formato === "Gravação de programa" && programaDescricao}
-                            {formData.formato === "Shorts / Reels" && shortsReelsDescricao}
-                            {formData.formato === "Animações para eventos in loco" && animacoesDescricao}
-                            {formData.formato === "Criação, edição e animações" && criacaoEdicaoDescricao}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            <div className="flex justify-between mt-10">
-                <button className="btn-secundario" onClick={() => { setPassoAtual(1); }}>
-                    ← Voltar
-                </button>
-                <button
-                    className="btn-primario"
-                    onClick={() => {
-                        if (!formData.tipo || !formData.formato) {
-                            alert("Por favor, selecione tanto o tipo quanto o formato de produção.");
-                            return;
-                        }
-                        if (!validarPassoAtual()) return;
-                        setPassoAtual(passo + 1);
-                    }}
-                >
-                    Continuar →
-                </button>
-            </div>
-        </>
-    );
+			<div className="flex justify-between mt-10">
+				<button
+					className="btn-secundario"
+					onClick={() => {
+						setPassoAtual(1);
+					}}
+				>
+					← Voltar
+				</button>
+				<button
+					className="btn-primario"
+					onClick={() => {
+						if (!formData.tipo || !formData.formato) {
+							alert(
+								"Por favor, selecione tanto o tipo quanto o formato de produção."
+							);
+							return;
+						}
+						if (!validarPassoAtual()) return;
+						setPassoAtual(passo + 1);
+					}}
+				>
+					Continuar →
+				</button>
+			</div>
+			<Footer />
+		</>
+	);
 }

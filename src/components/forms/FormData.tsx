@@ -1,39 +1,53 @@
 interface SolicitarFormData {
-  responsavel: string;
-  setor: string;
-  telefone: string;
-  local: string;
-  localExterno?: string;
-  data: string;
-  hora: string;
+	responsavel: string;
+	email: string;
+	setor: string;
+	telefone: string;
+	local: string;
+	localExterno?: string;
+	data: string;
+	hora: string;
 
-  tipo: string;
-  formato: string;
+	tipo: string;
+	formato: string;
 
-  titulo: string;
-  descricao: string;
+	nomeProjeto: string;
+	titulo: string;
+	descricao: string;
+	thumbnail: File | null;
+	acessibilidade: string[];
+	distribuicao: string;
 
-  pessoas: string;
-  observacoes: string;
+	dataLimite: string;
+	pessoas: string;
+	roteiro: File | null;
+	observacoes: string;
 }
 
 const initialData: SolicitarFormData = {
-  responsavel: "",
-  setor: "",
-  telefone: "",
-  local: "",
-  localExterno: "",
-  data: "",
-  hora: "",
+	responsavel: "",
+	email: "",
+	setor: "",
+	telefone: "",
+	local: "",
+	localExterno: "",
+	data: "",
+	hora: "",
 
-  tipo: "",
-  formato: "",
+	tipo: "",
+	formato: "",
 
-  titulo: "",
-  descricao: "",
+	nomeProjeto: "",
+	titulo: "",
+	descricao: "",
+	thumbnail: null,
+	acessibilidade: [],
+	distribuicao: "",
 
-  pessoas: "",
-  observacoes: "",
+	dataLimite: "",
+	pessoas: "",
+	roteiro: null,
+	observacoes: "",
 };
 
 export type { SolicitarFormData };
