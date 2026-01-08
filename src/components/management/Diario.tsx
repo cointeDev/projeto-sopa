@@ -36,7 +36,11 @@ function Diario() {
           next2Label={null}
           prev2Label={null}
           value={date}
-          onChange={setDate}
+          onChange={(value) => {
+            if (value instanceof Date) {
+              setDate(value);
+            }
+          }}
         />
         
         <div className="mt-4 flex flex-wrap justify-center gap-4">

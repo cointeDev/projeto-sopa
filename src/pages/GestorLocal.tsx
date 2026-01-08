@@ -1,11 +1,19 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { useState } from "react";
-import { CreateCardModal } from "../components/management/CreateCardModal";
-import { QuadroProduction } from "../components/management/QuadroProduction";
-import Agenda from "../components/management/Agenda";
-import Diario from "../components/management/Diario";
-import Dashboard from "../components/management/Dashboard";
+import { CreateCardModal } from "../components/Management/CreateCardModal";
+import { QuadroProduction } from "../components/Management/QuadroProduction";
+import { ManageTeamModal } from "../components/Management/ManagementTeamModal";
+import Agenda from "../components/Management/Agenda";
+import Diario from "../components/Management/Diario";
+import Dashboard from "../components/Management/Dashboard";
+import { Users } from "lucide-react"; // Ícone para o botão de equipe
+
+export interface Funcionario {
+    id: string;
+    nome: string;
+    cargo: "Editor" | "Cinegrafista" | "Designer" | "Libras" | "Gestor";
+}
 
 export interface Card {
     id: string;
@@ -32,6 +40,8 @@ export interface Card {
     equipe: number;
     arquivo?: File;
     acessibilidade: Array<string>; 
+    responsavelAtualId?: string;
+    historicoResponsaveis?: Array<{ etapa: string; funcionarioId: string; data: string }>;
 }
 
 type Aba = "dashboard" | "quadro" | "agenda" | "diario";
@@ -39,7 +49,9 @@ type Aba = "dashboard" | "quadro" | "agenda" | "diario";
 export default function GestorLocal() {
     const [abaAtual, setAbaAtual] = useState<Aba>("quadro");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isTeamModalOpen, setIsTeamModalOpen] = useState(false); // Estado para o modal de equipe
     const [cards, setCards] = useState<Array<Card>>([]);
+    const [funcionarios, setFuncionarios] = useState<Array<Funcionario>>([]); // setFuncionarios adicionado
 
     const handleCreateCard = (dadosNovoCard: Omit<Card, "id" | "etapa" | "acessibilidade">) => {
         const tagsAcessibilidade: Array<string> = [];
@@ -77,18 +89,59 @@ export default function GestorLocal() {
                             </button>
                         ))}
                     </nav>
-                    <button className="rounded-xl bg-indigo-500 px-4 py-2 text-sm font-bold hover:bg-indigo-400 transition" type="button" onClick={() => { setIsModalOpen(true); }}>+ Novo Card</button>
+                    
+                    <div className="flex items-center gap-4">
+                        {/* Botão de Gestão de Equipe */}
+                        <button 
+                            className="flex items-center gap-2 text-[#B4B9C7] hover:text-indigo-400 text-sm font-bold transition-colors"
+                            type="button"
+                            onClick={() => { setIsTeamModalOpen(true); }}
+                        >
+                            <Users size={18} />
+                            Equipe
+                        </button>
+
+                        <button 
+                            className="rounded-xl bg-indigo-500 px-4 py-2 text-sm font-bold hover:bg-indigo-400 transition" 
+                            type="button" 
+                            onClick={() => { setIsModalOpen(true); }}
+                        >
+                            + Novo Card
+                        </button>
+                    </div>
                 </header>
 
                 <div className="p-10">
                     {abaAtual === "dashboard" && <Dashboard cards={cards} />}
-                    {abaAtual === "quadro" && <QuadroProduction cards={cards} setCards={setCards} setVisaoQuadro={() => {}} visaoQuadro="geral" />}
+                    {abaAtual === "quadro" && (
+                        <QuadroProduction 
+                            cards={cards} 
+                            funcionarios={funcionarios} 
+                            setCards={setCards} 
+                            setVisaoQuadro={() => {}} 
+                            visaoQuadro="geral" 
+                        />
+                    )}
                     {abaAtual === "agenda" && <Agenda scope="geral" />}
                     {abaAtual === "diario" && <Diario />}
                 </div>
             </div>
 
-            {isModalOpen && <CreateCardModal onClose={() => { setIsModalOpen(false); }} onSave={handleCreateCard} />}
+            {/* Modais */}
+            {isModalOpen && (
+                <CreateCardModal 
+                    onClose={() => { setIsModalOpen(false); }} 
+                    onSave={handleCreateCard} 
+                />
+            )}
+
+            {isTeamModalOpen && (
+                <ManageTeamModal 
+                    funcionarios={funcionarios}
+                    setFuncionarios={setFuncionarios}
+                    onClose={() => { setIsTeamModalOpen(false); }}
+                />
+            )}
         </div>
     );
 }

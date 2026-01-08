@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Link } from "@tanstack/react-router"
 import { useState } from "react"
-import { KpiCard } from "../components/management/KpiCard"
-import Agenda from "../components/management/Agenda"
-import Diario from "../components/management/Diario"
+import { KpiCard } from "../components/Management/KpiCard"
+import Agenda from "../components/Management/Agenda"
+import Diario from "../components/Management/Diario"
 
 type Aba = "visao-geral" | "agenda-global" | "diario"
 

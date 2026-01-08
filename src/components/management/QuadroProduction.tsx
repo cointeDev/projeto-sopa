@@ -2,7 +2,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { useState } from "react";
 import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd";
-import type { Card } from "../../pages/GestorLocal";
+import { User } from "lucide-react"; 
+import type { Card, Funcionario } from "../../pages/GestorLocal";
 
 const COLUNAS = [
     "Standby", "Para Produção Semanal", "Ao Vivo", "Gravado",
@@ -12,14 +13,37 @@ const COLUNAS = [
 
 type QuadroProps = {
     visaoQuadro: "geral" | "focada";
-    setVisaoQuadro: (v: "geral" | "focada") => void;
+    setVisaoQuadro: (visao: "geral" | "focada") => void;
     cards: Array<Card>;
     setCards: React.Dispatch<React.SetStateAction<Array<Card>>>;
+    funcionarios: Array<Funcionario>; // Propriedade para receber a equipe cadastrada
 };
 
-export function QuadroProduction({ visaoQuadro, setVisaoQuadro, cards, setCards }: QuadroProps) {
+export function QuadroProduction({ visaoQuadro, setVisaoQuadro, cards, setCards, funcionarios }: QuadroProps) {
     const [colunaA, setColunaA] = useState(COLUNAS[0]);
     const [colunaB, setColunaB] = useState(COLUNAS[8]);
+
+    // Função para gerenciar a troca de responsável e gravar o histórico de etapas
+    const handleTrocaResponsavel = (cardId: string, funcionarioId: string) => {
+        setCards((previous) => previous.map((card) => {
+            if (card.id === cardId) {
+                const novoHistorico = [
+                    ...(card.historicoResponsaveis || []),
+                    { 
+                        etapa: card.etapa, 
+                        funcionarioId, 
+                        data: new Date().toISOString() 
+                    }
+                ];
+                return { 
+                    ...card, 
+                    responsavelAtualId: funcionarioId, 
+                    historicoResponsaveis: novoHistorico 
+                };
+            }
+            return card;
+        }));
+    };
 
     const onDragEnd = (result: DropResult) => {
         const { destination, source, draggableId } = result;
@@ -51,17 +75,42 @@ export function QuadroProduction({ visaoQuadro, setVisaoQuadro, cards, setCards 
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    className={`bg-[#0F111A] rounded-lg p-4 border transition-all select-none
+                    className={`bg-[#0F111A] rounded-xl p-4 border transition-all select-none
                         ${snapshot.isDragging ? "border-indigo-500 shadow-2xl bg-[#1e1e25]" : "border-white/10 hover:border-indigo-500/40"}`}
                 >
-                    <p className="text-white font-bold text-sm mb-1">{card.titulo}</p>
-                    <p className="text-[10px] text-[#B4B9C7] mb-2">{card.responsavel}</p>
-                    <div className="flex gap-1.5">
+                    <p className="text-white font-bold text-sm mb-1 leading-tight">{card.titulo}</p>
+                    <p className="text-[10px] text-[#B4B9C7] mb-3 flex items-center gap-1">
+                         <span className="opacity-50 italic">Solicitante:</span> {card.responsavel}
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-1.5 mb-4">
                         {card.acessibilidade.map((acess) => (
-                            <span key={acess} className="text-[9px] font-bold bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20">
+                            <span key={acess} className="text-[9px] font-bold bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20 uppercase">
                                 {acess}
                             </span>
                         ))}
+                    </div>
+
+                    {/* SEÇÃO DO RESPONSÁVEL: Aqui aparece a opção de alterar quem faz a tarefa */}
+                    <div className="pt-3 border-t border-white/5 space-y-2">
+                        <label className="text-[9px] uppercase font-bold text-[#B4B9C7] flex items-center gap-1">
+                            <User className="text-indigo-400" size={10} /> Atribuído a:
+                        </label>
+                        <select 
+                            value={card.responsavelAtualId || ""}
+                            className={`w-full text-[11px] p-2 rounded-lg border outline-none transition-all
+                                ${card.responsavelAtualId 
+                                    ? "bg-indigo-500/10 border-indigo-500/20 text-indigo-100" 
+                                    : "bg-[#161825] border-white/5 text-white/40"}`}
+                            onChange={(event) => { handleTrocaResponsavel(card.id, event.target.value); }}
+                        >
+                            <option value="">Nenhum responsável</option>
+                            {funcionarios.map((f) => (
+                                <option key={f.id} value={f.id}>
+                                    {f.nome} ({f.cargo})
+                                </option>
+                            ))}
+                        </select>
                     </div>
                 </div>
             )}
@@ -84,7 +133,7 @@ export function QuadroProduction({ visaoQuadro, setVisaoQuadro, cards, setCards 
                             {cards.filter((c) => c.etapa === colName).length}
                         </span>
                     </h3>
-                    <div className="space-y-3 flex-1 min-h-[150px]">
+                    <div className="space-y-3 flex-1 min-h-37.5">
                         {cards.filter((c) => c.etapa === colName).map((card, index) => renderCard(card, index))}
                         {provided.placeholder}
                     </div>
@@ -114,7 +163,7 @@ export function QuadroProduction({ visaoQuadro, setVisaoQuadro, cards, setCards 
             </div>
 
             {visaoQuadro === "geral" && (
-                <div className="flex gap-4 overflow-x-auto bg-[#0F111A] p-4 rounded-xl custom-scrollbar min-h-[600px]">
+                <div className="flex gap-4 overflow-x-auto bg-[#0F111A] p-4 rounded-xl custom-scrollbar min-h-150">
                     {COLUNAS.map((col) => renderColumn(col))}
                 </div>
             )}
