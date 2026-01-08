@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import Agenda from "../components/Management/Agenda";
+import Agenda from "../components/management/Agenda";
 
 type AbaOperacional = "tarefas" | "quadro" | "agenda";
 
