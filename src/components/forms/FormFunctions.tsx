@@ -20,13 +20,21 @@ interface FormContextType {
 		value: SolicitarFormData[K]
 	) => void;
 	validarPassoAtual: () => boolean;
+	resetForm: () => void;
 }
 
 const FormContext = createContext<FormContextType | undefined>(undefined);
 
 export function FormProvider({ children }: { children: ReactNode }) {
 	const [passo, setPasso] = useState<number>(() => {
-		return Number(localStorage.getItem("passo")) || 1;
+		const savedPasso = Number(localStorage.getItem("passo")) || 1;
+		if (savedPasso === 6) {
+			localStorage.removeItem("formData");
+			localStorage.removeItem("passo");
+			return 1;
+		}
+
+		return savedPasso;
 	});
 
 	const [formData, setFormData] = useState<SolicitarFormData>(() => {
@@ -73,16 +81,30 @@ export function FormProvider({ children }: { children: ReactNode }) {
 		return true;
 	}
 
+	function resetForm() {
+		setFormData(initialData);
+		setPasso(1);
+		localStorage.removeItem("formData");
+		localStorage.removeItem("passo");
+	}
+
 	return (
 		<FormContext.Provider
-			value={{ passo, formData, setPassoAtual, updateField, validarPassoAtual }}
+			value={{
+				passo,
+				formData,
+				setPassoAtual,
+				updateField,
+				validarPassoAtual,
+				resetForm,
+			}}
 		>
 			{children}
 		</FormContext.Provider>
 	);
 }
 
-export function useFormContext() {
+export function useFormContext(): FormContextType {
 	const context = useContext(FormContext);
 	if (!context) {
 		throw new Error("useFormContext must be used within FormProvider");
