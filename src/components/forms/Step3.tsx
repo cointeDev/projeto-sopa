@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { useFormContext } from "./FormFunctions";
+import { useFormContext } from "../../context/FormContext";
 import { Footer } from "../common/Footer";
 import { OPCOES_ACESSIBILIDADE, type Acessibilidade, type Distribuicao } from "../../common/types/solicitacao";
 

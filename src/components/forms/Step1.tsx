@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { useRef, useState } from "react";
-import { useFormContext } from "./FormFunctions";
 import { Footer } from "../common/Footer";
+import { useFormContext } from "../../context/FormContext";
 
 export default function Step1() {
 	const { formData, setPassoAtual, updateField } = useFormContext();
