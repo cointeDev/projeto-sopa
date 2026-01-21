@@ -1,30 +1,6 @@
-interface SolicitarFormData {
-	responsavel: string;
-	email: string;
-	setor: string;
-	telefone: string;
-	local: string;
-	localExterno?: string;
-	data: string;
-	hora: string;
+import type { SolicitarFormData } from "../../common/types/solicitacao";
 
-	tipo: string;
-	formato: string;
-
-	nomeProjeto: string;
-	titulo: string;
-	descricao: string;
-	thumbnail: File | null;
-	acessibilidade: string[];
-	distribuicao: string;
-
-	dataLimite: string;
-	pessoas: string;
-	roteiro: File | null;
-	observacoes: string;
-}
-
-const initialData: SolicitarFormData = {
+export const initialData: SolicitarFormData = {
 	responsavel: "",
 	email: "",
 	setor: "",
@@ -49,6 +25,3 @@ const initialData: SolicitarFormData = {
 	roteiro: null,
 	observacoes: "",
 };
-
-export type { SolicitarFormData };
-export { initialData };

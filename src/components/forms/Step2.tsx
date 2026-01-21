@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { useFormContext } from "./FormFunctions";
 import { Footer } from "../common/Footer";
+import { FORMATOS_PRODUCAO, TIPOS_PRODUCAO } from "../../common/types/solicitacao";
 
 const eventoDescricao = `Produção audiovisual de eventos realizados presencialmente, podendo ocorrer em dois contextos:
 - "In loco" (cobertura audiovisual do evento no local de realização)
@@ -57,7 +58,7 @@ export default function Step2() {
 			</h3>
 
 			<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-				{["Evento", "Institucional", "Chamada", "Videoaula", "Edição"].map(
+				{TIPOS_PRODUCAO.map(
 					(tipo, index) => (
 						<button
 							key={index}
@@ -96,16 +97,7 @@ export default function Step2() {
 			</h3>
 
 			<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-				{[
-					"Live pré-gravada",
-					"Live presencial (em estúdio)",
-					"Live remota",
-					"Podcast / Mesacast",
-					"Gravação de programa",
-					"Shorts / Reels",
-					"Animações para eventos in loco",
-					"Criação, edição e animações",
-				].map((formato, index) => (
+				{FORMATOS_PRODUCAO.map((formato, index) => (
 					<button
 						key={index}
 						className={`rounded-xl border p-4 text-white/80 transition ${

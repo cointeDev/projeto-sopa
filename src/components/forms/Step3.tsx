@@ -2,27 +2,29 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { useFormContext } from "./FormFunctions";
 import { Footer } from "../common/Footer";
+import { OPCOES_ACESSIBILIDADE, type Acessibilidade, type Distribuicao } from "../../common/types/solicitacao";
 
 export default function Step3() {
     const { passo, setPassoAtual, updateField } = useFormContext();
     const formData = useFormContext().formData;
 
-    const handleAcessibilidade = (opcao: string) => {
-        let novaLista = [...(formData.acessibilidade || [])];
+    const handleAcessibilidade = (opcao: Acessibilidade) => {
+	let novaLista = [...formData.acessibilidade];
 
-        if (opcao === "Não se aplica") {
-            novaLista = ["Não se aplica"];
-        } else {
-            novaLista = novaLista.filter((item) => item !== "Não se aplica");
+	if (opcao === "Não se aplica") {
+		novaLista = ["Não se aplica"];
+	} else {
+		novaLista = novaLista.filter(item => item !== "Não se aplica");
 
-            if (novaLista.includes(opcao)) {
-                novaLista = novaLista.filter((item) => item !== opcao);
-            } else {
-                novaLista.push(opcao);
-            }
-        }
-        updateField("acessibilidade", novaLista);
-    };
+		if (novaLista.includes(opcao)) {
+			novaLista = novaLista.filter(item => item !== opcao);
+		} else {
+			novaLista.push(opcao);
+		}
+	}
+
+	updateField("acessibilidade", novaLista);
+};
 
     return (
         <>
@@ -120,7 +122,7 @@ export default function Step3() {
                         Acessibilidade
                     </h2>
                     <div className="flex flex-wrap gap-6 pl-1.5">
-                        {["Incluir LIBRAS", "Incluir Legenda", "Não se aplica"].map(
+                        {OPCOES_ACESSIBILIDADE.map(
                             (item) => (
                                 <label
                                     key={item}
@@ -148,8 +150,10 @@ export default function Step3() {
                     <div className="relative">
                         <select
                             className="w-full bg-zinc-900/50 border border-zinc-700 text-zinc-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3.5 appearance-none cursor-pointer hover:bg-zinc-800 transition-colors"
-                            value={formData.distribuicao || ""}
-                            onChange={(event) => { updateField("distribuicao", event.target.value); }}
+                            value={formData.distribuicao}
+                            onChange={(event) => {
+                                updateField("distribuicao", event.target.value as Distribuicao);
+                            }}
                         >
                             <option disabled value="">
                                 Selecione onde será distribuído...

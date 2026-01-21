@@ -8,7 +8,7 @@ import {
 	useContext,
 	type ReactNode,
 } from "react";
-import type { SolicitarFormData } from "./FormData";
+import type{ SolicitarFormData } from "../../common/types/solicitacao";
 import { initialData } from "./FormData";
 
 interface FormContextType {

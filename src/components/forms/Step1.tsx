@@ -42,10 +42,10 @@ export default function Step1() {
 					</h2>
 					<input
 						ref={emailRef}
-						type="email"
 						className="input"
 						defaultValue={formData.email}
 						placeholder="Digite aqui o e-mail do responsável"
+						type="email"
 					/>
 				</div>
 
