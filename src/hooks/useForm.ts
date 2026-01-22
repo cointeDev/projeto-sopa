@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { SolicitarFormData } from "../common/types/solicitacao";
 import { initialData } from "../components/forms/FormData";
+import { solicitarFormSchema } from "../common/utils/schemas";
+import { toast } from "sonner";
 
 export interface UseFormReturn {
 	passo: number;
@@ -46,26 +48,90 @@ export function useForm(): UseFormReturn {
 		setFormData((previous) => ({ ...previous, [field]: value }));
 	}
 
+	function validarStep1(data: SolicitarFormData): boolean {
+		const result = solicitarFormSchema
+			.pick({
+				responsavel: true,
+				email: true,
+				setor: true,
+				telefone: true,
+				local: true,
+				localExterno: true,
+				data: true,
+				hora: true,
+			})
+			.safeParse(data);
+
+		if (!result.success) {
+			result.error.issues.forEach((issue) => {
+				toast.error(issue.message);
+			});
+			return false;
+		}
+
+		return true;
+	}
+
+	function validarStep2(data: SolicitarFormData): boolean {
+		const result = solicitarFormSchema
+			.pick({ tipo: true, formato: true })
+			.safeParse(data);
+
+		if (!result.success) {
+			result.error.issues.forEach((issue) => {
+				toast.error(issue.message);
+			});
+			return false;
+		}
+
+		return true;
+	}
+
+	function validarStep3(data: SolicitarFormData): boolean {
+		const result = solicitarFormSchema
+			.pick({
+				nomeProjeto: true,
+				titulo: true,
+				descricao: true,
+				thumbnail: true,
+				acessibilidade: true,
+				distribuicao: true,
+			})
+			.safeParse(data);
+
+		if (!result.success) {
+			result.error.issues.forEach((issue) => {
+				toast.error(issue.message);
+			});
+			return false;
+		}
+
+		return true;
+	}
+
+	function validarStep4(data: SolicitarFormData): boolean {
+		const result = solicitarFormSchema
+			.pick({
+				dataLimite: true,
+				pessoas: true,
+			})
+			.safeParse(data);
+
+		if (!result.success) {
+			result.error.issues.forEach((issue) => {
+				toast.error(issue.message);
+			});
+			return false;
+		}
+
+		return true;
+	}
+
 	function validarPassoAtual(): boolean {
-		if (passo === 1) {
-			return (
-				!!formData.responsavel &&
-				!!formData.setor &&
-				!!formData.telefone &&
-				!!formData.local &&
-				!!formData.data &&
-				!!formData.hora
-			);
-		}
-
-		if (passo === 2) {
-			return !!formData.tipo && !!formData.formato;
-		}
-
-		if (passo === 3) {
-			return !!formData.titulo && !!formData.descricao;
-		}
-
+		if (passo === 1) return validarStep1(formData);
+		if (passo === 2) return validarStep2(formData);
+		if (passo === 3) return validarStep3(formData);
+		if (passo === 4) return validarStep4(formData);
 		return true;
 	}
 

@@ -6,7 +6,7 @@ import { Footer } from "../common/Footer";
 import { useFormContext } from "../../context/FormContext";
 
 export default function Step1() {
-	const { formData, setPassoAtual, updateField } = useFormContext();
+	const { formData, setPassoAtual, updateField, validarPassoAtual } = useFormContext();
 	const [localValue, setLocalValue] = useState(formData.local);
 	const responsavelRef = useRef<HTMLInputElement>(null);
 	const emailRef = useRef<HTMLInputElement>(null);
@@ -145,53 +145,18 @@ export default function Step1() {
 				<button
 					className="btn-primario"
 					onClick={() => {
-						const errors: Array<string> = [];
+						updateField("responsavel", responsavelRef.current?.value || "");
+						updateField("email", emailRef.current?.value || "");
+						updateField("setor", setorRef.current?.value || "");
+						updateField("telefone", telefoneRef.current?.value || "");
+						updateField("local", localRef.current?.value || "");
+						updateField("localExterno", localExternoRef.current?.value || "");
+						updateField("data", dataRef.current?.value || "");
+						updateField("hora", horaRef.current?.value || "");
 
-						const emailValue = emailRef.current?.value.trim() || "";
-						const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-						if (!responsavelRef.current?.value.trim())
-							errors.push("Nome do Responsável");
-						if (!emailValue) {
-							errors.push("E-mail do Responsável");
-						} else if (!emailRegex.test(emailValue)) {
-							errors.push("E-mail com formato inválido");
-						}
-						if (!setorRef.current?.value.trim())
-							errors.push("Setor do Responsável");
-						if (
-							!telefoneRef.current?.value.trim() ||
-							telefoneRef.current?.value.replace(/\D/g, "").length !== 11
-						)
-							errors.push("Telefone do Responsável");
-						if (!localRef.current?.value) errors.push("Local de Gravação");
-						if (
-							localRef.current?.value === "Externo" &&
-							!localExternoRef.current?.value.trim()
-						) {
-							errors.push("Especificar Local de Gravação");
-						}
-						if (!dataRef.current?.value) errors.push("Data da Gravação");
-						if (!horaRef.current?.value) errors.push("Hora da Gravação");
-
-						if (errors.length > 0) {
-							alert(
-								`Por favor, preencha os seguintes campos:\n• ${errors.join("\n• ")}`
-							);
-							return;
-						}
+						if (!validarPassoAtual()) return;
 
 						setPassoAtual(2);
-						updateField("responsavel", responsavelRef.current!.value);
-						updateField("email", emailRef.current!.value);
-						updateField("setor", setorRef.current!.value);
-						updateField("telefone", telefoneRef.current!.value);
-						updateField("local", localRef.current!.value);
-						if (localRef.current?.value === "Externo") {
-							updateField("localExterno", localExternoRef.current!.value);
-						}
-						updateField("data", dataRef.current!.value);
-						updateField("hora", horaRef.current!.value);
 					}}
 				>
 					Continuar →

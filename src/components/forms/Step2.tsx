@@ -2,7 +2,10 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { useFormContext } from "../../context/FormContext";
 import { Footer } from "../common/Footer";
-import { FORMATOS_PRODUCAO, TIPOS_PRODUCAO } from "../../common/types/solicitacao";
+import {
+	FORMATOS_PRODUCAO,
+	TIPOS_PRODUCAO,
+} from "../../common/types/solicitacao";
 
 const eventoDescricao = `Produção audiovisual de eventos realizados presencialmente, podendo ocorrer em dois contextos:
 - "In loco" (cobertura audiovisual do evento no local de realização)
@@ -58,23 +61,21 @@ export default function Step2() {
 			</h3>
 
 			<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-				{TIPOS_PRODUCAO.map(
-					(tipo, index) => (
-						<button
-							key={index}
-							className={`rounded-xl border p-4 text-white/80 transition ${
-								tipo === formData.tipo
-									? "border-indigo-400 bg-indigo-500/10"
-									: "border-white/10 hover:border-indigo-400 hover:bg-indigo-500/10"
-							}`}
-							onClick={() => {
-								updateField("tipo", tipo);
-							}}
-						>
-							<strong>{tipo}</strong>
-						</button>
-					)
-				)}
+				{TIPOS_PRODUCAO.map((tipo, index) => (
+					<button
+						key={index}
+						className={`rounded-xl border p-4 text-white/80 transition ${
+							tipo === formData.tipo
+								? "border-indigo-400 bg-indigo-500/10"
+								: "border-white/10 hover:border-indigo-400 hover:bg-indigo-500/10"
+						}`}
+						onClick={() => {
+							updateField("tipo", tipo);
+						}}
+					>
+						<strong>{tipo}</strong>
+					</button>
+				))}
 			</div>
 
 			{formData.tipo && (
@@ -149,12 +150,6 @@ export default function Step2() {
 				<button
 					className="btn-primario"
 					onClick={() => {
-						if (!formData.tipo || !formData.formato) {
-							alert(
-								"Por favor, selecione tanto o tipo quanto o formato de produção."
-							);
-							return;
-						}
 						if (!validarPassoAtual()) return;
 						setPassoAtual(passo + 1);
 					}}
