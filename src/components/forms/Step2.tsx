@@ -7,9 +7,11 @@ import {
 	TIPOS_PRODUCAO,
 } from "../../common/types/solicitacao";
 
-const eventoDescricao = `Produção audiovisual de eventos realizados presencialmente, podendo ocorrer em dois contextos:
-- "In loco" (cobertura audiovisual do evento no local de realização)
-- "Em estúdio" (gravação de eventos institucionais ou acadêmicos nas dependências do estúdio).`;
+import { FORMATOS_POR_TIPO } from "../../common/rules/formatosPorTipo";
+
+const eventoInLocoDescricao = `Cobertura audiovisual do evento no local de realização, incluindo captação de imagens e utilização de animações e sonorização para material visual de apoio;`;
+
+const eventoEmEstudioDescricao = `Gravação de eventos institucionais ou acadêmicos, como aulas inaugurais, ciclos de palestras ou atividades similares, realizados nas dependências do estúdio.`;
 
 const institucionalDescricao = `Produção audiovisual realizada em estúdio ou em ambiente controlado, geralmente com múltiplos participantes, voltada à comunicação institucional e à divulgação oficial de ações, projetos ou atividades da instituição.`;
 
@@ -54,6 +56,10 @@ export default function Step2() {
 		useFormContext();
 	const formData = useFormContext().formData;
 
+	const formatosPermitidos = formData.tipo
+		? FORMATOS_POR_TIPO[formData.tipo]
+		: [];
+
 	return (
 		<>
 			<h3 className="text-2xl font-extrabold text-white mb-10">
@@ -71,6 +77,7 @@ export default function Step2() {
 						}`}
 						onClick={() => {
 							updateField("tipo", tipo);
+							updateField("formato", null);
 						}}
 					>
 						<strong>{tipo}</strong>
@@ -83,10 +90,13 @@ export default function Step2() {
 					<div className="p-6">
 						<h4 className="text-white font-semibold mb-3">{formData.tipo}</h4>
 						<div className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
-							{formData.tipo === "Evento" && eventoDescricao}
-							{formData.tipo === "Institucional" && institucionalDescricao}
-							{formData.tipo === "Chamada" && chamadaDescricao}
-							{formData.tipo === "Videoaula" && videoaulaDescricao}
+							{formData.tipo === "Evento in loco" && eventoInLocoDescricao}
+							{formData.tipo === "Evento em estúdio" &&
+								eventoEmEstudioDescricao}
+							{formData.tipo === "Vídeo institucional" &&
+								institucionalDescricao}
+							{formData.tipo === "Gravação de chamada" && chamadaDescricao}
+							{formData.tipo === "Gravação de videoaula" && videoaulaDescricao}
 							{formData.tipo === "Edição" && edicaoDescricao}
 						</div>
 					</div>
@@ -98,21 +108,32 @@ export default function Step2() {
 			</h3>
 
 			<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-				{FORMATOS_PRODUCAO.map((formato, index) => (
-					<button
-						key={index}
-						className={`rounded-xl border p-4 text-white/80 transition ${
-							formato === formData.formato
-								? "border-indigo-400 bg-indigo-500/10"
-								: "border-white/10 hover:border-indigo-400 hover:bg-indigo-500/10"
-						}`}
-						onClick={() => {
-							updateField("formato", formato);
-						}}
-					>
-						<strong>{formato}</strong>
-					</button>
-				))}
+				{FORMATOS_PRODUCAO.map((formato, index) => {
+					const habilitado =
+						!formData.tipo || formatosPermitidos.includes(formato);
+
+					return (
+						<button
+							key={index}
+							disabled={!habilitado}
+							className={`rounded-xl border p-4 transition
+					${
+						formato === formData.formato
+							? "border-indigo-400 bg-indigo-500/10 text-white"
+							: habilitado
+								? "border-white/10 text-white/80 hover:border-indigo-400 hover:bg-indigo-500/10"
+								: "border-white/5 text-white/30 cursor-not-allowed"
+					}
+				`}
+							onClick={() => {
+								if (!habilitado) return;
+								updateField("formato", formato);
+							}}
+						>
+							<strong>{formato}</strong>
+						</button>
+					);
+				})}
 			</div>
 
 			{formData.formato && (

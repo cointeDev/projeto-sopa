@@ -9,7 +9,8 @@ import {
 } from "../../common/types/solicitacao";
 
 export default function Step3() {
-	const { passo, setPassoAtual, updateField, validarPassoAtual } = useFormContext();
+	const { passo, setPassoAtual, updateField, validarPassoAtual } =
+		useFormContext();
 	const formData = useFormContext().formData;
 
 	const handleAcessibilidade = (opcao: Acessibilidade) => {
