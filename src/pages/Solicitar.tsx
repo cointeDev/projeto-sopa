@@ -8,7 +8,8 @@ import Step3 from "../components/forms/Step3";
 import Step4 from "../components/forms/Step4";
 import Step5 from "../components/forms/Step5";
 import Step6 from "../components/forms/Step6";
-import { FormProvider, useFormContext } from "../components/forms/FormFunctions";
+import { useFormContext } from "../context/FormContext";
+import { FormProvider } from "../components/forms/FormProvider";
 
 const steps = [
   "Informações",

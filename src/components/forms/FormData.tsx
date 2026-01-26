@@ -1,40 +1,27 @@
-interface SolicitarFormData {
-  responsavel: string;
-  setor: string;
-  telefone: string;
-  local: string;
-  localExterno?: string;
-  data: string;
-  hora: string;
+import type { SolicitarFormData } from "../../common/types/solicitacao";
 
-  tipo: string;
-  formato: string;
+export const initialData: SolicitarFormData = {
+	responsavel: "",
+	email: "",
+	setor: "",
+	telefone: "",
+	local: "",
+	localExterno: "",
+	data: "",
+	hora: "",
 
-  titulo: string;
-  descricao: string;
+	tipo: "",
+	formato: "",
 
-  pessoas: string;
-  observacoes: string;
-}
+	nomeProjeto: "",
+	titulo: "",
+	descricao: "",
+	thumbnail: null,
+	acessibilidade: [],
+	distribuicao: "",
 
-const initialData: SolicitarFormData = {
-  responsavel: "",
-  setor: "",
-  telefone: "",
-  local: "",
-  localExterno: "",
-  data: "",
-  hora: "",
-
-  tipo: "",
-  formato: "",
-
-  titulo: "",
-  descricao: "",
-
-  pessoas: "",
-  observacoes: "",
+	dataLimite: "",
+	pessoas: "",
+	roteiro: null,
+	observacoes: "",
 };
-
-export type { SolicitarFormData };
-export { initialData };
