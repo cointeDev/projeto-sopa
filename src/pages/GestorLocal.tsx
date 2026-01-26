@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Users } from "lucide-react";
 
-// Imports padronizados em letras minúsculas para a pasta management
 import { CreateCardModal } from "../components/management/CreateCardModal";
 import { QuadroProduction } from "../components/management/QuadroProduction";
 import { ManageTeamModal } from "../components/management/ManageTeamModal";
@@ -19,7 +18,7 @@ export interface Funcionario {
 
 export interface Card {
     id: string;
-    etapa: string;
+    etapa: string; 
     titulo: string;
     responsavel: string;
     acessibilidade: Array<string>;
@@ -80,6 +79,7 @@ export default function GestorLocal() {
                     <div className="flex gap-4">
                         <button 
                             className="flex items-center gap-2 text-[#B4B9C7] hover:text-indigo-400 text-sm font-bold transition"
+                            type="button"
                             onClick={() => { setIsTeamModalOpen(true); }}
                         >
                             <Users size={18} /> Equipe
@@ -87,6 +87,7 @@ export default function GestorLocal() {
                         
                         <button 
                             className="rounded-xl bg-indigo-500 px-4 py-2 text-sm font-bold hover:bg-indigo-400 transition" 
+                            type="button"
                             onClick={() => { setIsModalOpen(true); }}
                         >
                             + Novo Card
@@ -94,7 +95,7 @@ export default function GestorLocal() {
                     </div>
                 </header>
 
-                <div className="p-10">
+                <main className="p-10">
                     {abaAtual === "dashboard" && <Dashboard cards={cards} />}
                     
                     {abaAtual === "quadro" && (
@@ -109,7 +110,7 @@ export default function GestorLocal() {
                     
                     {abaAtual === "agenda" && <Agenda scope="geral" />}
                     {abaAtual === "diario" && <Diario />}
-                </div>
+                </main>
             </div>
 
             {isModalOpen && (
