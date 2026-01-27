@@ -11,6 +11,7 @@ export interface FormContextType {
 	) => void;
 	validarPassoAtual: () => boolean;
 	resetForm: () => void;
+	getMaxPessoasPorFormato: () => number;
 }
 
 export const FormContext = createContext<FormContextType | undefined>(

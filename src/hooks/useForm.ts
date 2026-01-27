@@ -3,6 +3,7 @@ import type { SolicitarFormData } from "../common/types/solicitacao";
 import { initialData } from "../components/forms/FormData";
 import { solicitarFormSchema } from "../common/utils/schemas";
 import { toast } from "sonner";
+import { FORMATOS_POR_TIPO } from "../common/rules/formatosPorTipo";
 
 export interface UseFormReturn {
 	passo: number;
@@ -14,6 +15,7 @@ export interface UseFormReturn {
 	) => void;
 	validarPassoAtual: () => boolean;
 	resetForm: () => void;
+	getMaxPessoasPorFormato: () => number;
 }
 
 export function useForm(): UseFormReturn {
@@ -84,6 +86,18 @@ export function useForm(): UseFormReturn {
 			return false;
 		}
 
+		if (!data.tipo || !data.formato) {
+			toast.error("Selecione o tipo e o formato de produção.");
+			return false;
+		}
+
+		const formatosValidos = FORMATOS_POR_TIPO[data.tipo] ?? [];
+
+		if (!formatosValidos.includes(data.formato)) {
+			toast.error("Formato inválido para o tipo de produção selecionado.");
+			return false;
+		}
+
 		return true;
 	}
 
@@ -142,6 +156,21 @@ export function useForm(): UseFormReturn {
 		localStorage.removeItem("passo");
 	}
 
+	function getMaxPessoasPorFormato(): number {
+		switch (formData.formato) {
+			case "Live remota":
+				return 8;
+
+			case "Live presencial (em estúdio)":
+			case "Podcast / Mesacast":
+			case "Gravação de programa":
+				return 4;
+
+			default:
+				return 4;
+		}
+	}
+
 	return {
 		passo,
 		formData,
@@ -149,5 +178,6 @@ export function useForm(): UseFormReturn {
 		updateField,
 		validarPassoAtual,
 		resetForm,
+		getMaxPessoasPorFormato,
 	};
 }

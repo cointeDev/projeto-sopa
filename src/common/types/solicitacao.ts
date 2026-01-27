@@ -1,8 +1,9 @@
 export type TipoProducao =
-	| "Evento"
-	| "Institucional"
-	| "Chamada"
-	| "Videoaula"
+	| "Evento in loco"
+	| "Evento em estúdio"
+	| "Vídeo institucional"
+	| "Gravação de chamada"
+	| "Gravação de videoaula"
 	| "Edição";
 
 export type FormatoProducao =
@@ -20,12 +21,7 @@ export type Acessibilidade =
 	| "Incluir Legenda"
 	| "Não se aplica";
 
-export type Distribuicao =
-	| "interna"
-	| "seec"
-	| "instagram"
-	| "outro";
-
+export type Distribuicao = "interna" | "seec" | "instagram" | "outro";
 
 export interface SolicitarFormData {
 	// STEP 1
@@ -38,11 +34,11 @@ export interface SolicitarFormData {
 	data: string;
 	hora: string;
 
-	// STEP 2 
+	// STEP 2
 	tipo: TipoProducao | "";
 	formato: FormatoProducao | "";
 
-	// STEP 3 
+	// STEP 3
 	nomeProjeto: string;
 	titulo: string;
 	descricao: string;
@@ -50,22 +46,21 @@ export interface SolicitarFormData {
 	acessibilidade: Array<Acessibilidade>;
 	distribuicao: Distribuicao | "";
 
-	// STEP 4 
+	// STEP 4
 	dataLimite: string;
 	pessoas: string;
 	roteiro: File | null;
 	observacoes: string;
 }
 
-
 export const TIPOS_PRODUCAO: Array<TipoProducao> = [
-	"Evento",
-	"Institucional",
-	"Chamada",
-	"Videoaula",
+	"Evento in loco",
+	"Evento em estúdio",
+	"Vídeo institucional",
+	"Gravação de chamada",
+	"Gravação de videoaula",
 	"Edição",
 ];
-
 
 export const FORMATOS_PRODUCAO: Array<FormatoProducao> = [
 	"Live pré-gravada",
