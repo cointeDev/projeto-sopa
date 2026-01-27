@@ -10,20 +10,28 @@ import Agenda from "../components/management/Agenda";
 import Diario from "../components/management/Diario";
 import Dashboard from "../components/management/Dashboard";
 
-export interface Funcionario {
-    id: string;
-    nome: string;
-    cargo: "Editor" | "Cinegrafista" | "Designer" | "Libras" | "Gestor";
-}
-
+// Interfaces exportadas para que o QuadroProduction as reconheça
 export interface Card {
     id: string;
     etapa: string; 
     titulo: string;
     responsavel: string;
     acessibilidade: Array<string>;
+    projeto?: string;
+    tipoProducao?: string;
+    dataGravacao?: string;
+    libras?: boolean;
+    legendas?: boolean;
+    duracaoMinutos?: number;
+    localGravacao?: string;
     responsavelAtualId?: string;
     historicoResponsaveis?: Array<{ etapa: string; funcionarioId: string; data: string }>;
+}
+
+export interface Funcionario {
+    id: string;
+    nome: string;
+    cargo: "Editor" | "Cinegrafista" | "Designer" | "Libras" | "Gestor";
 }
 
 type Aba = "dashboard" | "quadro" | "agenda" | "diario";
@@ -37,23 +45,24 @@ export default function GestorLocal() {
     const [funcionarios, setFuncionarios] = useState<Array<Funcionario>>([]);
     const [visaoQuadro, setVisaoQuadro] = useState<"geral" | "focada">("geral");
 
+    // Tipagem explícita para o parâmetro para satisfazer o ESLint
     const handleCreateCard = (dadosNovoCard: Omit<Card, "id" | "etapa" | "acessibilidade">) => {
         const novoCard: Card = {
             ...dadosNovoCard,
             id: Math.random().toString(36).substring(2, 9),
             etapa: "Standby",
-            acessibilidade: [] 
+            acessibilidade: []
         };
         
-        setCards((previous) => [...previous, novoCard]);
+        setCards((previous: Array<Card>) => [...previous, novoCard]);
         setIsModalOpen(false);
     };
 
     return (
-        <div className="min-h-screen bg-[#0F111A] px-6 py-10 font-inter text-white">
-            <div className="max-w-7xl mx-auto bg-[#161825] rounded-2xl shadow-2xl overflow-hidden border border-white/5">
+        <div className="min-h-screen bg-[#0F111A] px-4 py-6 font-inter text-white">
+            <div className="w-full bg-[#161825] rounded-2xl shadow-2xl overflow-hidden border border-white/5 flex flex-col h-[92vh]">
                 
-                <header className="flex items-center justify-between border-b border-white/10 px-10 py-6">
+                <header className="flex items-center justify-between border-b border-white/10 px-8 py-4">
                     <nav className="flex gap-8">
                         {[
                             { key: "dashboard", label: "Dashboard" },
@@ -95,9 +104,8 @@ export default function GestorLocal() {
                     </div>
                 </header>
 
-                <main className="p-10">
+                <main className="p-6 flex-1 overflow-hidden">
                     {abaAtual === "dashboard" && <Dashboard cards={cards} />}
-                    
                     {abaAtual === "quadro" && (
                         <QuadroProduction 
                             cards={cards} 
@@ -107,7 +115,6 @@ export default function GestorLocal() {
                             visaoQuadro={visaoQuadro}
                         />
                     )}
-                    
                     {abaAtual === "agenda" && <Agenda scope="geral" />}
                     {abaAtual === "diario" && <Diario />}
                 </main>

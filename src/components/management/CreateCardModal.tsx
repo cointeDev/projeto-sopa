@@ -5,7 +5,8 @@ import type { Card } from "../../pages/GestorLocal";
 
 interface ModalProps {
     onClose: () => void;
-    onSave: (dadosNovoCard: Omit<Card, "id" | "etapa" | "acessibilidade">) => void; 
+    // Tipagem atualizada para aceitar os campos opcionais da barra
+    onSave: (dadosNovoCard: Omit<Card, "id" | "etapa">) => void; 
 }
 
 export function CreateCardModal({ onClose, onSave }: ModalProps) {
@@ -19,28 +20,20 @@ export function CreateCardModal({ onClose, onSave }: ModalProps) {
     const localSel = formData.get("localGravacao") as string;
     const localFinal = localSel === "Externo" ? (formData.get("localExterno") as string) : localSel;
 
-    const dadosNovoCard = {
+    // Criando o objeto com as chaves que a barra do QuadroProduction espera
+    const dadosNovoCard: Omit<Card, "id" | "etapa"> = {
       titulo: formData.get("titulo") as string,
       responsavel: formData.get("responsavel") as string,
-      email: formData.get("email") as string,
-      setor: formData.get("setor") as string,
-      telefone: formData.get("telefone") as string,
-      localGravacao: localFinal,
-      dataGravacao: formData.get("dataGravacao") as string,
-      horaGravacao: formData.get("horaGravacao") as string,
-      limiteEntrega: formData.get("limiteEntrega") as string,
-      tipoProducao: tipoProduction,
-      formatoEspecifico: formData.get("formatoEspecifico") as string,
-      
       projeto: formData.get("projeto") as string,
-      disciplina: formData.get("disciplina") as string,
-      duracaoMinutos: Number(formData.get("duracaoMinutos")),
-      isAoVivo: tipoProduction.toLowerCase().includes("live") || (formData.get("formatoEspecifico") as string).toLowerCase().includes("live"),
-      
+      tipoProducao: tipoProduction,
+      dataGravacao: formData.get("dataGravacao") as string,
       libras: formData.get("libras") === "on",
       legendas: formData.get("legendas") === "on",
-      descricao: formData.get("descricao") as string,
-      equipe: Number(formData.get("equipe")),
+      
+      // Campos adicionais do formulário
+      localGravacao: localFinal,
+      duracaoMinutos: Number(formData.get("duracaoMinutos")),
+      acessibilidade: [] // Inicializa vazio; os selos usam os booleanos acima
     };
 
     onSave(dadosNovoCard);
@@ -64,14 +57,14 @@ export function CreateCardModal({ onClose, onSave }: ModalProps) {
         </header>
 
         <form className="space-y-8" onSubmit={handleSubmit}>
-          {/* Seção 1: Identificação e Projeto (Step 3 e Contexto) */}
+          {/* Seção 1: Identificação do Conteúdo */}
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2">
               <span className="w-2 h-2 bg-indigo-500 rounded-full"></span> Identificação do Conteúdo
             </h3>
             <div className="gap-4 grid grid-cols-1 md:grid-cols-4">
               <div className="md:col-span-4">
-                <label className="block font-bold mb-2 text-[#B4B9C7] text-xs uppercase">Título do Vídeo (Step 3)</label>
+                <label className="block font-bold mb-2 text-[#B4B9C7] text-xs uppercase">Título do Vídeo</label>
                 <input required className="bg-[#0F111A] border border-white/10 focus:border-indigo-500 outline-none px-4 py-3 rounded-lg text-white w-full transition-all" name="titulo" placeholder="Ex: Aula 01 - Revolução Industrial" />
               </div>
               <div className="md:col-span-2">
@@ -85,10 +78,10 @@ export function CreateCardModal({ onClose, onSave }: ModalProps) {
             </div>
           </div>
 
-          {/* Seção 2: Responsável (Step 1) */}
+          {/* Seção 2: Solicitante */}
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2">
-              <span className="w-2 h-2 bg-indigo-500 rounded-full"></span> Solicitante (Step 1)
+              <span className="w-2 h-2 bg-indigo-500 rounded-full"></span> Solicitante
             </h3>
             <div className="gap-4 grid grid-cols-1 md:grid-cols-3">
               <div>
@@ -106,10 +99,10 @@ export function CreateCardModal({ onClose, onSave }: ModalProps) {
             </div>
           </div>
 
-          {/* Seção 3: Tipo e Formato (Step 2) */}
+          {/* Seção 3: Tipo e Formato */}
           <div className="bg-white/5 border border-white/10 p-6 rounded-2xl space-y-6">
             <h3 className="text-sm font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2">
-              <span className="w-2 h-2 bg-indigo-500 rounded-full"></span> Definição de Produção (Step 2)
+              <span className="w-2 h-2 bg-indigo-500 rounded-full"></span> Definição de Produção
             </h3>
             <div className="gap-6 grid grid-cols-1 md:grid-cols-3">
               <div>
@@ -142,13 +135,13 @@ export function CreateCardModal({ onClose, onSave }: ModalProps) {
             </div>
           </div>
 
-          {/* Seção 4: Local, Datas e Equipe (Step 1 e 4) */}
+          {/* Seção 4: Local, Datas e Equipe */}
           <div className="gap-6 grid grid-cols-1 md:grid-cols-4">
             <div>
               <label className="block font-bold mb-2 text-[#B4B9C7] text-xs uppercase">Estúdio / Polo</label>
               <select 
                 required 
-                className="bg-[#0F111A] border border-white/10 px-4 py-3 rounded-lg text-white w-full outline-none focus:border-indigo-500" 
+                className="bg-[#0F111A] border border-white/10 px-4 py-3 rounded-lg text-white w-full outline-none focus:border-indigo-500"
                 name="localGravacao"
                 onChange={(event) => {
                   setMostrarExterno(event.target.value === "Externo");
@@ -168,7 +161,7 @@ export function CreateCardModal({ onClose, onSave }: ModalProps) {
                 <input required className="bg-[#0F111A] border border-white/10 px-4 py-3 rounded-lg text-white w-full" name="localExterno" placeholder="Local externo" />
               </div>
             )}
-            <div className={mostrarExterno ? "md:col-span-1" : "md:col-span-1"}>
+            <div>
               <label className="block font-bold mb-2 text-[#B4B9C7] text-xs uppercase">Data Gravação</label>
               <input required className="bg-[#0F111A] border border-white/10 px-4 py-3 rounded-lg text-white w-full" name="dataGravacao" type="date" />
             </div>
@@ -182,7 +175,7 @@ export function CreateCardModal({ onClose, onSave }: ModalProps) {
             </div>
           </div>
 
-          {/* Seção 5: Descrição e Acessibilidade (Step 3 e 4) */}
+          {/* Seção 5: Descrição e Acessibilidade */}
           <div className="gap-6 grid grid-cols-1 md:grid-cols-3">
             <div className="md:col-span-2">
               <label className="block font-bold mb-2 text-[#B4B9C7] text-xs uppercase">Descrição e Observações</label>

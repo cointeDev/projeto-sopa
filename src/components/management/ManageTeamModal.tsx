@@ -38,7 +38,7 @@ export function ManageTeamModal({ onClose, funcionarios, setFuncionarios }: Mana
                 <header className="p-6 border-b border-white/10 flex justify-between items-center">
                     <div className="flex flex-col">
                         <h2 className="font-black text-xl text-indigo-400 uppercase tracking-tight flex items-center gap-2">
-                            <UserPlus size={20} /> Gestão de Equipa
+                            <UserPlus size={20} /> Gestão de Equipe
                         </h2>
                         <p className="text-[10px] text-[#B4B9C7] uppercase mt-1">Cadastro de profissionais para atribuição de tarefas</p>
                     </div>
