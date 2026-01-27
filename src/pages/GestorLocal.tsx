@@ -10,7 +10,6 @@ import Agenda from "../components/management/Agenda";
 import Diario from "../components/management/Diario";
 import Dashboard from "../components/management/Dashboard";
 
-// Interfaces exportadas para que o QuadroProduction as reconheça
 export interface Card {
     id: string;
     etapa: string; 
@@ -43,15 +42,16 @@ export default function GestorLocal() {
     
     const [cards, setCards] = useState<Array<Card>>([]);
     const [funcionarios, setFuncionarios] = useState<Array<Funcionario>>([]);
+    
+    // Estado central da visão do quadro
     const [visaoQuadro, setVisaoQuadro] = useState<"geral" | "focada">("geral");
 
-    // Tipagem explícita para o parâmetro para satisfazer o ESLint
-    const handleCreateCard = (dadosNovoCard: Omit<Card, "id" | "etapa" | "acessibilidade">) => {
+    const handleCreateCard = (dadosNovoCard: Omit<Card, "id" | "etapa">) => {
         const novoCard: Card = {
             ...dadosNovoCard,
             id: Math.random().toString(36).substring(2, 9),
             etapa: "Standby",
-            acessibilidade: []
+            acessibilidade: dadosNovoCard.acessibilidade || []
         };
         
         setCards((previous: Array<Card>) => [...previous, novoCard]);
@@ -104,8 +104,9 @@ export default function GestorLocal() {
                     </div>
                 </header>
 
-                <main className="p-6 flex-1 overflow-hidden">
+               <main className={`flex-1 ${abaAtual === "quadro" ? "overflow-hidden" : "overflow-y-auto"} p-6 custom-scrollbar`}>
                     {abaAtual === "dashboard" && <Dashboard cards={cards} />}
+                    
                     {abaAtual === "quadro" && (
                         <QuadroProduction 
                             cards={cards} 
@@ -115,25 +116,14 @@ export default function GestorLocal() {
                             visaoQuadro={visaoQuadro}
                         />
                     )}
+                    
                     {abaAtual === "agenda" && <Agenda scope="geral" />}
                     {abaAtual === "diario" && <Diario />}
                 </main>
             </div>
 
-            {isModalOpen && (
-                <CreateCardModal 
-                    onClose={() => { setIsModalOpen(false); }} 
-                    onSave={handleCreateCard} 
-                />
-            )}
-
-            {isTeamModalOpen && (
-                <ManageTeamModal 
-                    funcionarios={funcionarios}
-                    setFuncionarios={setFuncionarios}
-                    onClose={() => { setIsTeamModalOpen(false); }}
-                />
-            )}
+            {isModalOpen && <CreateCardModal onClose={() => { setIsModalOpen(false); }} onSave={handleCreateCard} />}
+            {isTeamModalOpen && <ManageTeamModal funcionarios={funcionarios} setFuncionarios={setFuncionarios} onClose={() => { setIsTeamModalOpen(false); }} />}
         </div>
     );
 }

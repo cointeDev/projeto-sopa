@@ -110,7 +110,7 @@ export default function Dashboard({ cards }: DashboardProps) {
                         <p className="text-xs text-[#B4B9C7] uppercase font-bold mt-1 tracking-widest">Volume de cards no filtro atual</p>
                     </div>
                     
-                    <div className="h-[320px] w-full">
+                    <div className="h-80 w-full">
                         <ResponsiveContainer height="100%" width="100%">
                             <BarChart data={dataGraficoBarras}>
                                 <CartesianGrid stroke="#ffffff05" strokeDasharray="3 3" vertical={false} />
