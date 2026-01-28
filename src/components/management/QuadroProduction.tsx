@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { useState } from "react";
 import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd";
-import { User, Calendar, Folder, FileVideo, LayoutDashboard, Columns } from "lucide-react";
+import { User, Calendar, Folder, FileVideo, LayoutDashboard, Columns, Cpu, Radio, UserCheck, FileText } from "lucide-react"; 
 import type { Card, Funcionario } from "../../pages/GestorLocal";
 
 const COLUNAS = [
@@ -29,7 +29,6 @@ export function QuadroProduction({ visaoQuadro, setVisaoQuadro, cards, setCards,
             const target = document.getElementById(`scroll-target-${colName}`);
             
             if (container && target) {
-                // Scroll horizontal puro: trava o eixo Y
                 const targetScrollPos = target.offsetLeft - container.offsetLeft - 24;
                 container.scrollTo({
                     left: targetScrollPos,
@@ -83,14 +82,22 @@ export function QuadroProduction({ visaoQuadro, setVisaoQuadro, cards, setCards,
                     {...provided.dragHandleProps}
                 >
                     <p className="text-white font-bold text-base mb-1 leading-tight">{card.titulo}</p>
-                    <p className="text-sm text-[#B4B9C7] mb-4 italic font-medium">Solicitante: {card.responsavel}</p>
+                    <p className="text-sm text-[#B4B9C7] mb-3 italic font-medium">Solicitante: {card.responsavel}</p>
+
+                    {/* Correção para exibir a descrição sem erro de tipagem */}
+                    {card.descricao && (
+                        <div className="mb-4 flex gap-2 items-start text-[#B4B9C7]/60 text-xs italic line-clamp-2">
+                            <FileText className="shrink-0 mt-0.5" size={12} />
+                            <p>{card.descricao}</p>
+                        </div>
+                    )}
 
                     <div className="pt-4 border-t border-white/5 space-y-3">
                         <label className="text-xs uppercase font-black text-[#B4B9C7] flex items-center gap-2">
                             <User className="text-indigo-400" size={14} /> Atribuído a:
                         </label>
                         <select
-                            className="w-full text-sm p-3 rounded-lg bg-[#161825] border border-white/10 text-white outline-none focus:border-indigo-500 transition-colors"
+                            className="w-full text-sm p-3 rounded-lg bg-[#161825] border border-white/10 text-white outline-none focus:border-indigo-500"
                             value={card.responsavelAtualId || ""}
                             onChange={(event) => { handleTrocaResponsavel(card.id, event.target.value); }}
                         >
@@ -159,9 +166,9 @@ export function QuadroProduction({ visaoQuadro, setVisaoQuadro, cards, setCards,
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
-            <div className="flex flex-col h-full">
+            {/* O uso de w-full e overflow-x-hidden aqui trava o scroll horizontal do container pai */}
+            <div className="flex flex-col h-full w-full overflow-x-hidden relative">
                 
-                {/* 2ª APPBAR FIXA: Workflow + Seletor + Jump Menu */}
                 <div className="sticky top-0 z-40 bg-[#161825] pt-2 pb-4">
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex flex-col gap-1">
@@ -202,10 +209,10 @@ export function QuadroProduction({ visaoQuadro, setVisaoQuadro, cards, setCards,
                     </nav>
                 </div>
 
-                {/* ÁREA SCROLLABLE */}
-                <div className="flex-1 mt-4">
+                <div className="flex-1 mt-4 overflow-hidden">
                     {visaoQuadro === "geral" ? (
-                        <div className="flex gap-6 overflow-x-auto pb-6 custom-scrollbar h-full items-start scroll-smooth" id="columns-container">
+                        /* Somente este container possui overflow-x-auto, permitindo o scroll das listas sem mover a tela toda */
+                        <div className="flex gap-6 overflow-x-auto pb-12 pr-32 custom-scrollbar h-full items-start scroll-smooth w-full" id="columns-container">
                             {COLUNAS.map((col: string) => renderColumn(col, "", false))}
                         </div>
                     ) : (
@@ -231,6 +238,35 @@ export function QuadroProduction({ visaoQuadro, setVisaoQuadro, cards, setCards,
                         </div>
                     )}
                 </div>
+
+                <footer className="sticky bottom-0 z-40 h-10 border-t border-white/10 bg-[#0F111A] px-8 flex items-center justify-between shrink-0">
+                    <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-3">
+                            <div className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                            </div>
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-500">Estúdio RIEH Online</span>
+                        </div>
+                        <div className="h-3 w-px bg-white/10"></div>
+                        <div className="flex items-center gap-2 text-[#B4B9C7]">
+                            <UserCheck className="text-indigo-400" size={12} />
+                            <span className="text-[9px] font-bold uppercase tracking-widest">Sessão: Gestor Local</span>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-2 px-2 py-0.5 bg-white/5 rounded border border-white/5">
+                            <Cpu className="text-indigo-400" size={10} />
+                            <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">SOPA v1.0.4</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Radio className="text-indigo-400" size={10} />
+                            <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em]">SEEC / RN</span>
+                        </div>
+                    </div>
+                </footer>
+
             </div>
         </DragDropContext>
     );
