@@ -17,19 +17,22 @@ export interface Card {
     titulo: string;
     responsavel: string;
     emailSolicitante?: string; 
+    telefoneSolicitante?: string; // Adicionado do Step 1
     setor?: string;           
     projeto?: string;
     tipoProducao?: string;
     formato?: string;         
     localGravacao?: string;
+    localExterno?: string; // Adicionado do Step 1
     dataGravacao?: string;
+    horaGravacao?: string;    
     duracaoMinutos?: number;
     acessibilidade: Array<string>; 
-    libras?: boolean; // Adicionado para resolver Erro TS2353
-    legendas?: boolean; // Adicionado para resolver Erro TS2353
+    libras?: boolean; 
+    legendas?: boolean; 
     distribuicao?: string;    
     dataLimite?: string;      
-    pessoasEmCena?: number;    
+    pessoasEmCena?: number;   
     descricao?: string; 
     observacoes?: string;     
     responsavelAtualId?: string;
@@ -59,31 +62,7 @@ export default function GestorLocal() {
     const [funcionarios, setFuncionarios] = useState<Array<Funcionario>>([]);
     const [visaoQuadro, setVisaoQuadro] = useState<"geral" | "focada">("geral");
     
-    const [solicitacoes, setSolicitacoes] = useState<Array<Solicitacao>>([
-        {
-            id: "sol-882",
-            token: "SOPA-2026-X91",
-            titulo: "Entrevista: Desafios da Inovação",
-            responsavel: "Marcos Silva",
-            emailSolicitante: "marcos@seec.rn.gov.br",
-            setor: "COINTE",
-            projeto: "Inova RN",
-            tipoProducao: "Vídeo institucional",
-            formato: "Gravação de programa",
-            localGravacao: "Natal",
-            dataGravacao: "2026-02-10",
-            duracaoMinutos: 30,
-            acessibilidade: ["LIBRAS", "Legendas"],
-            libras: true,
-            legendas: true,
-            distribuicao: "seec",
-            dataLimite: "2026-02-20",
-            pessoasEmCena: 2,
-            descricao: "Entrevista com o secretário sobre novas tecnologias.",
-            status: "Pendente",
-            dataCriacao: "2026-01-29"
-        }
-    ]);
+    const [solicitacoes, setSolicitacoes] = useState<Array<Solicitacao>>([]);
 
     const handleCreateCard = (dadosNovoCard: Omit<Card, "id" | "etapa">) => {
         const novoCard: Card = {
@@ -120,13 +99,13 @@ export default function GestorLocal() {
                             { key: "agenda", label: "Agenda", icon: null },
                             { key: "diario", label: "Diário", icon: null },
                         ].map((item) => (
-                            <div className="relative" key={item.key}>
+                            <div key={item.key} className="relative">
                                 <button
+                                    type="button"
                                     className={`pb-2 text-[10px] font-black uppercase tracking-widest transition-all flex items-center ${
                                         abaAtual === item.key ? "text-indigo-400 border-b-2 border-indigo-400" : "text-[#B4B9C7]"
                                     }`}
                                     onClick={() => { setAbaAtual(item.key as Aba); }}
-                                    type="button"
                                 >
                                     {item.icon}{item.label}
                                 </button>
@@ -140,10 +119,10 @@ export default function GestorLocal() {
                     </nav>
 
                     <div className="flex gap-4">
-                        <button className="flex items-center gap-2 text-[#B4B9C7] text-[10px] font-black uppercase hover:text-white transition-colors" onClick={() => { setIsTeamModalOpen(true); }} type="button">
+                        <button className="flex items-center gap-2 text-[#B4B9C7] text-[10px] font-black uppercase hover:text-white transition-colors" type="button" onClick={() => { setIsTeamModalOpen(true); }}>
                             <Users size={14} /> Equipe
                         </button>
-                        <button className="rounded-xl bg-indigo-500 px-5 py-2 text-[10px] font-black uppercase shadow-lg shadow-indigo-500/20 hover:bg-indigo-400 transition-all flex items-center gap-2" onClick={() => { setIsModalOpen(true); }} type="button">
+                        <button className="rounded-xl bg-indigo-500 px-5 py-2 text-[10px] font-black uppercase shadow-lg shadow-indigo-500/20 hover:bg-indigo-400 transition-all flex items-center gap-2" type="button" onClick={() => { setIsModalOpen(true); }}>
                             <Plus size={14} /> Novo Card
                         </button>
                     </div>
@@ -161,7 +140,7 @@ export default function GestorLocal() {
                         />
                     )}
                     {abaAtual === "solicitacoes" && (
-                        <SolicitacoesTab onAceitar={aceitarSolicitacao} setSolicitacoes={setSolicitacoes} solicitacoes={solicitacoes} />
+                        <SolicitacoesTab setSolicitacoes={setSolicitacoes} solicitacoes={solicitacoes} onAceitar={aceitarSolicitacao} />
                     )}
                     {abaAtual === "agenda" && <Agenda scope="geral" />}
                     {abaAtual === "diario" && <Diario />}
@@ -189,7 +168,7 @@ export default function GestorLocal() {
             </footer>
 
             {isModalOpen && <CreateCardModal onClose={() => { setIsModalOpen(false); }} onSave={handleCreateCard} />}
-            {isTeamModalOpen && <ManageTeamModal funcionarios={funcionarios} onClose={() => { setIsTeamModalOpen(false); }} setFuncionarios={setFuncionarios} />}
+            {isTeamModalOpen && <ManageTeamModal funcionarios={funcionarios} setFuncionarios={setFuncionarios} onClose={() => { setIsTeamModalOpen(false); }} />}
         </div>
     );
 }
