@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { useState } from "react";
 import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd";
-import { User, Calendar, Folder, FileVideo, LayoutDashboard, Columns, Cpu, Radio, UserCheck, FileText } from "lucide-react"; 
+import { User, LayoutDashboard, Columns, Clock, MapPin, Hash, Globe, Users as UsersIcon } from "lucide-react"; // Calendar, Folder, FileVideo, FileText removidos
 import type { Card, Funcionario } from "../../pages/GestorLocal";
 
 const COLUNAS = [
@@ -13,7 +13,7 @@ const COLUNAS = [
 
 type QuadroProps = {
     visaoQuadro: "geral" | "focada";
-    setVisaoQuadro: (v: "geral" | "focada") => void;
+    setVisaoQuadro: (visao: "geral" | "focada") => void;
     cards: Array<Card>;
     setCards: React.Dispatch<React.SetStateAction<Array<Card>>>;
     funcionarios: Array<Funcionario>;
@@ -25,113 +25,103 @@ export function QuadroProduction({ visaoQuadro, setVisaoQuadro, cards, setCards,
 
     const handleJump = (colName: string) => {
         if (visaoQuadro === "geral") {
-            const container = document.getElementById("columns-container");
-            const target = document.getElementById(`scroll-target-${colName}`);
-            
-            if (container && target) {
-                const targetScrollPos = target.offsetLeft - container.offsetLeft - 24;
-                container.scrollTo({
-                    left: targetScrollPos,
-                    behavior: "smooth"
-                });
+            const element = document.getElementById(`scroll-target-${colName}`);
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
             }
         } else {
-            setColunaA(colName);
+            setColunaB(colName);
         }
-    };
-
-    const handleTrocaResponsavel = (cardId: string, funcionarioId: string) => {
-        setCards((previous: Array<Card>) => 
-            previous.map((card: Card): Card => {
-                if (card.id === cardId) {
-                    return { ...card, responsavelAtualId: funcionarioId };
-                }
-                return card;
-            })
-        );
     };
 
     const onDragEnd = (result: DropResult) => {
         const { destination, draggableId } = result;
-        if (!destination) return;
+        if (!destination) { return; }
 
-        const destinoId = destination.droppableId;
-        const etapaDestino = (destinoId.split("-side-")[0]) || "Standby";
+        const etapaDestino: string = (destination.droppableId.split("-side-")[0]) || "Standby";
         
-        const updatedCards: Array<Card> = cards.map((card: Card): Card => {
-            if (card.id === draggableId) {
-                return { ...card, etapa: etapaDestino };
-            }
-            return card;
+        setCards((previous: Array<Card>): Array<Card> => {
+            return previous.map((card: Card): Card => {
+                return card.id === draggableId ? { ...card, etapa: etapaDestino } : card;
+            });
         });
-
-        setCards(updatedCards);
     };
 
     const renderCard = (card: Card, index: number) => (
         <Draggable key={card.id} draggableId={card.id} index={index}>
             {(provided, snapshot) => (
                 <div
-                    ref={provided.innerRef}
-                    className={`bg-[#0F111A] rounded-xl p-5 border transition-all mb-4
-                        ${snapshot.isDragging
-                            ? "border-indigo-500 shadow-2xl bg-[#1e1e25]"
-                            : "border-white/10 hover:border-indigo-500/40"
-                        }`}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
+                    ref={provided.innerRef}
+                    className={`bg-[#0F111A] rounded-xl p-5 border transition-all mb-4 ${
+                        snapshot.isDragging ? "border-indigo-500 shadow-2xl bg-[#1e1e25]" : "border-white/10 hover:border-indigo-500/40"
+                    }`}
                 >
-                    <p className="text-white font-bold text-base mb-1 leading-tight">{card.titulo}</p>
-                    <p className="text-sm text-[#B4B9C7] mb-3 italic font-medium">Solicitante: {card.responsavel}</p>
-
-                    {/* Correção para exibir a descrição sem erro de tipagem */}
-                    {card.descricao && (
-                        <div className="mb-4 flex gap-2 items-start text-[#B4B9C7]/60 text-xs italic line-clamp-2">
-                            <FileText className="shrink-0 mt-0.5" size={12} />
-                            <p>{card.descricao}</p>
+                    <div className="flex justify-between items-start mb-2">
+                        <div className="flex flex-col">
+                            <p className="text-white font-bold text-base leading-tight">{card.titulo}</p>
+                            <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mt-1">
+                                {card.formato || card.tipoProducao}
+                            </span>
                         </div>
-                    )}
+                        {card.dataLimite && (
+                            <div className="bg-red-500/10 border border-red-500/20 px-2 py-1 rounded flex flex-col items-center">
+                                <span className="text-[8px] font-black text-red-400 uppercase">Entrega</span>
+                                <span className="text-[10px] font-bold text-white">
+                                    {new Date(card.dataLimite).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'})}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                    
+                    <div className="flex items-center gap-2 text-[11px] text-[#B4B9C7] mb-3 italic">
+                        <User className="text-indigo-400" size={12} /> 
+                        <span className="font-bold">{card.responsavel}</span>
+                        {card.setor && <span className="text-[10px] bg-white/5 px-1.5 rounded">· {card.setor}</span>}
+                    </div>
 
-                    <div className="pt-4 border-t border-white/5 space-y-3">
-                        <label className="text-xs uppercase font-black text-[#B4B9C7] flex items-center gap-2">
-                            <User className="text-indigo-400" size={14} /> Atribuído a:
-                        </label>
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#B4B9C7]">
+                            <MapPin className="text-indigo-400" size={12} /> {card.localGravacao || "Estúdio"}
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#B4B9C7]">
+                            <UsersIcon className="text-indigo-400" size={12} /> {card.pessoasEmCena || 1} em cena
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#B4B9C7]">
+                            <Globe className="text-indigo-400" size={12} /> {card.distribuicao || "Interna"}
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#B4B9C7]">
+                            <Clock className="text-indigo-400" size={12} /> {card.duracaoMinutos || 0}m
+                        </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-white/5">
                         <select
-                            className="w-full text-sm p-3 rounded-lg bg-[#161825] border border-white/10 text-white outline-none focus:border-indigo-500"
+                            className="w-full text-xs p-2.5 rounded-lg bg-[#161825] border border-white/10 text-white outline-none focus:border-indigo-500"
                             value={card.responsavelAtualId || ""}
-                            onChange={(event) => { handleTrocaResponsavel(card.id, event.target.value); }}
+                            onChange={(event) => {
+                                setCards((previous) => {
+                                    return previous.map((item) => {
+                                        return item.id === card.id ? { ...item, responsavelAtualId: event.target.value } : item;
+                                    });
+                                });
+                            }}
                         >
-                            <option value="">Sem responsável</option>
-                            {funcionarios.map((f: Funcionario) => (
+                            <option value="">Atribuir profissional...</option>
+                            {funcionarios.map((f) => (
                                 <option key={f.id} value={f.id}>{f.nome}</option>
                             ))}
                         </select>
                     </div>
 
                     <div className="mt-5 pt-4 border-t border-white/5 flex flex-wrap gap-2 items-center">
-                        {card.projeto && (
-                            <span className="flex items-center gap-1.5 text-[11px] font-black text-indigo-300 bg-indigo-500/10 px-3 py-1 rounded border border-indigo-500/20 uppercase tracking-widest">
-                                <Folder size={12} /> {card.projeto}
-                            </span>
-                        )}
-                        {card.tipoProducao && (
-                            <span className="flex items-center gap-1.5 text-[11px] font-black text-[#B4B9C7] bg-white/5 px-3 py-1 rounded border border-white/5 uppercase">
-                                <FileVideo className="text-white/30" size={12} /> {card.tipoProducao}
-                            </span>
-                        )}
-                        <div className="ml-auto flex gap-2 items-center">
-                            {(card.libras || card.legendas) && (
-                                <div className="flex gap-2 pr-2 border-r border-white/10 mr-1">
-                                    {card.libras && <span className="text-[11px] font-black text-emerald-400">LIBRAS</span>}
-                                    {card.legendas && <span className="text-[11px] font-black text-amber-400">CC</span>}
-                                </div>
-                            )}
-                            {card.dataGravacao && (
-                                <span className="flex items-center gap-1.5 text-sm font-bold text-[#B4B9C7]">
-                                    <Calendar className="text-indigo-400" size={14} />
-                                    {new Date(card.dataGravacao).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}
-                                </span>
-                            )}
+                        <span className="text-[10px] font-black text-white/40 bg-white/5 px-2 py-1 rounded uppercase flex items-center gap-1 border border-white/5">
+                            <Hash className="text-indigo-400" size={10} /> {card.projeto || "Geral"}
+                        </span>
+                        <div className="ml-auto flex gap-2">
+                            {(card.acessibilidade?.includes("LIBRAS") || card.libras) && <span className="text-[9px] font-black text-emerald-400 border border-emerald-400/20 px-1 rounded">LIBRAS</span>}
+                            {(card.acessibilidade?.includes("Legendas") || card.legendas) && <span className="text-[9px] font-black text-amber-400 border border-amber-400/20 px-1 rounded">CC</span>}
                         </div>
                     </div>
                 </div>
@@ -143,20 +133,21 @@ export function QuadroProduction({ visaoQuadro, setVisaoQuadro, cards, setCards,
         <Droppable key={`${colName}${suffix}`} droppableId={`${colName}${suffix}`}>
             {(provided, snapshot) => (
                 <div
+                    {...provided.droppableProps}
                     ref={provided.innerRef}
                     id={suffix === "" ? `scroll-target-${colName}` : undefined}
-                    className={`${isFullWidth ? 'w-full' : 'w-85 shrink-0'} bg-[#161825] border rounded-2xl p-5 flex flex-col h-full transition-colors
-                        ${snapshot.isDraggingOver ? "border-indigo-500/50 bg-[#1c1e2d]" : "border-white/5"}`}
-                    {...provided.droppableProps}
+                    className={`${isFullWidth ? 'w-full' : 'w-85 shrink-0'} bg-[#161825]/50 border rounded-2xl p-5 flex flex-col h-full transition-colors ${
+                        snapshot.isDraggingOver ? "border-indigo-500/50 bg-[#1c1e2d]" : "border-white/5"
+                    }`}
                 >
                     <h3 className="text-sm font-black text-white uppercase mb-5 flex justify-between items-center tracking-tighter">
                         {colName}
-                        <span className="bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full text-xs font-bold">
-                            {cards.filter((c: Card) => c.etapa === colName).length}
+                        <span className="bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full text-[10px]">
+                            {cards.filter((c) => { return c.etapa === colName; }).length}
                         </span>
                     </h3>
                     <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
-                        {cards.filter((c: Card) => c.etapa === colName).map((card: Card, index: number) => renderCard(card, index))}
+                        {cards.filter((c) => { return c.etapa === colName; }).map((card, index) => { return renderCard(card, index); })}
                         {provided.placeholder}
                     </div>
                 </div>
@@ -166,70 +157,73 @@ export function QuadroProduction({ visaoQuadro, setVisaoQuadro, cards, setCards,
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
-            {/* O uso de w-full e overflow-x-hidden aqui trava o scroll horizontal do container pai */}
-            <div className="flex flex-col h-full w-full overflow-x-hidden relative">
-                
-                <div className="sticky top-0 z-40 bg-[#161825] pt-2 pb-4">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex flex-col gap-1">
-                            <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Workflow de Produção</h2>
-                            <p className="text-xs text-indigo-400 uppercase font-bold tracking-[0.2em]">Gestão Digital Estúdio RIEH</p>
-                        </div>
-                        
-                        <div className="flex bg-[#0F111A] p-1.5 rounded-xl border border-white/5 shadow-2xl">
-                            <button
-                                className={`px-6 py-2.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${visaoQuadro === "geral" ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30" : "text-[#B4B9C7] hover:text-white"}`}
-                                type="button"
-                                onClick={() => { setVisaoQuadro("geral"); }}
-                            >
-                                <LayoutDashboard size={14} /> Geral
-                            </button>
-                            <button
-                                className={`px-6 py-2.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${visaoQuadro === "focada" ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30" : "text-[#B4B9C7] hover:text-white"}`}
-                                type="button"
-                                onClick={() => { setVisaoQuadro("focada"); }}
-                            >
-                                <Columns size={14} /> Comparar
-                            </button>
-                        </div>
+            <div className="flex flex-col h-full relative">
+                <header className="shrink-0 mb-4 flex items-center justify-between px-6">
+                    <div className="flex flex-col">
+                        <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Workflow</h2>
+                        <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-[0.2em]">Gestão Digital Estúdio RIEH</p>
                     </div>
+                    <div className="flex bg-[#0F111A] p-1.5 rounded-xl border border-white/5 shadow-2xl">
+                        <button 
+                            type="button"
+                            className={`px-6 py-2.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
+                                visaoQuadro === "geral" ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30" : "text-[#B4B9C7] hover:text-white"
+                            }`} 
+                            onClick={() => { setVisaoQuadro("geral"); }}
+                        >
+                            <LayoutDashboard size={14} /> Geral
+                        </button>
+                        <button 
+                            type="button"
+                            className={`px-6 py-2.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
+                                visaoQuadro === "focada" ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30" : "text-[#B4B9C7] hover:text-white"
+                            }`} 
+                            onClick={() => { setVisaoQuadro("focada"); }}
+                        >
+                            <Columns size={14} /> Comparar
+                        </button>
+                    </div>
+                </header>
 
-                    <nav className="flex gap-3 overflow-x-auto py-2 custom-scrollbar border-b border-white/5 items-center min-h-[50px]">
-                        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mr-4 shrink-0">Acesso Rápido:</span>
-                        {COLUNAS.map((col: string) => (
-                            <button
-                                key={col}
-                                className="whitespace-nowrap px-4 py-2 rounded-lg bg-white/5 text-[11px] font-black uppercase text-[#B4B9C7] hover:bg-indigo-500 hover:text-white transition-all border border-white/5 hover:border-indigo-400"
-                                type="button"
-                                onClick={() => { handleJump(col); }}
-                            >
-                                {col}
-                            </button>
-                        ))}
-                    </nav>
-                </div>
+                <nav className="flex gap-3 overflow-x-auto px-6 pb-4 mb-4 custom-scrollbar border-b border-white/5 items-center shrink-0">
+                    <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mr-2">Salto Rápido:</span>
+                    {COLUNAS.map((col) => (
+                        <button 
+                            key={col} 
+                            className="whitespace-nowrap px-4 py-2 rounded-lg bg-white/5 text-[10px] font-black uppercase text-[#B4B9C7] hover:bg-indigo-500 hover:text-white transition-all border border-white/5" 
+                            type="button" 
+                            onClick={() => { handleJump(col); }}
+                        >
+                            {col}
+                        </button>
+                    ))}
+                </nav>
 
-                <div className="flex-1 mt-4 overflow-hidden">
+                <div className="flex-1 px-6 overflow-hidden">
                     {visaoQuadro === "geral" ? (
-                        /* Somente este container possui overflow-x-auto, permitindo o scroll das listas sem mover a tela toda */
-                        <div className="flex gap-6 overflow-x-auto pb-12 pr-32 custom-scrollbar h-full items-start scroll-smooth w-full" id="columns-container">
-                            {COLUNAS.map((col: string) => renderColumn(col, "", false))}
+                        <div 
+                            className="flex gap-6 overflow-x-auto pb-12 pr-48 custom-scrollbar h-full items-start scroll-smooth"
+                            id="columns-container" 
+                        >
+                            {COLUNAS.map((col) => { return renderColumn(col); })}
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 gap-10 bg-[#0F111A] p-8 rounded-3xl border border-white/10 h-full overflow-y-auto custom-scrollbar">
-                            {[
+                        <div className="grid grid-cols-2 gap-10 bg-[#0F111A]/50 p-8 rounded-3xl border border-white/5 h-full overflow-hidden mb-12">
+                            {[ 
                                 { val: colunaA, set: setColunaA, label: "Painel Esquerdo" }, 
-                                { val: colunaB, set: setColunaB, label: "Painel Direito" }
-                            ].map((side, index: number) => (
+                                { val: colunaB, set: setColunaB, label: "Painel Direito" } 
+                            ].map((side, index) => (
                                 <div key={index} className="flex flex-col gap-5 h-full">
                                     <div className="flex items-center justify-between px-2">
-                                        <span className="text-xs font-black text-indigo-400 uppercase tracking-widest bg-indigo-500/10 px-4 py-1.5 rounded-full">{side.label}</span>
-                                        <select
-                                            className="bg-[#161825] text-white text-xs font-black p-3.5 rounded-xl border border-white/10 outline-none focus:border-indigo-500 min-w-64 uppercase shadow-2xl"
-                                            value={side.val}
+                                        <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest bg-indigo-500/10 px-4 py-1.5 rounded-full">
+                                            {side.label}
+                                        </span>
+                                        <select 
+                                            className="bg-[#161825] text-white text-[10px] font-black p-3.5 rounded-xl border border-white/10 outline-none focus:border-indigo-500 min-w-64 uppercase" 
+                                            value={side.val as string} 
                                             onChange={(event) => { side.set(event.target.value); }}
                                         >
-                                            {COLUNAS.map((c: string) => <option key={c} value={c}>{c}</option>)}
+                                            {COLUNAS.map((c) => { return <option key={c} value={c}>{c}</option>; })}
                                         </select>
                                     </div>
                                     {renderColumn(side.val as string, `-side-${index}`, true)}
@@ -238,35 +232,6 @@ export function QuadroProduction({ visaoQuadro, setVisaoQuadro, cards, setCards,
                         </div>
                     )}
                 </div>
-
-                <footer className="sticky bottom-0 z-40 h-10 border-t border-white/10 bg-[#0F111A] px-8 flex items-center justify-between shrink-0">
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-3">
-                            <div className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-                            </div>
-                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-500">Estúdio RIEH Online</span>
-                        </div>
-                        <div className="h-3 w-px bg-white/10"></div>
-                        <div className="flex items-center gap-2 text-[#B4B9C7]">
-                            <UserCheck className="text-indigo-400" size={12} />
-                            <span className="text-[9px] font-bold uppercase tracking-widest">Sessão: Gestor Local</span>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-2 px-2 py-0.5 bg-white/5 rounded border border-white/5">
-                            <Cpu className="text-indigo-400" size={10} />
-                            <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">SOPA v1.0.4</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Radio className="text-indigo-400" size={10} />
-                            <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em]">SEEC / RN</span>
-                        </div>
-                    </div>
-                </footer>
-
             </div>
         </DragDropContext>
     );
