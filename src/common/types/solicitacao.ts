@@ -16,10 +16,7 @@ export type FormatoProducao =
 	| "Animações para eventos in loco"
 	| "Criação, edição e animações";
 
-export type Acessibilidade =
-	| "Incluir LIBRAS"
-	| "Incluir Legenda"
-	| "Não se aplica";
+export type Acessibilidade = "Incluir LIBRAS" | "Não se aplica";
 
 export type Distribuicao = "interna" | "seec" | "instagram" | "outro";
 
@@ -75,7 +72,6 @@ export const FORMATOS_PRODUCAO: Array<FormatoProducao> = [
 
 export const OPCOES_ACESSIBILIDADE: Array<Acessibilidade> = [
 	"Incluir LIBRAS",
-	"Incluir Legenda",
 	"Não se aplica",
 ];
 
@@ -85,3 +81,13 @@ export const OPCOES_DISTRIBUICAO: Array<Distribuicao> = [
 	"instagram",
 	"outro",
 ];
+
+export type CampoComErro = {
+	campo: keyof SolicitarFormData;
+	mensagem: string;
+};
+
+export type DevolutivaGestor = {
+	status: "devolvido";
+	campos: Array<CampoComErro>;
+};

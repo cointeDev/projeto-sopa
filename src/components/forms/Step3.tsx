@@ -146,12 +146,24 @@ export default function Step3() {
 										handleAcessibilidade(item);
 									}}
 								/>
+
 								<span className="text-zinc-300 group-hover:text-white transition-colors">
 									{item}
 								</span>
 							</label>
 						))}
 					</div>
+
+					{formData.acessibilidade?.includes("Incluir LIBRAS") && (
+						<div className="mt-4 pl-1.5">
+							<p className="text-sm 0   bg-white/5 border-white/10 text-white/70 border rounded-xl p-3">
+								⚠️ Atenção: a RIEH{" "}
+								<strong>não fornece intérpretes de Libras</strong>. Caso
+								necessário, a contratação deverá ser providenciada pelo
+								solicitante.
+							</p>
+						</div>
+					)}
 				</div>
 
 				<div className="md:col-span-4">

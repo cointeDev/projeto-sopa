@@ -57,10 +57,10 @@ export function useForm(): UseFormReturn {
 				email: true,
 				setor: true,
 				telefone: true,
-				local: true,
-				localExterno: true,
-				data: true,
-				hora: true,
+				//local: true,
+				//localExterno: true,
+				//data: true,
+				//hora: true,
 			})
 			.safeParse(data);
 

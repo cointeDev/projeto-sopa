@@ -1,21 +1,18 @@
 /* eslint-disable unicorn/prevent-abbreviations */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Footer } from "../common/Footer";
 import { useFormContext } from "../../context/FormContext";
 
 export default function Step1() {
-	const { formData, setPassoAtual, updateField, validarPassoAtual } = useFormContext();
-	const [localValue, setLocalValue] = useState(formData.local);
+	const { passo, formData, setPassoAtual, updateField, validarPassoAtual } =
+		useFormContext();
+
 	const responsavelRef = useRef<HTMLInputElement>(null);
 	const emailRef = useRef<HTMLInputElement>(null);
 	const setorRef = useRef<HTMLInputElement>(null);
 	const telefoneRef = useRef<HTMLInputElement>(null);
-	const localRef = useRef<HTMLSelectElement>(null);
-	const localExternoRef = useRef<HTMLInputElement>(null);
-	const dataRef = useRef<HTMLInputElement>(null);
-	const horaRef = useRef<HTMLInputElement>(null);
 
 	return (
 		<>
@@ -33,6 +30,9 @@ export default function Step1() {
 						className="input"
 						defaultValue={formData.responsavel}
 						placeholder="Digite aqui o nome do responsável"
+						onChange={(event) => {
+							updateField("responsavel", event.target.value);
+						}}
 					/>
 				</div>
 
@@ -46,6 +46,9 @@ export default function Step1() {
 						defaultValue={formData.email}
 						placeholder="Digite aqui o e-mail do responsável"
 						type="email"
+						onChange={(event) => {
+							updateField("email", event.target.value);
+						}}
 					/>
 				</div>
 
@@ -58,6 +61,9 @@ export default function Step1() {
 						className="input"
 						defaultValue={formData.setor}
 						placeholder="Sigla do setor"
+						onChange={(event) => {
+							updateField("setor", event.target.value);
+						}}
 					/>
 				</div>
 
@@ -81,63 +87,9 @@ export default function Step1() {
 							if (value.length > 7) formatted += `-${value.slice(7, 11)}`;
 
 							e.target.value = formatted;
+							updateField("telefone", e.target.value);
 						}}
 					/>
-				</div>
-
-				<div className="md:col-span-2">
-					<h2 className="text-xg pb-3 pl-1.5 font-semibold text-white">
-						Local de Gravação
-					</h2>
-					<select
-						ref={localRef}
-						className="input md:col-span-2"
-						defaultValue={formData.local}
-						onChange={(e) => {
-							setLocalValue(e.target.value);
-						}}
-					>
-						<option value="">Selecione o estúdio</option>
-						<option value="Natal">Natal</option>
-						<option value="Mossoró">Mossoró</option>
-						<option value="Pau dos Ferros">Pau dos Ferros</option>
-						<option value="Caicó">Caicó</option>
-						<option value="Externo">Externo</option>
-					</select>
-				</div>
-
-				{localValue === "Externo" && (
-					<div className="md:col-span-2">
-						<h2 className="text-xg pb-3 pl-1.5 font-semibold text-white">
-							Especificar Local de Gravação
-						</h2>
-						<input
-							ref={localExternoRef}
-							className="input"
-							defaultValue={formData.localExterno}
-							placeholder="Especificar local de gravação"
-						/>
-					</div>
-				)}
-
-				<div className="md:col-span-2">
-					<h2 className="text-xg pb-3 pl-1.5 font-semibold text-white">
-						Data e Hora da Gravação
-					</h2>
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-						<input
-							ref={dataRef}
-							className="input md:col-span-2"
-							defaultValue={formData.data}
-							type="date"
-						/>
-						<input
-							ref={horaRef}
-							className="input md:col-span-1"
-							defaultValue={formData.hora}
-							type="time"
-						/>
-					</div>
 				</div>
 			</div>
 
@@ -145,18 +97,9 @@ export default function Step1() {
 				<button
 					className="btn-primario"
 					onClick={() => {
-						updateField("responsavel", responsavelRef.current?.value || "");
-						updateField("email", emailRef.current?.value || "");
-						updateField("setor", setorRef.current?.value || "");
-						updateField("telefone", telefoneRef.current?.value || "");
-						updateField("local", localRef.current?.value || "");
-						updateField("localExterno", localExternoRef.current?.value || "");
-						updateField("data", dataRef.current?.value || "");
-						updateField("hora", horaRef.current?.value || "");
-
 						if (!validarPassoAtual()) return;
 
-						setPassoAtual(2);
+						setPassoAtual(passo + 1);
 					}}
 				>
 					Continuar →

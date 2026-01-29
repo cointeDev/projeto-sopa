@@ -16,6 +16,7 @@ import { Route as MvpRouteImport } from './routes/mvp'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as GestorLocalRouteImport } from './routes/gestor-local'
 import { Route as GestorGeralRouteImport } from './routes/gestor-geral'
+import { Route as DevolutivaRouteImport } from './routes/devolutiva'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TokenstatusRoute = TokenstatusRouteImport.update({
@@ -53,6 +54,11 @@ const GestorGeralRoute = GestorGeralRouteImport.update({
   path: '/gestor-geral',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DevolutivaRoute = DevolutivaRouteImport.update({
+  id: '/devolutiva',
+  path: '/devolutiva',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -61,6 +67,7 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/devolutiva': typeof DevolutivaRoute
   '/gestor-geral': typeof GestorGeralRoute
   '/gestor-local': typeof GestorLocalRoute
   '/login': typeof LoginRoute
@@ -71,6 +78,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/devolutiva': typeof DevolutivaRoute
   '/gestor-geral': typeof GestorGeralRoute
   '/gestor-local': typeof GestorLocalRoute
   '/login': typeof LoginRoute
@@ -82,6 +90,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/devolutiva': typeof DevolutivaRoute
   '/gestor-geral': typeof GestorGeralRoute
   '/gestor-local': typeof GestorLocalRoute
   '/login': typeof LoginRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/devolutiva'
     | '/gestor-geral'
     | '/gestor-local'
     | '/login'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/devolutiva'
     | '/gestor-geral'
     | '/gestor-local'
     | '/login'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/devolutiva'
     | '/gestor-geral'
     | '/gestor-local'
     | '/login'
@@ -125,6 +137,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DevolutivaRoute: typeof DevolutivaRoute
   GestorGeralRoute: typeof GestorGeralRoute
   GestorLocalRoute: typeof GestorLocalRoute
   LoginRoute: typeof LoginRoute
@@ -185,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestorGeralRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/devolutiva': {
+      id: '/devolutiva'
+      path: '/devolutiva'
+      fullPath: '/devolutiva'
+      preLoaderRoute: typeof DevolutivaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -197,6 +217,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DevolutivaRoute: DevolutivaRoute,
   GestorGeralRoute: GestorGeralRoute,
   GestorLocalRoute: GestorLocalRoute,
   LoginRoute: LoginRoute,

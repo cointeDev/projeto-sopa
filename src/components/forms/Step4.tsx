@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { useFormContext } from "../../context/FormContext";
 import { Footer } from "../common/Footer";
+import { useRef, useState } from "react";
 
 export default function Step4() {
 	const {
@@ -13,6 +14,14 @@ export default function Step4() {
 	} = useFormContext();
 	const formData = useFormContext().formData;
 
+	const [localValue, setLocalValue] = useState(formData.local);
+
+	const localRef = useRef<HTMLSelectElement>(null);
+	const localExternoRef = useRef<HTMLInputElement>(null);
+	const dataRef = useRef<HTMLInputElement>(null);
+	const horaRef = useRef<HTMLInputElement>(null);
+	const hoje = new Date().toISOString().split("T")[0];
+
 	const maxPessoas = getMaxPessoasPorFormato();
 
 	return (
@@ -22,6 +31,65 @@ export default function Step4() {
 			</h3>
 
 			<div className="space-y-6">
+				<div className="md:col-span-2">
+					<h2 className="text-xg pb-3 pl-1.5 font-semibold text-white">
+						Local de Gravação
+					</h2>
+					<select
+						ref={localRef}
+						className="input md:col-span-2"
+						defaultValue={formData.local}
+						onChange={(e) => {
+							setLocalValue(e.target.value);
+							updateField("local", e.target.value);
+						}}
+					>
+						<option value="">Selecione o estúdio</option>
+						<option value="Natal">Natal</option>
+						<option value="Mossoró">Mossoró</option>
+						<option value="Pau dos Ferros">Pau dos Ferros</option>
+						<option value="Caicó">Caicó</option>
+						<option value="Externo">Externo</option>
+					</select>
+				</div>
+
+				{localValue === "Externo" && (
+					<div className="md:col-span-2">
+						<h2 className="text-xg pb-3 pl-1.5 font-semibold text-white">
+							Especificar Local de Gravação
+						</h2>
+						<input
+							ref={localExternoRef}
+							className="input"
+							defaultValue={formData.localExterno}
+							placeholder="Especificar local de gravação"
+						/>
+					</div>
+				)}
+
+				<div className="md:col-span-2">
+					<h2 className="text-xg pb-3 pl-1.5 font-semibold text-white">
+						Data e Hora da Gravação
+					</h2>
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+						<input
+							ref={dataRef}
+							className="input md:col-span-2"
+							defaultValue={formData.data}
+							type="date"
+							min={hoje}
+						/>
+						<input
+							ref={horaRef}
+							className="input md:col-span-1"
+							defaultValue={formData.hora}
+							type="time"
+							min="09:00"
+							max="17:00"
+						/>
+					</div>
+				</div>
+
 				<div>
 					<h2 className="text-xg pb-3 pl-1.5 font-semibold text-white">
 						Data Limite para Entrega
