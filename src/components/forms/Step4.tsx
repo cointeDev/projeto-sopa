@@ -20,7 +20,7 @@ export default function Step4() {
 	const localExternoRef = useRef<HTMLInputElement>(null);
 	const dataRef = useRef<HTMLInputElement>(null);
 	const horaRef = useRef<HTMLInputElement>(null);
-	const hoje = new Date().toISOString().split("T")[0];
+	const hoje = new Date().toLocaleDateString("en-CA");
 
 	const maxPessoas = getMaxPessoasPorFormato();
 
@@ -86,6 +86,7 @@ export default function Step4() {
 							type="time"
 							min="09:00"
 							max="17:00"
+							step="900"
 						/>
 					</div>
 				</div>

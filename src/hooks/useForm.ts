@@ -126,8 +126,13 @@ export function useForm(): UseFormReturn {
 	function validarStep4(data: SolicitarFormData): boolean {
 		const result = solicitarFormSchema
 			.pick({
+				local: true,
+				data: true,
+				hora: true,
 				dataLimite: true,
 				pessoas: true,
+				roteiro: true,
+				observacoes: true,
 			})
 			.safeParse(data);
 
@@ -137,6 +142,10 @@ export function useForm(): UseFormReturn {
 			});
 			return false;
 		}
+
+		if (!formData.data) return false;
+		if (!formData.hora) return false;
+		if (formData.hora < "09:00" || formData.hora > "17:00") return false;
 
 		return true;
 	}

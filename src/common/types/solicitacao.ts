@@ -88,6 +88,6 @@ export type CampoComErro = {
 };
 
 export type DevolutivaGestor = {
-	status: "devolvido";
+	status: "Devolvido";
 	campos: Array<CampoComErro>;
 };

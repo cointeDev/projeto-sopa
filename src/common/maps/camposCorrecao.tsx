@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { SolicitarFormData } from "../../common/types/solicitacao";
 import { useFormContext } from "../../context/FormContext";
 
@@ -10,7 +10,7 @@ export type CampoCorrecaoConfig = {
 export function useCamposCorrecao(): Partial<
 	Record<keyof SolicitarFormData, CampoCorrecaoConfig>
 > {
-	const { formData, updateField } = useFormContext();
+	const { updateField } = useFormContext();
 
 	return {
 		telefone: {
@@ -18,7 +18,6 @@ export function useCamposCorrecao(): Partial<
 			render: () => (
 				<input
 					className="input"
-					value={formData.telefone}
 					onChange={(e) => updateField("telefone", e.target.value)}
 				/>
 			),
@@ -29,12 +28,35 @@ export function useCamposCorrecao(): Partial<
 			render: () => (
 				<input
 					className="input"
-					value={formData.nomeProjeto}
 					onChange={(e) => updateField("nomeProjeto", e.target.value)}
 				/>
 			),
 		},
 
-		// ⚠️ adicione outros campos conforme necessário
+		roteiro: {
+			label: "Anexar novo roteiro",
+			render: () => (
+				<input
+					type="file"
+					className="input"
+					accept=".pdf,.doc,.docx"
+					onChange={(e) => updateField("roteiro", e.target.files?.[0] ?? null)}
+				/>
+			),
+		},
+
+		thumbnail: {
+			label: "Anexar nova thumbnail",
+			render: () => (
+				<input
+					type="file"
+					className="input"
+					accept="image/*"
+					onChange={(e) =>
+						updateField("thumbnail", e.target.files?.[0] ?? null)
+					}
+				/>
+			),
+		},
 	};
 }

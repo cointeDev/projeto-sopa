@@ -1,10 +1,12 @@
 import { FormularioCorrecao } from "../components/correcao/FormularioCorrecao";
 
+import { FormProvider } from "../components/forms/FormProvider";
+
 import type { DevolutivaGestor } from "../common/types/solicitacao";
 
 export function Devolutiva() {
 	const devolutivaMock: DevolutivaGestor = {
-		status: "devolvido",
+		status: "Devolvido",
 		campos: [
 			{
 				campo: "telefone",
@@ -14,8 +16,20 @@ export function Devolutiva() {
 				campo: "nomeProjeto",
 				mensagem: "Nome muito genérico",
 			},
+			{
+				campo: "roteiro",
+				mensagem: "Roteiro pouco detalhado",
+			},
+			{
+				campo: "thumbnail",
+				mensagem: "Thumbnail improprio",
+			},
 		],
 	};
 
-	return <FormularioCorrecao devolutiva={devolutivaMock} />;
+	return (
+		<FormProvider>
+			<FormularioCorrecao devolutiva={devolutivaMock} />
+		</FormProvider>
+	);
 }
