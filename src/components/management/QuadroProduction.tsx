@@ -1,236 +1,168 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { useState } from "react";
-import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd";
-import { User, LayoutDashboard, Columns, Clock, MapPin, Hash, Globe, Users as UsersIcon } from "lucide-react"; // Calendar, Folder, FileVideo, FileText removidos
-import type { Card, Funcionario } from "../../pages/GestorLocal";
+import { useState, useMemo } from "react";
+import { DragDropContext, Droppable, Draggable, type DropResult, type DroppableProvided, type DraggableProvided } from "@hello-pangea/dnd";
+import { LayoutDashboard, Columns, User } from "lucide-react"; 
+import type { Card, Projeto } from "../../pages/GestorLocal";
 
-const COLUNAS = [
-    "Standby", "Para Produção Semanal", "Ao Vivo", "Gravado",
-    "Edição 1", "Edição 2", "Edição 3", "Edição Final",
-    "Libras", "Revisão LP", "Produção LSE", "Concluído", "Publicado",
-];
+const colunasBase = ["Standby", "Para Produção Semanal", "Ao Vivo", "Gravado", "Edição 1", "Edição 2", "Edição 3", "Edição Final", "Libras", "Revisão LP", "Produção LSE", "Concluído", "Publicado"];
 
-type QuadroProps = {
-    visaoQuadro: "geral" | "focada";
-    setVisaoQuadro: (visao: "geral" | "focada") => void;
-    cards: Array<Card>;
-    setCards: React.Dispatch<React.SetStateAction<Array<Card>>>;
-    funcionarios: Array<Funcionario>;
+const coresSopa = {
+    areas: { matematica: "#fdde82", linguagens: "#bec658", humanas: "#c3dcf6", natureza: "#4068a7" },
+    workflow: {
+        standby: { bg: "rgba(195, 220, 246, 0.2)", header: "#4068a7" },
+        semanal: { bg: "rgba(253, 222, 130, 0.2)", header: "#fdde82" },
+        aovivo: { bg: "rgba(97, 201, 225, 0.2)", header: "#61c9e1" },
+        gravado: { bg: "rgba(84, 180, 177, 0.2)", header: "#54b4b1" },
+        concluido: { bg: "rgba(190, 198, 88, 0.2)", header: "#bec658" }
+    }
 };
 
-export function QuadroProduction({ visaoQuadro, setVisaoQuadro, cards, setCards, funcionarios }: QuadroProps) {
-    const [colunaA, setColunaA] = useState(COLUNAS[0]);
-    const [colunaB, setColunaB] = useState(COLUNAS[4]);
+interface QuadroProductionProps {
+    cards: Array<Card>;
+    projetos: Array<Projeto>;
+    onCardClick: (card: Card) => void;
+    setCards: React.Dispatch<React.SetStateAction<Array<Card>>>;
+    setVisaoQuadro: React.Dispatch<React.SetStateAction<"geral" | "focada">>;
+    visaoQuadro: "geral" | "focada";
+}
 
-    const handleJump = (colName: string) => {
-        if (visaoQuadro === "geral") {
-            const element = document.getElementById(`scroll-target-${colName}`);
-            if (element) {
-                element.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-            }
-        } else {
-            setColunaB(colName);
-        }
-    };
+export function QuadroProduction({ cards, onCardClick, projetos, setCards, setVisaoQuadro, visaoQuadro }: QuadroProductionProps) {
+    const [filtroProjeto, setFiltroProjeto] = useState<string>("Geral");
+
+    const cardsFiltrados = useMemo(() => {
+        return filtroProjeto === "Geral" ? cards : cards.filter((cardItem) => cardItem.projeto === filtroProjeto);
+    }, [cards, filtroProjeto]);
+
+    const colunasAtivas = useMemo(() => {
+        if (filtroProjeto === "Geral") return colunasBase;
+        const projetoAtivo = projetos.find(p => p.nome === filtroProjeto);
+        return projetoAtivo ? projetoAtivo.etapas : colunasBase;
+    }, [projetos, filtroProjeto]);
 
     const onDragEnd = (result: DropResult) => {
-        const { destination, draggableId } = result;
-        if (!destination) { return; }
+        const { destination, source, draggableId } = result;
 
-        const etapaDestino: string = (destination.droppableId.split("-side-")[0]) || "Standby";
+        if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
+            return;
+        }
+
+        const etapaDestino = destination.droppableId;
         
-        setCards((previous: Array<Card>): Array<Card> => {
-            return previous.map((card: Card): Card => {
-                return card.id === draggableId ? { ...card, etapa: etapaDestino } : card;
-            });
-        });
+        // CORREÇÃO AQUI: Garantindo que o retorno do map seja estritamente do tipo Card
+        setCards((previousCards: Array<Card>) => 
+            previousCards.map((c: Card): Card => 
+                c.id === draggableId ? { ...c, etapa: etapaDestino } : c
+            )
+        );
     };
 
-    const renderCard = (card: Card, index: number) => (
-        <Draggable key={card.id} draggableId={card.id} index={index}>
-            {(provided, snapshot) => (
-                <div
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    ref={provided.innerRef}
-                    className={`bg-[#0F111A] rounded-xl p-5 border transition-all mb-4 ${
-                        snapshot.isDragging ? "border-indigo-500 shadow-2xl bg-[#1e1e25]" : "border-white/10 hover:border-indigo-500/40"
-                    }`}
-                >
-                    <div className="flex justify-between items-start mb-2">
-                        <div className="flex flex-col">
-                            <p className="text-white font-bold text-base leading-tight">{card.titulo}</p>
-                            <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mt-1">
-                                {card.formato || card.tipoProducao}
-                            </span>
-                        </div>
-                        {card.dataLimite && (
-                            <div className="bg-red-500/10 border border-red-500/20 px-2 py-1 rounded flex flex-col items-center">
-                                <span className="text-[8px] font-black text-red-400 uppercase">Entrega</span>
-                                <span className="text-[10px] font-bold text-white">
-                                    {new Date(card.dataLimite).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'})}
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                    
-                    <div className="flex items-center gap-2 text-[11px] text-[#B4B9C7] mb-3 italic">
-                        <User className="text-indigo-400" size={12} /> 
-                        <span className="font-bold">{card.responsavel}</span>
-                        {card.setor && <span className="text-[10px] bg-white/5 px-1.5 rounded">· {card.setor}</span>}
-                    </div>
+    const handleJump = (nomeColuna: string) => {
+        const element = document.getElementById(`scrollTarget${nomeColuna.replace(/\s+/g, '')}`);
+        if (element) element.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+    };
 
-                    <div className="grid grid-cols-2 gap-2 mb-4">
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#B4B9C7]">
-                            <MapPin className="text-indigo-400" size={12} /> {card.localGravacao || "Estúdio"}
-                        </div>
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#B4B9C7]">
-                            <UsersIcon className="text-indigo-400" size={12} /> {card.pessoasEmCena || 1} em cena
-                        </div>
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#B4B9C7]">
-                            <Globe className="text-indigo-400" size={12} /> {card.distribuicao || "Interna"}
-                        </div>
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#B4B9C7]">
-                            <Clock className="text-indigo-400" size={12} /> {card.duracaoMinutos || 0}m
-                        </div>
-                    </div>
+    const getWorkflowStyle = (colunaNome: string) => {
+        if (colunaNome === "Standby" || colunaNome.includes("Edição")) return coresSopa.workflow.standby;
+        if (colunaNome === "Para Produção Semanal" || colunaNome === "Revisão LP") return coresSopa.workflow.semanal;
+        if (colunaNome === "Ao Vivo" || colunaNome === "Libras") return coresSopa.workflow.aovivo;
+        if (colunaNome === "Gravado" || colunaNome === "Produção LSE") return coresSopa.workflow.gravado;
+        if (colunaNome === "Concluído" || colunaNome === "Publicado") return coresSopa.workflow.concluido;
+        return { bg: "#F1F5F9", header: "#334155" };
+    };
 
-                    <div className="pt-4 border-t border-white/5">
-                        <select
-                            className="w-full text-xs p-2.5 rounded-lg bg-[#161825] border border-white/10 text-white outline-none focus:border-indigo-500"
-                            value={card.responsavelAtualId || ""}
-                            onChange={(event) => {
-                                setCards((previous) => {
-                                    return previous.map((item) => {
-                                        return item.id === card.id ? { ...item, responsavelAtualId: event.target.value } : item;
-                                    });
-                                });
-                            }}
-                        >
-                            <option value="">Atribuir profissional...</option>
-                            {funcionarios.map((f) => (
-                                <option key={f.id} value={f.id}>{f.nome}</option>
-                            ))}
-                        </select>
-                    </div>
+    const renderCard = (cardItem: Card, index: number) => {
+        let areaColor = "#cbd5e1";
+        const etiquetasTexto = cardItem.etiquetas?.join(" ") || "";
+        if (etiquetasTexto.includes("Matemática")) areaColor = coresSopa.areas.matematica;
+        else if (etiquetasTexto.includes("Linguagens")) areaColor = coresSopa.areas.linguagens;
+        else if (etiquetasTexto.includes("Humanas")) areaColor = coresSopa.areas.humanas;
+        else if (etiquetasTexto.includes("Natureza")) areaColor = coresSopa.areas.natureza;
 
-                    <div className="mt-5 pt-4 border-t border-white/5 flex flex-wrap gap-2 items-center">
-                        <span className="text-[10px] font-black text-white/40 bg-white/5 px-2 py-1 rounded uppercase flex items-center gap-1 border border-white/5">
-                            <Hash className="text-indigo-400" size={10} /> {card.projeto || "Geral"}
-                        </span>
-                        <div className="ml-auto flex gap-2">
-                            {(card.acessibilidade?.includes("LIBRAS") || card.libras) && <span className="text-[9px] font-black text-emerald-400 border border-emerald-400/20 px-1 rounded">LIBRAS</span>}
-                            {(card.acessibilidade?.includes("Legendas") || card.legendas) && <span className="text-[9px] font-black text-amber-400 border border-amber-400/20 px-1 rounded">CC</span>}
+        return (
+            <Draggable key={cardItem.id} draggableId={cardItem.id} index={index}>
+                {(provided: DraggableProvided) => (
+                    <div 
+                        {...provided.draggableProps} 
+                        {...provided.dragHandleProps} 
+                        ref={provided.innerRef} 
+                        className="mb-4 rounded-2xl border border-slate-100 border-l-[6px] bg-white p-5 shadow-sm transition-all hover:shadow-md cursor-pointer" 
+                        style={{ ...provided.draggableProps.style, borderLeftColor: areaColor }}
+                        onClick={() => { onCardClick(cardItem); }}
+                    >
+                        <h4 className="text-slate-800 font-black text-sm uppercase tracking-tight text-left leading-tight">{cardItem.titulo}</h4>
+                        <div className="mt-4 flex items-center gap-2 text-[10px] font-bold uppercase text-slate-400">
+                            <User size={12} /> {cardItem.responsavel}
                         </div>
                     </div>
-                </div>
-            )}
-        </Draggable>
-    );
-
-    const renderColumn = (colName: string, suffix = "", isFullWidth = false) => (
-        <Droppable key={`${colName}${suffix}`} droppableId={`${colName}${suffix}`}>
-            {(provided, snapshot) => (
-                <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    id={suffix === "" ? `scroll-target-${colName}` : undefined}
-                    className={`${isFullWidth ? 'w-full' : 'w-85 shrink-0'} bg-[#161825]/50 border rounded-2xl p-5 flex flex-col h-full transition-colors ${
-                        snapshot.isDraggingOver ? "border-indigo-500/50 bg-[#1c1e2d]" : "border-white/5"
-                    }`}
-                >
-                    <h3 className="text-sm font-black text-white uppercase mb-5 flex justify-between items-center tracking-tighter">
-                        {colName}
-                        <span className="bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full text-[10px]">
-                            {cards.filter((c) => { return c.etapa === colName; }).length}
-                        </span>
-                    </h3>
-                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
-                        {cards.filter((c) => { return c.etapa === colName; }).map((card, index) => { return renderCard(card, index); })}
-                        {provided.placeholder}
-                    </div>
-                </div>
-            )}
-        </Droppable>
-    );
+                )}
+            </Draggable>
+        );
+    };
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
-            <div className="flex flex-col h-full relative">
-                <header className="shrink-0 mb-4 flex items-center justify-between px-6">
-                    <div className="flex flex-col">
-                        <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Workflow</h2>
-                        <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-[0.2em]">Gestão Digital Estúdio RIEH</p>
+            <div className="relative flex h-full flex-col p-8 pt-4 text-left">
+                <header className="mb-6 flex shrink-0 items-center justify-between">
+                    <div className="flex items-center gap-6">
+                        <div>
+                            <h2 className="tracking-tighter text-4xl font-black uppercase text-slate-800 leading-none">Workflow</h2>
+                            <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Estúdio RIEH — {filtroProjeto}</p>
+                        </div>
+                        <div className="flex items-center gap-3 bg-slate-100 p-1 rounded-2xl border border-slate-200">
+                             <span className="pl-4 text-[9px] font-black text-slate-400 uppercase">Projeto:</span>
+                             <select className="bg-white rounded-xl px-4 py-2 text-[10px] font-black uppercase text-slate-700 outline-none shadow-sm" value={filtroProjeto} onChange={(event_) => { setFiltroProjeto(event_.target.value); }}>
+                                <option value="Geral">Visão Geral</option>
+                                {projetos.map(p => <option key={p.id} value={p.nome}>{p.nome}</option>)}
+                             </select>
+                        </div>
                     </div>
-                    <div className="flex bg-[#0F111A] p-1.5 rounded-xl border border-white/5 shadow-2xl">
-                        <button 
-                            type="button"
-                            className={`px-6 py-2.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
-                                visaoQuadro === "geral" ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30" : "text-[#B4B9C7] hover:text-white"
-                            }`} 
-                            onClick={() => { setVisaoQuadro("geral"); }}
-                        >
-                            <LayoutDashboard size={14} /> Geral
-                        </button>
-                        <button 
-                            type="button"
-                            className={`px-6 py-2.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
-                                visaoQuadro === "focada" ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30" : "text-[#B4B9C7] hover:text-white"
-                            }`} 
-                            onClick={() => { setVisaoQuadro("focada"); }}
-                        >
-                            <Columns size={14} /> Comparar
-                        </button>
+                    <div className="flex rounded-2xl border border-slate-200 bg-slate-100 p-1 shadow-inner">
+                        <button className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-black uppercase transition-all ${visaoQuadro === "geral" ? "bg-white text-indigo-600 shadow-md" : "text-slate-400"}`} type="button" onClick={() => { setVisaoQuadro("geral"); }}><LayoutDashboard size={14} /> GERAL</button>
+                        <button className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-black uppercase transition-all ${visaoQuadro === "focada" ? "bg-white text-indigo-600 shadow-md" : "text-slate-400"}`} type="button" onClick={() => { setVisaoQuadro("focada"); }}><Columns size={14} /> COMPARAR</button>
                     </div>
                 </header>
 
-                <nav className="flex gap-3 overflow-x-auto px-6 pb-4 mb-4 custom-scrollbar border-b border-white/5 items-center shrink-0">
-                    <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mr-2">Salto Rápido:</span>
-                    {COLUNAS.map((col) => (
-                        <button 
-                            key={col} 
-                            className="whitespace-nowrap px-4 py-2 rounded-lg bg-white/5 text-[10px] font-black uppercase text-[#B4B9C7] hover:bg-indigo-500 hover:text-white transition-all border border-white/5" 
-                            type="button" 
-                            onClick={() => { handleJump(col); }}
-                        >
-                            {col}
-                        </button>
+                <nav className="custom-scrollbar mb-6 flex shrink-0 items-center gap-2 overflow-x-auto pb-4">
+                    <span className="mr-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">Salto Rápido:</span>
+                    {colunasAtivas.map((nomeColuna) => (
+                        <button key={nomeColuna} className="whitespace-nowrap rounded-xl border border-slate-100 bg-white px-5 py-2 text-[10px] font-black uppercase text-slate-400 shadow-sm transition-all hover:text-indigo-600" type="button" onClick={() => { handleJump(nomeColuna); }}>{nomeColuna}</button>
                     ))}
                 </nav>
 
-                <div className="flex-1 px-6 overflow-hidden">
-                    {visaoQuadro === "geral" ? (
-                        <div 
-                            className="flex gap-6 overflow-x-auto pb-12 pr-48 custom-scrollbar h-full items-start scroll-smooth"
-                            id="columns-container" 
-                        >
-                            {COLUNAS.map((col) => { return renderColumn(col); })}
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-2 gap-10 bg-[#0F111A]/50 p-8 rounded-3xl border border-white/5 h-full overflow-hidden mb-12">
-                            {[ 
-                                { val: colunaA, set: setColunaA, label: "Painel Esquerdo" }, 
-                                { val: colunaB, set: setColunaB, label: "Painel Direito" } 
-                            ].map((side, index) => (
-                                <div key={index} className="flex flex-col gap-5 h-full">
-                                    <div className="flex items-center justify-between px-2">
-                                        <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest bg-indigo-500/10 px-4 py-1.5 rounded-full">
-                                            {side.label}
-                                        </span>
-                                        <select 
-                                            className="bg-[#161825] text-white text-[10px] font-black p-3.5 rounded-xl border border-white/10 outline-none focus:border-indigo-500 min-w-64 uppercase" 
-                                            value={side.val as string} 
-                                            onChange={(event) => { side.set(event.target.value); }}
+                <div className="flex-1 overflow-hidden">
+                    <div 
+                        className={`custom-scrollbar h-full pb-8 scroll-smooth ${visaoQuadro === "geral" ? "flex items-start gap-8 overflow-x-auto pr-48" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 overflow-y-auto pr-4"}`} 
+                        id="columnsContainer"
+                    >
+                        {colunasAtivas.map((nomeColuna) => {
+                            const estiloFluxo = getWorkflowStyle(nomeColuna);
+                            const cardsNaColuna = cardsFiltrados.filter(c => c.etapa === nomeColuna);
+
+                            return (
+                                <Droppable key={nomeColuna} droppableId={nomeColuna}>
+                                    {(provided: DroppableProvided) => (
+                                        <div 
+                                            {...provided.droppableProps} 
+                                            ref={provided.innerRef} 
+                                            className={`${visaoQuadro === "geral" ? "w-80 shrink-0" : "w-full"} flex h-full flex-col rounded-[2.5rem] border border-slate-200/50 p-4`} 
+                                            id={`scrollTarget${nomeColuna.replace(/\s+/g, '')}`}
+                                            style={{ backgroundColor: estiloFluxo.bg }}
                                         >
-                                            {COLUNAS.map((c) => { return <option key={c} value={c}>{c}</option>; })}
-                                        </select>
-                                    </div>
-                                    {renderColumn(side.val as string, `-side-${index}`, true)}
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                                            <h3 className="mb-4 flex items-center justify-between rounded-full py-3 px-6 text-[11px] font-black uppercase tracking-widest text-white shadow-sm"
+                                                style={{ backgroundColor: estiloFluxo.header }}>
+                                                {nomeColuna} <span className="rounded-full bg-white/20 px-3 py-0.5 text-[9px] text-white">{cardsNaColuna.length}</span>
+                                            </h3>
+                                            <div className="custom-scrollbar flex-1 overflow-y-auto pr-1 min-h-[50px]">
+                                                {cardsNaColuna.map((cardItem, index) => renderCard(cardItem, index))}
+                                                {provided.placeholder}
+                                            </div>
+                                        </div>
+                                    )}
+                                </Droppable>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
         </DragDropContext>

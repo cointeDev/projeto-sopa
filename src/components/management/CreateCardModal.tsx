@@ -1,166 +1,145 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import type { Card } from "../../pages/GestorLocal";
+import { useState } from "react";
+import { X, Plus, ListFilter } from "lucide-react";
+import type { Card, Projeto } from "../../pages/GestorLocal";
 
-interface ModalProps {
-    onClose: () => void;
-    onSave: (dadosNovoCard: Omit<Card, "id" | "etapa">) => void;
-}
+const etapasPadrao = ["Gravação", "Edição 1", "Edição 2", "Edição 3", "Edição Final", "Libras", "Revisão LP", "Produção LSE"];
 
-export function CreateCardModal({ onClose, onSave }: ModalProps) {
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const formData = new FormData(event.currentTarget);
+export function CreateCardModal({ onClose, onSave, projetosAtuais, onCreateProject }: { 
+    onClose: () => void; 
+    onSave: (dadosCard_: Omit<Card, "id" | "etapa">) => void;
+    projetosAtuais: Array<Projeto>;
+    onCreateProject: (projetoNovo_: Projeto) => void;
+}) {
+    const [modoVisualizacao, setModoVisualizacao] = useState<"card" | "projeto">("card");
+    const [listaOpcoesEtapas, setListaOpcoesEtapas] = useState<Array<string>>(etapasPadrao);
+    const [etapasSelecionadas, setEtapasSelecionadas] = useState<Array<string>>(["Standby", "Publicado"]);
+    const [projetoSelecionado, setProjetoSelecionado] = useState(projetosAtuais[0]?.nome || "");
+    const [nomeNovaColuna, setNomeNovaColuna] = useState("");
+
+    const adicionarColunaCustomizada = () => {
+        const nomeLimpo_ = nomeNovaColuna.trim();
+        if (nomeLimpo_ && !listaOpcoesEtapas.includes(nomeLimpo_)) {
+            // Adiciona à lista de opções visíveis com checkbox
+            setListaOpcoesEtapas([...listaOpcoesEtapas, nomeLimpo_]);
+            // Marca automaticamente a nova coluna como selecionada
+            setEtapasSelecionadas([...etapasSelecionadas, nomeLimpo_]);
+            setNomeNovaColuna("");
+        }
+    };
+
+    const alternarSelecaoEtapa = (etapaAlvo_: string) => {
+        setEtapasSelecionadas(lista_ => 
+            lista_.includes(etapaAlvo_) 
+                ? lista_.filter(item_ => item_ !== etapaAlvo_) 
+                : [...lista_, etapaAlvo_]
+        );
+    };
+
+    const tratarEnvioCard = (event_: React.FormEvent<HTMLFormElement>) => {
+        event_.preventDefault();
+        const dadosFormulario_ = new FormData(event_.currentTarget);
+        const projetoEncontrado_ = projetosAtuais.find(p => p.nome === projetoSelecionado);
         
-        const dados: Omit<Card, "id" | "etapa"> = {
-            titulo: formData.get("titulo") as string,
-            responsavel: formData.get("responsavel") as string,
-            emailSolicitante: formData.get("emailSolicitante") as string,
-            setor: formData.get("setor") as string,
-            projeto: formData.get("projeto") as string,
-            tipoProducao: formData.get("tipoProducao") as string,
-            formato: formData.get("formato") as string,
-            localGravacao: formData.get("localGravacao") as string,
-            dataGravacao: formData.get("dataGravacao") as string,
-            horaGravacao: formData.get("horaGravacao") as string,
-            duracaoMinutos: Number(formData.get("duracaoMinutos")),
-            dataLimite: formData.get("dataLimite") as string,
-            pessoasEmCena: Number(formData.get("pessoasEmCena")),
-            distribuicao: formData.get("distribuicao") as string,
-            descricao: formData.get("descricao") as string,
-            observacoes: formData.get("observacoes") as string,
-            libras: formData.get("libras") === "on",
-            legendas: formData.get("legendas") === "on",
-            acessibilidade: [] // Pode ser populado baseado nos checkboxes
+        onSave({
+            titulo: dadosFormulario_.get("titulo") as string,
+            projeto: projetoSelecionado,
+            responsavel: dadosFormulario_.get("responsavel") as string,
+            fluxoEtapas: projetoEncontrado_ ? projetoEncontrado_.etapas : etapasSelecionadas,
+            setor: "SEEC/RN",
+            nucleo: "Núcleo Natal",
+            tipoProducao: "Vídeo",
+            etiquetas: [projetoSelecionado],
+            caracteristicas: { participantes: Number(dadosFormulario_.get("participantes")) },
+            formato: dadosFormulario_.get("formato") as string,
+            roteiro: { texto: dadosFormulario_.get("roteiro") as string }
+        });
+    };
+
+    const tratarEnvioProjeto = (event_: React.FormEvent<HTMLFormElement>) => {
+        event_.preventDefault();
+        const dadosFormulario_ = new FormData(event_.currentTarget);
+        const projetoNovo_ = {
+            id: Math.random().toString(36).substring(2, 9),
+            nome: dadosFormulario_.get("nomeProjeto") as string,
+            etapas: etapasSelecionadas
         };
-        onSave(dados);
+        onCreateProject(projetoNovo_);
+        setProjetoSelecionado(projetoNovo_.nome);
+        setModoVisualizacao("card");
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="bg-[#161825] w-full max-w-5xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden animate-fade-in">
-                <header className="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-[#161825]">
-                    <h2 className="text-xl font-black text-white uppercase tracking-widest">Novo Planeamento de Produção</h2>
-                    <button className="text-[#B4B9C7] hover:text-white text-2xl" type="button" onClick={onClose}>×</button>
+        <div className="fixed inset-0 z-110 flex items-center justify-center bg-slate-900/60 p-6 backdrop-blur-md">
+            <div className="bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col text-left animate-fade-in ring-1 ring-white/20">
+                <header className="p-10 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center relative">
+                    <div className="absolute left-0 top-0 h-[3px] w-full bg-[#4f46e5]" />
+                    <div className="space-y-1">
+                        <h2 className="text-3xl font-black text-[#334155] uppercase tracking-tighter">
+                            {modoVisualizacao === "card" ? "Novo Processo" : "Configurar Novo Projeto"}
+                        </h2>
+                        <nav className="flex gap-4 mt-2">
+                            <button className={`text-[9px] font-black uppercase tracking-widest ${modoVisualizacao === "card" ? "text-[#4f46e5]" : "text-slate-400"}`} type="button" onClick={() => { setModoVisualizacao("card"); }}>1. Dados da Aula</button>
+                            <button className={`text-[9px] font-black uppercase tracking-widest ${modoVisualizacao === "projeto" ? "text-[#4f46e5]" : "text-slate-400"}`} type="button" onClick={() => { setModoVisualizacao("projeto"); }}>2. Fluxo do Projeto</button>
+                        </nav>
+                    </div>
+                    <button className="p-4 bg-white rounded-2xl shadow-xl hover:text-red-500 transition-all" type="button" onClick={onClose}><X size={28} /></button>
                 </header>
-                
-                <form className="p-8 grid grid-cols-1 md:grid-cols-3 gap-6 max-h-[80vh] overflow-y-auto custom-scrollbar" onSubmit={handleSubmit}>
-                    {/* Seção 1: Identificação (Step 1) */}
-                    <div className="md:col-span-3 border-b border-white/5 pb-2">
-                        <span className="text-indigo-400 text-[10px] font-black uppercase tracking-widest">1. Identificação do Solicitante</span>
-                    </div>
-                    <div className="md:col-span-2">
-                        <label className="block text-[9px] font-black uppercase text-[#B4B9C7] mb-1.5">Título do Conteúdo</label>
-                        <input required className="w-full bg-[#0F111A] border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-white text-sm" name="titulo" />
-                    </div>
-                    <div>
-                        <label className="block text-[9px] font-black uppercase text-[#B4B9C7] mb-1.5">Nome do Responsável</label>
-                        <input required className="w-full bg-[#0F111A] border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-white text-sm" name="responsavel" />
-                    </div>
-                    <div>
-                        <label className="block text-[9px] font-black uppercase text-[#B4B9C7] mb-1.5">E-mail Institucional</label>
-                        <input required className="w-full bg-[#0F111A] border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-white text-sm" name="emailSolicitante" type="email" />
-                    </div>
-                    <div>
-                        <label className="block text-[9px] font-black uppercase text-[#B4B9C7] mb-1.5">Setor / Sigla</label>
-                        <input required className="w-full bg-[#0F111A] border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-white text-sm" name="setor" />
-                    </div>
-                    <div>
-                        <label className="block text-[9px] font-black uppercase text-[#B4B9C7] mb-1.5">Projeto / Disciplina</label>
-                        <input required className="w-full bg-[#0F111A] border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-white text-sm" name="projeto" />
-                    </div>
 
-                    {/* Seção 2: Produção (Step 2 e 3) */}
-                    <div className="md:col-span-3 border-b border-white/5 pb-2 mt-4">
-                        <span className="text-indigo-400 text-[10px] font-black uppercase tracking-widest">2. Detalhes de Produção</span>
-                    </div>
-                    <div>
-                        <label className="block text-[9px] font-black uppercase text-[#B4B9C7] mb-1.5">Tipo de Produção</label>
-                        <select className="w-full bg-[#0F111A] border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-white text-sm" name="tipoProducao">
-                            <option value="Videoaula">Gravação de videoaula</option>
-                            <option value="Evento em estúdio">Evento em estúdio</option>
-                            <option value="Vídeo institucional">Vídeo institucional</option>
-                            <option value="Edição">Edição</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-[9px] font-black uppercase text-[#B4B9C7] mb-1.5">Formato</label>
-                        <select className="w-full bg-[#0F111A] border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-white text-sm" name="formato">
-                            <option value="Podcast / Mesacast">Podcast / Mesacast</option>
-                            <option value="Live presencial">Live presencial</option>
-                            <option value="Gravação de programa">Gravação de programa</option>
-                            <option value="Shorts / Reels">Shorts / Reels</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-[9px] font-black uppercase text-[#B4B9C7] mb-1.5">Distribuição</label>
-                        <select className="w-full bg-[#0F111A] border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-white text-sm" name="distribuicao">
-                            <option value="interna">Veiculação Interna</option>
-                            <option value="seec">Canal da SEEC</option>
-                            <option value="instagram">Instagram da SEEC</option>
-                        </select>
-                    </div>
+                <div className="p-12 overflow-y-auto custom-scrollbar">
+                    {modoVisualizacao === "card" ? (
+                        <form className="space-y-10" onSubmit={tratarEnvioCard}>
+                            <div className="grid grid-cols-2 gap-8 text-left">
+                                <div className="col-span-2">
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Título da Gravação</label>
+                                    <input required className="w-full rounded-2xl border border-slate-200 bg-[#F8FAFC] p-5 font-bold text-[#334155] outline-none focus:ring-4 focus:ring-indigo-50" name="titulo" />
+                                </div>
+                                <div>
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Projeto Vinculado</label>
+                                    <div className="flex gap-2">
+                                        <select className="flex-1 rounded-2xl border border-slate-200 bg-[#F8FAFC] p-5 font-bold text-[#334155] outline-none" value={projetoSelecionado} onChange={(event_) => { setProjetoSelecionado(event_.target.value); }}>
+                                            {projetosAtuais.map(p_ => <option key={p_.id} value={p_.nome}>{p_.nome}</option>)}
+                                        </select>
+                                        <button className="p-5 bg-indigo-50 text-[#4f46e5] rounded-2xl hover:bg-indigo-100" type="button" onClick={() => { setModoVisualizacao("projeto"); }}><Plus size={20}/></button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Responsável</label>
+                                    <input required className="w-full rounded-2xl border border-slate-200 bg-[#F8FAFC] p-5 font-bold text-[#334155] outline-none" name="responsavel" />
+                                </div>
+                            </div>
+                            <footer className="flex justify-end pt-10 border-t"><button className="bg-[#4f46e5] text-white px-12 py-5 rounded-2xl font-black text-[10px] uppercase shadow-xl hover:scale-105 transition-all" type="submit">Criar Card</button></footer>
+                        </form>
+                    ) : (
+                        <form className="space-y-10" onSubmit={tratarEnvioProjeto}>
+                            <div className="text-left">
+                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Nome Identificador do Projeto</label>
+                                <input required className="w-full rounded-2xl border border-slate-200 bg-[#F8FAFC] p-5 font-bold text-[#334155] outline-none focus:ring-4 focus:ring-indigo-50" name="nomeProjeto" placeholder="Ex: Novo Curso 2026" />
+                            </div>
 
-                    {/* Seção 3: Logística e Prazos (Step 4) */}
-                    <div className="md:col-span-3 border-b border-white/5 pb-2 mt-4">
-                        <span className="text-indigo-400 text-[10px] font-black uppercase tracking-widest">3. Logística e Prazos</span>
-                    </div>
-                    <div>
-                        <label className="block text-[9px] font-black uppercase text-[#B4B9C7] mb-1.5">Local de Gravação</label>
-                        <select className="w-full bg-[#0F111A] border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-white text-sm" name="localGravacao">
-                            <option value="Natal">Estúdio Natal</option>
-                            <option value="Mossoró">Estúdio Mossoró</option>
-                            <option value="Externo">Externo (In Loco)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-[9px] font-black uppercase text-[#B4B9C7] mb-1.5">Data da Gravação</label>
-                        <input required className="w-full bg-[#0F111A] border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-white text-sm" name="dataGravacao" type="date" />
-                    </div>
-                    <div>
-                        <label className="block text-[9px] font-black uppercase text-[#B4B9C7] mb-1.5">Hora da Gravação</label>
-                        <input required className="w-full bg-[#0F111A] border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-white text-sm" name="horaGravacao" type="time" />
-                    </div>
-                    <div>
-                        <label className="block text-[9px] font-black uppercase text-[#B4B9C7] mb-1.5">Pessoas em Cena</label>
-                        <input required className="w-full bg-[#0F111A] border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-white text-sm" name="pessoasEmCena" type="number" />
-                    </div>
-                    <div>
-                        <label className="block text-[9px] font-black uppercase text-[#B4B9C7] mb-1.5">Duração (Minutos)</label>
-                        <input required className="w-full bg-[#0F111A] border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-white text-sm" name="duracaoMinutos" type="number" />
-                    </div>
-                    <div>
-                        <label className="block text-[9px] font-black uppercase text-[#B4B9C7] mb-1.5">Prazo de Entrega Final</label>
-                        <input required className="w-full bg-[#0F111A] border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-white text-sm" name="dataLimite" type="date" />
-                    </div>
+                            <section className="bg-slate-50/50 p-10 rounded-[2.5rem] border border-slate-100 text-left">
+                                <div className="flex items-center justify-between mb-8">
+                                    <h3 className="text-sm font-black text-[#334155] uppercase flex items-center gap-2"><ListFilter className="text-[#4f46e5]" size={18} /> Seleção de Colunas</h3>
+                                    <div className="flex gap-2 p-1.5 bg-white rounded-2xl border border-dashed border-slate-300">
+                                        <input className="px-4 text-[10px] font-bold outline-none uppercase w-32" placeholder="Criar coluna..." value={nomeNovaColuna} onChange={(event_) => { setNomeNovaColuna(event_.target.value); }} />
+                                        <button className="bg-indigo-600 text-white p-2 rounded-xl hover:bg-indigo-700" type="button" onClick={adicionarColunaCustomizada}><Plus size={14} /></button>
+                                    </div>
+                                </div>
 
-                    <div className="md:col-span-3 flex gap-8 py-4 border-y border-white/5 my-2">
-                        <label className="flex items-center gap-3 cursor-pointer group">
-                            <input className="w-5 h-5 accent-indigo-500" name="libras" type="checkbox" />
-                            <span className="text-[10px] font-black uppercase text-[#B4B9C7] group-hover:text-white transition-colors">Requer LIBRAS</span>
-                        </label>
-                        <label className="flex items-center gap-3 cursor-pointer group">
-                            <input className="w-5 h-5 accent-indigo-500" name="legendas" type="checkbox" />
-                            <span className="text-[10px] font-black uppercase text-[#B4B9C7] group-hover:text-white transition-colors">Requer CC</span>
-                        </label>
-                    </div>
-
-                    <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-[9px] font-black uppercase text-indigo-400 mb-1.5">Descrição do Conteúdo</label>
-                            <textarea className="w-full bg-[#0F111A] border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-white text-sm custom-scrollbar" name="descricao" rows={3} />
-                        </div>
-                        <div>
-                            <label className="block text-[9px] font-black uppercase text-indigo-400 mb-1.5">Observações Finais</label>
-                            <textarea className="w-full bg-[#0F111A] border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-white text-sm custom-scrollbar" name="observacoes" rows={3} />
-                        </div>
-                    </div>
-
-                    <footer className="md:col-span-3 flex justify-end gap-4 pt-6 border-t border-white/5 mt-4">
-                        <button className="px-6 py-3 text-[10px] font-black uppercase text-[#B4B9C7] hover:text-white transition-all" type="button" onClick={onClose}>Cancelar</button>
-                        <button className="bg-indigo-600 hover:bg-indigo-500 px-10 py-3 rounded-xl text-[10px] font-black uppercase text-white shadow-lg shadow-indigo-900/20 transition-all" type="submit">Gerar Card de Produção</button>
-                    </footer>
-                </form>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                    {listaOpcoesEtapas.map(etapa_ => (
+                                        <label key={etapa_} className={`flex items-center gap-3 p-4 rounded-2xl border transition-all cursor-pointer ${etapasSelecionadas.includes(etapa_) ? 'bg-white border-[#4f46e5] shadow-md' : 'bg-transparent border-slate-200 opacity-60'}`}>
+                                            <input checked={etapasSelecionadas.includes(etapa_)} className="h-4 w-4 accent-[#4f46e5]" type="checkbox" onChange={() => { alternarSelecaoEtapa(etapa_); }} />
+                                            <span className="text-[9px] font-black text-[#334155] uppercase">{etapa_}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </section>
+                            <footer className="flex justify-end pt-10 border-t"><button className="bg-[#334155] text-white px-12 py-5 rounded-2xl font-black text-[10px] uppercase shadow-xl hover:scale-105 transition-all" type="submit">Salvar Projeto e Voltar</button></footer>
+                        </form>
+                    )}
+                </div>
             </div>
         </div>
     );
