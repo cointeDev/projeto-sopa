@@ -1,145 +1,152 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { useState } from "react";
-import { X, Plus, ListFilter } from "lucide-react";
-import type { Card, Projeto } from "../../pages/GestorLocal";
+import { X, Plus, Palette, User, FileText, Layout, CheckSquare } from "lucide-react";
+import type { Projeto } from "../../pages/GestorLocal";
 
-const etapasPadrao = ["Gravação", "Edição 1", "Edição 2", "Edição 3", "Edição Final", "Libras", "Revisão LP", "Produção LSE"];
+const coresAreas = {
+    matematica: { bg: "#fdde82", label: "Matemática" },
+    linguagens: { bg: "#bec658", label: "Linguagens" },
+    humanas: { bg: "#c3dcf6", label: "Humanas" },
+    natureza: { bg: "#4068a7", label: "Natureza" }
+};
 
-export function CreateCardModal({ onClose, onSave, projetosAtuais, onCreateProject }: { 
-    onClose: () => void; 
-    onSave: (dadosCard_: Omit<Card, "id" | "etapa">) => void;
+const etapasPadrao = ["STANDBY", "PARA PRODUÇÃO SEMANAL", "AO VIVO", "GRAVADO", "EDIÇÃO 1", "EDIÇÃO 2", "EDIÇÃO 3", "EDIÇÃO FINAL", "LIBRAS", "REVISÃO LP", "PRODUÇÃO LSE", "CONCLUÍDO", "PUBLICADO"];
+
+export interface NovoCardInterface {
+    titulo: string;
+    responsavel: string;
+    projeto: string;
+    etiquetaArea: string;
+    corDestaque: string;
+    etapa: string;
+    fluxoEtapas: Array<string>;
+}
+
+interface CreateCardModalProps {
+    isOpen: boolean;
+    onClose: () => void;
     projetosAtuais: Array<Projeto>;
-    onCreateProject: (projetoNovo_: Projeto) => void;
-}) {
-    const [modoVisualizacao, setModoVisualizacao] = useState<"card" | "projeto">("card");
-    const [listaOpcoesEtapas, setListaOpcoesEtapas] = useState<Array<string>>(etapasPadrao);
-    const [etapasSelecionadas, setEtapasSelecionadas] = useState<Array<string>>(["Standby", "Publicado"]);
-    const [projetoSelecionado, setProjetoSelecionado] = useState(projetosAtuais[0]?.nome || "");
-    const [nomeNovaColuna, setNomeNovaColuna] = useState("");
+    onSave: (novoCard: NovoCardInterface) => void;
+    onCreateProject: (novoProjeto: Projeto) => void;
+}
 
-    const adicionarColunaCustomizada = () => {
-        const nomeLimpo_ = nomeNovaColuna.trim();
-        if (nomeLimpo_ && !listaOpcoesEtapas.includes(nomeLimpo_)) {
-            // Adiciona à lista de opções visíveis com checkbox
-            setListaOpcoesEtapas([...listaOpcoesEtapas, nomeLimpo_]);
-            // Marca automaticamente a nova coluna como selecionada
-            setEtapasSelecionadas([...etapasSelecionadas, nomeLimpo_]);
-            setNomeNovaColuna("");
+export function CreateCardModal({ isOpen, onClose, projetosAtuais, onSave, onCreateProject }: CreateCardModalProps) {
+    const [passo, setPasso] = useState<1 | 2>(1);
+    const [projetoId, setProjetoId] = useState("");
+    const [titulo, setTitulo] = useState("");
+    const [responsavel, setResponsavel] = useState("");
+    const [areaConhecimento, setAreaConhecimento] = useState<keyof typeof coresAreas>("matematica");
+    
+    const [etapasSelecionadas, setEtapasSelecionadas] = useState<Array<string>>(["STANDBY", "CONCLUÍDO"]);
+    const [listaEtapas, setListaEtapas] = useState<Array<string>>(etapasPadrao);
+    const [novaEtapaNome, setNovaEtapaNome] = useState("");
+
+    if (!isOpen) return null;
+
+    const handleAdicionarEtapa = () => {
+        const formatada = novaEtapaNome.trim().toUpperCase();
+        if (formatada && !listaEtapas.includes(formatada)) {
+            setListaEtapas(previous => [...previous, formatada]);
+            setEtapasSelecionadas(previous => [...previous, formatada]);
+            setNovaEtapaNome("");
         }
     };
 
-    const alternarSelecaoEtapa = (etapaAlvo_: string) => {
-        setEtapasSelecionadas(lista_ => 
-            lista_.includes(etapaAlvo_) 
-                ? lista_.filter(item_ => item_ !== etapaAlvo_) 
-                : [...lista_, etapaAlvo_]
-        );
+    const handleNovoProjeto = () => {
+        const nome = prompt("Nome do novo projeto:");
+        if (nome) {
+            const novo: Projeto = { id: Math.random().toString(36).substring(2, 9), nome, etapas: etapasPadrao };
+            onCreateProject(novo);
+            setProjetoId(novo.id);
+        }
     };
 
-    const tratarEnvioCard = (event_: React.FormEvent<HTMLFormElement>) => {
-        event_.preventDefault();
-        const dadosFormulario_ = new FormData(event_.currentTarget);
-        const projetoEncontrado_ = projetosAtuais.find(p => p.nome === projetoSelecionado);
-        
+    const handleFinalizar = () => {
+        if (!titulo || !projetoId) { alert("Preencha os dados básicos."); return; }
+        const projetoObject = projetosAtuais.find(p => p.id === projetoId);
         onSave({
-            titulo: dadosFormulario_.get("titulo") as string,
-            projeto: projetoSelecionado,
-            responsavel: dadosFormulario_.get("responsavel") as string,
-            fluxoEtapas: projetoEncontrado_ ? projetoEncontrado_.etapas : etapasSelecionadas,
-            setor: "SEEC/RN",
-            nucleo: "Núcleo Natal",
-            tipoProducao: "Vídeo",
-            etiquetas: [projetoSelecionado],
-            caracteristicas: { participantes: Number(dadosFormulario_.get("participantes")) },
-            formato: dadosFormulario_.get("formato") as string,
-            roteiro: { texto: dadosFormulario_.get("roteiro") as string }
+            titulo,
+            responsavel,
+            projeto: projetoObject?.nome || "Geral",
+            etiquetaArea: coresAreas[areaConhecimento].label,
+            corDestaque: coresAreas[areaConhecimento].bg,
+            etapa: etapasSelecionadas[0] || "STANDBY",
+            fluxoEtapas: etapasSelecionadas
         });
-    };
-
-    const tratarEnvioProjeto = (event_: React.FormEvent<HTMLFormElement>) => {
-        event_.preventDefault();
-        const dadosFormulario_ = new FormData(event_.currentTarget);
-        const projetoNovo_ = {
-            id: Math.random().toString(36).substring(2, 9),
-            nome: dadosFormulario_.get("nomeProjeto") as string,
-            etapas: etapasSelecionadas
-        };
-        onCreateProject(projetoNovo_);
-        setProjetoSelecionado(projetoNovo_.nome);
-        setModoVisualizacao("card");
+        onClose();
     };
 
     return (
-        <div className="fixed inset-0 z-110 flex items-center justify-center bg-slate-900/60 p-6 backdrop-blur-md">
-            <div className="bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col text-left animate-fade-in ring-1 ring-white/20">
-                <header className="p-10 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center relative">
-                    <div className="absolute left-0 top-0 h-[3px] w-full bg-[#4f46e5]" />
-                    <div className="space-y-1">
-                        <h2 className="text-3xl font-black text-[#334155] uppercase tracking-tighter">
-                            {modoVisualizacao === "card" ? "Novo Processo" : "Configurar Novo Projeto"}
-                        </h2>
-                        <nav className="flex gap-4 mt-2">
-                            <button className={`text-[9px] font-black uppercase tracking-widest ${modoVisualizacao === "card" ? "text-[#4f46e5]" : "text-slate-400"}`} type="button" onClick={() => { setModoVisualizacao("card"); }}>1. Dados da Aula</button>
-                            <button className={`text-[9px] font-black uppercase tracking-widest ${modoVisualizacao === "projeto" ? "text-[#4f46e5]" : "text-slate-400"}`} type="button" onClick={() => { setModoVisualizacao("projeto"); }}>2. Fluxo do Projeto</button>
-                        </nav>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 text-left font-inter">
+            <div className="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                <header className="p-8 pb-4 flex items-center justify-between border-b border-slate-100 shrink-0">
+                    <div className="flex flex-col">
+                        <h2 className="text-3xl font-black uppercase tracking-tighter text-slate-800 leading-none">Novo Processo</h2>
+                        <div className="flex gap-4 mt-2 font-black uppercase">
+                            <button className={`text-[10px] ${passo === 1 ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-300'}`} type="button" onClick={() => { setPasso(1); }}>1. Dados Básicos</button>
+                            <button className={`text-[10px] ${passo === 2 ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-300'}`} type="button" onClick={() => { setPasso(2); }}>2. Personalizar Fluxo</button>
+                        </div>
                     </div>
-                    <button className="p-4 bg-white rounded-2xl shadow-xl hover:text-red-500 transition-all" type="button" onClick={onClose}><X size={28} /></button>
+                    <button className="p-3 bg-slate-50 rounded-2xl text-slate-400 hover:text-slate-600" type="button" onClick={onClose}><X size={20} /></button>
                 </header>
 
-                <div className="p-12 overflow-y-auto custom-scrollbar">
-                    {modoVisualizacao === "card" ? (
-                        <form className="space-y-10" onSubmit={tratarEnvioCard}>
-                            <div className="grid grid-cols-2 gap-8 text-left">
-                                <div className="col-span-2">
-                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Título da Gravação</label>
-                                    <input required className="w-full rounded-2xl border border-slate-200 bg-[#F8FAFC] p-5 font-bold text-[#334155] outline-none focus:ring-4 focus:ring-indigo-50" name="titulo" />
+                <div className="p-8 overflow-y-auto custom-scrollbar flex-1">
+                    {passo === 1 ? (
+                        <div className="space-y-6">
+                            <div className="space-y-2 text-left">
+                                <label className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tracking-widest"><Layout size={12} /> Projeto Vinculado</label>
+                                <div className="flex gap-2">
+                                    <select className="flex-1 bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold text-slate-700 outline-none appearance-none" value={projetoId} onChange={(event_) => { setProjetoId(event_.target.value); }}>
+                                        <option value="">Selecione o Projeto</option>
+                                        {projetosAtuais.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                                    </select>
+                                    <button className="p-4 bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-100" type="button" onClick={handleNovoProjeto}><Plus size={20} /></button>
                                 </div>
-                                <div>
-                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Projeto Vinculado</label>
+                            </div>
+                            <div className="space-y-2 text-left">
+                                <label className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tracking-widest"><FileText size={12} /> Título da Gravação</label>
+                                <input className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold text-slate-700 outline-none" type="text" value={titulo} onChange={(event_) => { setTitulo(event_.target.value); }} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2 text-left">
+                                    <label className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tracking-widest"><User size={12} /> Responsável</label>
+                                    <input className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold text-slate-700 outline-none" type="text" value={responsavel} onChange={(event_) => { setResponsavel(event_.target.value); }} />
+                                </div>
+                                <div className="space-y-2 text-left">
+                                    <label className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tracking-widest"><Palette size={12} /> Área</label>
                                     <div className="flex gap-2">
-                                        <select className="flex-1 rounded-2xl border border-slate-200 bg-[#F8FAFC] p-5 font-bold text-[#334155] outline-none" value={projetoSelecionado} onChange={(event_) => { setProjetoSelecionado(event_.target.value); }}>
-                                            {projetosAtuais.map(p_ => <option key={p_.id} value={p_.nome}>{p_.nome}</option>)}
-                                        </select>
-                                        <button className="p-5 bg-indigo-50 text-[#4f46e5] rounded-2xl hover:bg-indigo-100" type="button" onClick={() => { setModoVisualizacao("projeto"); }}><Plus size={20}/></button>
+                                        {(Object.keys(coresAreas) as Array<keyof typeof coresAreas>).map((k) => (
+                                            <button key={k} className={`w-10 h-10 rounded-xl border-2 transition-all ${areaConhecimento === k ? 'ring-2 ring-indigo-500 scale-110 border-white' : 'border-transparent opacity-60'}`} style={{ backgroundColor: coresAreas[k].bg }} type="button" onClick={() => { setAreaConhecimento(k); }} />
+                                        ))}
                                     </div>
                                 </div>
-                                <div>
-                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Responsável</label>
-                                    <input required className="w-full rounded-2xl border border-slate-200 bg-[#F8FAFC] p-5 font-bold text-[#334155] outline-none" name="responsavel" />
-                                </div>
                             </div>
-                            <footer className="flex justify-end pt-10 border-t"><button className="bg-[#4f46e5] text-white px-12 py-5 rounded-2xl font-black text-[10px] uppercase shadow-xl hover:scale-105 transition-all" type="submit">Criar Card</button></footer>
-                        </form>
+                        </div>
                     ) : (
-                        <form className="space-y-10" onSubmit={tratarEnvioProjeto}>
-                            <div className="text-left">
-                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Nome Identificador do Projeto</label>
-                                <input required className="w-full rounded-2xl border border-slate-200 bg-[#F8FAFC] p-5 font-bold text-[#334155] outline-none focus:ring-4 focus:ring-indigo-50" name="nomeProjeto" placeholder="Ex: Novo Curso 2026" />
+                        <div className="space-y-6">
+                            <div className="flex gap-2 mb-4">
+                                <input className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-bold outline-none" placeholder="Criar nova etapa..." value={novaEtapaNome} onChange={(event_) => { setNovaEtapaNome(event_.target.value); }} />
+                                <button className="p-3 bg-indigo-600 text-white rounded-xl shadow-sm" type="button" onClick={handleAdicionarEtapa}><Plus size={18} /></button>
                             </div>
-
-                            <section className="bg-slate-50/50 p-10 rounded-[2.5rem] border border-slate-100 text-left">
-                                <div className="flex items-center justify-between mb-8">
-                                    <h3 className="text-sm font-black text-[#334155] uppercase flex items-center gap-2"><ListFilter className="text-[#4f46e5]" size={18} /> Seleção de Colunas</h3>
-                                    <div className="flex gap-2 p-1.5 bg-white rounded-2xl border border-dashed border-slate-300">
-                                        <input className="px-4 text-[10px] font-bold outline-none uppercase w-32" placeholder="Criar coluna..." value={nomeNovaColuna} onChange={(event_) => { setNomeNovaColuna(event_.target.value); }} />
-                                        <button className="bg-indigo-600 text-white p-2 rounded-xl hover:bg-indigo-700" type="button" onClick={adicionarColunaCustomizada}><Plus size={14} /></button>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                    {listaOpcoesEtapas.map(etapa_ => (
-                                        <label key={etapa_} className={`flex items-center gap-3 p-4 rounded-2xl border transition-all cursor-pointer ${etapasSelecionadas.includes(etapa_) ? 'bg-white border-[#4f46e5] shadow-md' : 'bg-transparent border-slate-200 opacity-60'}`}>
-                                            <input checked={etapasSelecionadas.includes(etapa_)} className="h-4 w-4 accent-[#4f46e5]" type="checkbox" onChange={() => { alternarSelecaoEtapa(etapa_); }} />
-                                            <span className="text-[9px] font-black text-[#334155] uppercase">{etapa_}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </section>
-                            <footer className="flex justify-end pt-10 border-t"><button className="bg-[#334155] text-white px-12 py-5 rounded-2xl font-black text-[10px] uppercase shadow-xl hover:scale-105 transition-all" type="submit">Salvar Projeto e Voltar</button></footer>
-                        </form>
+                            <div className="grid grid-cols-1 gap-2">
+                                {listaEtapas.map((etapa) => (
+                                    <label key={etapa} className={`flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all ${etapasSelecionadas.includes(etapa) ? 'bg-indigo-50 border border-indigo-100' : 'bg-slate-50 opacity-60'}`}>
+                                        <span className="text-[10px] font-black uppercase text-slate-600">{etapa}</span>
+                                        <input checked={etapasSelecionadas.includes(etapa)} className="hidden" type="checkbox" onChange={() => { setEtapasSelecionadas(previous => previous.includes(etapa) ? previous.filter(index => index !== etapa) : [...previous, etapa]); }} />
+                                        <div className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 transition-all ${etapasSelecionadas.includes(etapa) ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-200 bg-white'}`}>
+                                            {etapasSelecionadas.includes(etapa) && <CheckSquare size={14} />}
+                                        </div>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
                     )}
                 </div>
+
+                <footer className="p-8 bg-slate-50/50 flex justify-end gap-4 border-t border-slate-100 shrink-0">
+                    <button className="bg-indigo-600 text-white px-12 py-4 rounded-2xl text-[10px] font-black uppercase shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-1 transition-all active:scale-95" type="button" onClick={handleFinalizar}>Finalizar e Criar</button>
+                </footer>
             </div>
         </div>
     );

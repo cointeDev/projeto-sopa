@@ -2,20 +2,19 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { useState, useMemo } from "react";
 import { DragDropContext, Droppable, Draggable, type DropResult, type DroppableProvided, type DraggableProvided } from "@hello-pangea/dnd";
-import { LayoutDashboard, Columns, User } from "lucide-react"; 
+import { LayoutDashboard, Columns, User, Pause, Calendar, Radio, Video, Edit3, CheckCircle, UploadCloud, ArrowRightLeft } from "lucide-react"; 
 import type { Card, Projeto } from "../../pages/GestorLocal";
 
-const colunasBase = ["Standby", "Para Produção Semanal", "Ao Vivo", "Gravado", "Edição 1", "Edição 2", "Edição 3", "Edição Final", "Libras", "Revisão LP", "Produção LSE", "Concluído", "Publicado"];
+const colunasBasePadrao = ["STANDBY", "PARA PRODUÇÃO SEMANAL", "AO VIVO", "GRAVADO", "EDIÇÃO 1", "EDIÇÃO 2", "EDIÇÃO 3", "EDIÇÃO FINAL", "LIBRAS", "REVISÃO LP", "PRODUÇÃO LSE", "CONCLUÍDO", "PUBLICADO"];
 
-const coresSopa = {
-    areas: { matematica: "#fdde82", linguagens: "#bec658", humanas: "#c3dcf6", natureza: "#4068a7" },
-    workflow: {
-        standby: { bg: "rgba(195, 220, 246, 0.2)", header: "#4068a7" },
-        semanal: { bg: "rgba(253, 222, 130, 0.2)", header: "#fdde82" },
-        aovivo: { bg: "rgba(97, 201, 225, 0.2)", header: "#61c9e1" },
-        gravado: { bg: "rgba(84, 180, 177, 0.2)", header: "#54b4b1" },
-        concluido: { bg: "rgba(190, 198, 88, 0.2)", header: "#bec658" }
-    }
+const configuracaoColunas: Record<string, { gradiente: string; texto: string; icone: React.ReactNode }> = {
+    "STANDBY": { gradiente: "from-[#8E9EAB] to-[#EEF2F3]", texto: "text-slate-700", icone: <Pause size={16} /> },
+    "PARA PRODUÇÃO SEMANAL": { gradiente: "from-[#F2994A] to-[#F2C94C]", texto: "text-amber-900", icone: <Calendar size={16} /> },
+    "AO VIVO": { gradiente: "from-[#2193b0] to-[#6dd5ed]", texto: "text-cyan-900", icone: <Radio size={16} /> },
+    "GRAVADO": { gradiente: "from-[#11998e] to-[#38ef7d]", texto: "text-emerald-900", icone: <Video size={16} /> },
+    "EDIÇÃO 1": { gradiente: "from-[#2c3e50] to-[#4ca1af]", texto: "text-white", icone: <Edit3 size={16} /> },
+    "CONCLUÍDO": { gradiente: "from-[#00b09b] to-[#96c93d]", texto: "text-white", icone: <CheckCircle size={16} /> },
+    "PUBLICADO": { gradiente: "from-[#4e54c8] to-[#8f94fb]", texto: "text-white", icone: <UploadCloud size={16} /> },
 };
 
 interface QuadroProductionProps {
@@ -29,132 +28,107 @@ interface QuadroProductionProps {
 
 export function QuadroProduction({ cards, onCardClick, projetos, setCards, setVisaoQuadro, visaoQuadro }: QuadroProductionProps) {
     const [filtroProjeto, setFiltroProjeto] = useState<string>("Geral");
-
-    const cardsFiltrados = useMemo(() => {
-        return filtroProjeto === "Geral" ? cards : cards.filter((cardItem) => cardItem.projeto === filtroProjeto);
-    }, [cards, filtroProjeto]);
+    const [colunasComparacao, setColunasComparacao] = useState<[string, string]>(["STANDBY", "PARA PRODUÇÃO SEMANAL"]);
 
     const colunasAtivas = useMemo(() => {
-        if (filtroProjeto === "Geral") return colunasBase;
-        const projetoAtivo = projetos.find(p => p.nome === filtroProjeto);
-        return projetoAtivo ? projetoAtivo.etapas : colunasBase;
-    }, [projetos, filtroProjeto]);
+        const etapasUnicas = new Set<string>();
+        if (filtroProjeto !== "Geral") {
+            const projetoAtivo = projetos.find(p => p.nome === filtroProjeto);
+            if (projetoAtivo) {
+                projetoAtivo.etapas.forEach(etapa => etapasUnicas.add(etapa.toUpperCase()));
+                return Array.from(etapasUnicas);
+            }
+        }
+        colunasBasePadrao.forEach(etapa => etapasUnicas.add(etapa));
+        cards.forEach(card => {
+            if (card.etapa) etapasUnicas.add(card.etapa.toUpperCase());
+            card.fluxoEtapas?.forEach(etapa => etapasUnicas.add(etapa.toUpperCase()));
+        });
+        return Array.from(etapasUnicas);
+    }, [projetos, cards, filtroProjeto]);
+
+    const handleSaltoOuSelecao = (nomeColuna: string) => {
+        if (visaoQuadro === "geral") {
+            const element = document.getElementById(`scrollTarget${nomeColuna.replace(/\s+/g, '')}`);
+            if (element) element.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+        } else {
+            setColunasComparacao(previous => [previous[1], nomeColuna]);
+        }
+    };
 
     const onDragEnd = (result: DropResult) => {
-        const { destination, source, draggableId } = result;
-
-        if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
-            return;
-        }
-
-        const etapaDestino = destination.droppableId;
-        
-        // CORREÇÃO AQUI: Garantindo que o retorno do map seja estritamente do tipo Card
-        setCards((previousCards: Array<Card>) => 
-            previousCards.map((c: Card): Card => 
-                c.id === draggableId ? { ...c, etapa: etapaDestino } : c
-            )
-        );
+        const { destination, draggableId } = result;
+        if (!destination) return;
+        setCards((previous) => previous.map((c): Card => c.id === draggableId ? { ...c, etapa: destination.droppableId } : c));
     };
 
-    const handleJump = (nomeColuna: string) => {
-        const element = document.getElementById(`scrollTarget${nomeColuna.replace(/\s+/g, '')}`);
-        if (element) element.scrollIntoView({ behavior: 'smooth', inline: 'center' });
-    };
-
-    const getWorkflowStyle = (colunaNome: string) => {
-        if (colunaNome === "Standby" || colunaNome.includes("Edição")) return coresSopa.workflow.standby;
-        if (colunaNome === "Para Produção Semanal" || colunaNome === "Revisão LP") return coresSopa.workflow.semanal;
-        if (colunaNome === "Ao Vivo" || colunaNome === "Libras") return coresSopa.workflow.aovivo;
-        if (colunaNome === "Gravado" || colunaNome === "Produção LSE") return coresSopa.workflow.gravado;
-        if (colunaNome === "Concluído" || colunaNome === "Publicado") return coresSopa.workflow.concluido;
-        return { bg: "#F1F5F9", header: "#334155" };
-    };
-
-    const renderCard = (cardItem: Card, index: number) => {
-        let areaColor = "#cbd5e1";
-        const etiquetasTexto = cardItem.etiquetas?.join(" ") || "";
-        if (etiquetasTexto.includes("Matemática")) areaColor = coresSopa.areas.matematica;
-        else if (etiquetasTexto.includes("Linguagens")) areaColor = coresSopa.areas.linguagens;
-        else if (etiquetasTexto.includes("Humanas")) areaColor = coresSopa.areas.humanas;
-        else if (etiquetasTexto.includes("Natureza")) areaColor = coresSopa.areas.natureza;
-
-        return (
-            <Draggable key={cardItem.id} draggableId={cardItem.id} index={index}>
-                {(provided: DraggableProvided) => (
-                    <div 
-                        {...provided.draggableProps} 
-                        {...provided.dragHandleProps} 
-                        ref={provided.innerRef} 
-                        className="mb-4 rounded-2xl border border-slate-100 border-l-[6px] bg-white p-5 shadow-sm transition-all hover:shadow-md cursor-pointer" 
-                        style={{ ...provided.draggableProps.style, borderLeftColor: areaColor }}
-                        onClick={() => { onCardClick(cardItem); }}
-                    >
-                        <h4 className="text-slate-800 font-black text-sm uppercase tracking-tight text-left leading-tight">{cardItem.titulo}</h4>
-                        <div className="mt-4 flex items-center gap-2 text-[10px] font-bold uppercase text-slate-400">
-                            <User size={12} /> {cardItem.responsavel}
-                        </div>
-                    </div>
-                )}
-            </Draggable>
-        );
-    };
+    const colunasParaExibir = visaoQuadro === "geral" ? colunasAtivas : colunasComparacao;
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
-            <div className="relative flex h-full flex-col p-8 pt-4 text-left">
+            <div className="relative flex h-full flex-col p-8 pt-4 text-left bg-[#F1F5F9]/30 font-inter">
                 <header className="mb-6 flex shrink-0 items-center justify-between">
-                    <div className="flex items-center gap-6">
-                        <div>
-                            <h2 className="tracking-tighter text-4xl font-black uppercase text-slate-800 leading-none">Workflow</h2>
-                            <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Estúdio RIEH — {filtroProjeto}</p>
-                        </div>
-                        <div className="flex items-center gap-3 bg-slate-100 p-1 rounded-2xl border border-slate-200">
-                             <span className="pl-4 text-[9px] font-black text-slate-400 uppercase">Projeto:</span>
-                             <select className="bg-white rounded-xl px-4 py-2 text-[10px] font-black uppercase text-slate-700 outline-none shadow-sm" value={filtroProjeto} onChange={(event_) => { setFiltroProjeto(event_.target.value); }}>
+                    <div className="flex flex-col text-left">
+                        <h2 className="tracking-tighter text-4xl font-black uppercase text-slate-800 leading-none">Workflow</h2>
+                        <div className="flex items-center gap-3 mt-4 text-left">
+                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Projeto:</span>
+                             <select className="bg-white border border-slate-200 rounded-xl px-4 py-2 text-[10px] font-black uppercase text-slate-700 outline-none shadow-sm" value={filtroProjeto} onChange={(event_) => { setFiltroProjeto(event_.target.value); }}>
                                 <option value="Geral">Visão Geral</option>
                                 {projetos.map(p => <option key={p.id} value={p.nome}>{p.nome}</option>)}
                              </select>
                         </div>
                     </div>
-                    <div className="flex rounded-2xl border border-slate-200 bg-slate-100 p-1 shadow-inner">
-                        <button className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-black uppercase transition-all ${visaoQuadro === "geral" ? "bg-white text-indigo-600 shadow-md" : "text-slate-400"}`} type="button" onClick={() => { setVisaoQuadro("geral"); }}><LayoutDashboard size={14} /> GERAL</button>
-                        <button className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-black uppercase transition-all ${visaoQuadro === "focada" ? "bg-white text-indigo-600 shadow-md" : "text-slate-400"}`} type="button" onClick={() => { setVisaoQuadro("focada"); }}><Columns size={14} /> COMPARAR</button>
+                    <div className="flex rounded-2xl border border-slate-200 bg-white p-1 shadow-sm h-fit">
+                        <button className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-black uppercase transition-all ${visaoQuadro === "geral" ? "bg-indigo-600 text-white shadow-md" : "text-slate-400"}`} type="button" onClick={() => { setVisaoQuadro("geral"); }}><LayoutDashboard size={14} /> GERAL</button>
+                        <button className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-[10px] font-black uppercase transition-all ${visaoQuadro === "focada" ? "bg-indigo-600 text-white shadow-md" : "text-slate-400"}`} type="button" onClick={() => { setVisaoQuadro("focada"); }}><Columns size={14} /> COMPARAR</button>
                     </div>
                 </header>
 
-                <nav className="custom-scrollbar mb-6 flex shrink-0 items-center gap-2 overflow-x-auto pb-4">
-                    <span className="mr-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">Salto Rápido:</span>
-                    {colunasAtivas.map((nomeColuna) => (
-                        <button key={nomeColuna} className="whitespace-nowrap rounded-xl border border-slate-100 bg-white px-5 py-2 text-[10px] font-black uppercase text-slate-400 shadow-sm transition-all hover:text-indigo-600" type="button" onClick={() => { handleJump(nomeColuna); }}>{nomeColuna}</button>
-                    ))}
+                <nav className="mb-8 inline-block max-w-max text-left">
+                    <div className="mb-3 flex items-center gap-2">
+                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest shrink-0">Salto Rápido:</span>
+                         {visaoQuadro === "focada" && <ArrowRightLeft className="text-indigo-500 animate-pulse" size={14} />}
+                         <div className="h-px bg-slate-200 flex-1 ml-2"></div>
+                    </div>
+                    <div className="grid grid-cols-7 gap-1.5">
+                        {colunasAtivas.map((nome) => {
+                            const config = configuracaoColunas[nome] || { gradiente: "from-slate-400 to-slate-500", texto: "text-white" };
+                            const selecionada = visaoQuadro === "focada" && colunasComparacao.includes(nome);
+                            return (
+                                <button key={nome} className={`rounded-lg px-2 py-1.5 text-[8px] font-black uppercase border transition-all ${selecionada ? 'ring-2 ring-indigo-500 scale-105 border-white' : 'border-white/20 opacity-80'} bg-linear-to-br ${config.gradiente} ${config.texto} truncate`} type="button" onClick={() => { handleSaltoOuSelecao(nome); }}>{nome}</button>
+                            );
+                        })}
+                    </div>
                 </nav>
 
                 <div className="flex-1 overflow-hidden">
-                    <div 
-                        className={`custom-scrollbar h-full pb-8 scroll-smooth ${visaoQuadro === "geral" ? "flex items-start gap-8 overflow-x-auto pr-48" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 overflow-y-auto pr-4"}`} 
-                        id="columnsContainer"
-                    >
-                        {colunasAtivas.map((nomeColuna) => {
-                            const estiloFluxo = getWorkflowStyle(nomeColuna);
-                            const cardsNaColuna = cardsFiltrados.filter(c => c.etapa === nomeColuna);
+                    <div className={`custom-scrollbar h-full pb-8 scroll-smooth flex items-start gap-6 overflow-x-auto ${visaoQuadro === "geral" ? "" : "justify-center"}`}>
+                        {colunasParaExibir.map((nome) => {
+                            const config = configuracaoColunas[nome] || { gradiente: "from-slate-400 to-slate-500", texto: "text-white", icone: <Edit3 size={16} /> };
+                            const cardsNaColuna = cards.filter(c => c.etapa?.toUpperCase() === nome && (filtroProjeto === "Geral" || c.projeto === filtroProjeto));
 
                             return (
-                                <Droppable key={nomeColuna} droppableId={nomeColuna}>
+                                <Droppable key={nome} droppableId={nome}>
                                     {(provided: DroppableProvided) => (
-                                        <div 
-                                            {...provided.droppableProps} 
-                                            ref={provided.innerRef} 
-                                            className={`${visaoQuadro === "geral" ? "w-80 shrink-0" : "w-full"} flex h-full flex-col rounded-[2.5rem] border border-slate-200/50 p-4`} 
-                                            id={`scrollTarget${nomeColuna.replace(/\s+/g, '')}`}
-                                            style={{ backgroundColor: estiloFluxo.bg }}
-                                        >
-                                            <h3 className="mb-4 flex items-center justify-between rounded-full py-3 px-6 text-[11px] font-black uppercase tracking-widest text-white shadow-sm"
-                                                style={{ backgroundColor: estiloFluxo.header }}>
-                                                {nomeColuna} <span className="rounded-full bg-white/20 px-3 py-0.5 text-[9px] text-white">{cardsNaColuna.length}</span>
-                                            </h3>
-                                            <div className="custom-scrollbar flex-1 overflow-y-auto pr-1 min-h-[50px]">
-                                                {cardsNaColuna.map((cardItem, index) => renderCard(cardItem, index))}
+                                        <div {...provided.droppableProps} ref={provided.innerRef} className={`${visaoQuadro === "geral" ? "w-80" : "w-[45%] max-w-xl"} shrink-0 h-full flex flex-col rounded-[2.5rem] bg-white/40 border border-slate-200/60 overflow-hidden shadow-sm`} id={`scrollTarget${nome.replace(/\s+/g, '')}`}>
+                                            <header className={`bg-linear-to-br ${config.gradiente} p-4 flex flex-row items-center gap-4 shrink-0 shadow-inner`}>
+                                                <div className={`p-2 rounded-xl bg-white/20 backdrop-blur-md ${config.texto} shadow-sm shrink-0`}>{config.icone}</div>
+                                                <div className="flex flex-col min-w-0 text-left">
+                                                    <h3 className={`text-[11px] font-black uppercase tracking-tighter truncate ${config.texto}`}>{nome}</h3>
+                                                    <span className={`text-[8px] font-bold uppercase opacity-60 ${config.texto}`}>{cardsNaColuna.length} Card(s)</span>
+                                                </div>
+                                            </header>
+                                            <div className="custom-scrollbar flex-1 overflow-y-auto p-4 min-h-[150px]">
+                                                {cardsNaColuna.map((card, index) => (
+                                                    <Draggable key={card.id} draggableId={card.id} index={index}>
+                                                        {(p: DraggableProvided) => (
+                                                            <div {...p.draggableProps} {...p.dragHandleProps} ref={p.innerRef} className="mb-3 rounded-2xl border-l-[6px] bg-white p-4 shadow-sm text-left transition-all hover:shadow-md cursor-pointer" style={{ ...p.draggableProps.style, borderLeftColor: card.corDestaque || "#cbd5e1" }} onClick={() => { onCardClick(card); }}>
+                                                                <h4 className="text-slate-800 font-black text-xs uppercase leading-tight">{card.titulo}</h4>
+                                                                <div className="mt-3 flex items-center gap-2 text-[9px] font-bold uppercase text-slate-400"><User size={10} /> {card.responsavel}</div>
+                                                            </div>
+                                                        )}
+                                                    </Draggable>
+                                                ))}
                                                 {provided.placeholder}
                                             </div>
                                         </div>
