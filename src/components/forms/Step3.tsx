@@ -3,10 +3,13 @@
 import { useFormContext } from "../../context/FormContext";
 import { Footer } from "../common/Footer";
 import {
-	OPCOES_ACESSIBILIDADE,
-	type Acessibilidade,
-	type Distribuicao,
+  OPCOES_ACESSIBILIDADE,
+  OPCOES_DISTRIBUICAO,
+  DISTRIBUICAO_LABELS,
+  type Acessibilidade,
+  type Distribuicao,
 } from "../../common/types/solicitacao";
+
 
 export default function Step3() {
 	const { passo, setPassoAtual, updateField, validarPassoAtual } =
@@ -173,31 +176,20 @@ export default function Step3() {
 					</h2>
 					<div className="relative">
 						<select
-							className="w-full bg-zinc-900/50 border border-zinc-700 text-zinc-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3.5 appearance-none cursor-pointer hover:bg-zinc-800 transition-colors"
 							value={formData.distribuicao}
-							onChange={(event) => {
-								updateField("distribuicao", event.target.value as Distribuicao);
-							}}
+							onChange={(e) =>
+								updateField("distribuicao", e.target.value as Distribuicao)
+							}
 						>
 							<option disabled value="">
 								Selecione onde será distribuído...
 							</option>
-							<option className="bg-zinc-900" value="interna">
-								{" "}
-								Veiculação Interna{" "}
-							</option>
-							<option className="bg-zinc-900" value="seec">
-								{" "}
-								Canal da SEEC{" "}
-							</option>
-							<option className="bg-zinc-900" value="instagram">
-								{" "}
-								Instagram da SEEC{" "}
-							</option>
-							<option className="bg-zinc-900" value="outro">
-								{" "}
-								Outro{" "}
-							</option>
+
+							{OPCOES_DISTRIBUICAO.map((item) => (
+								<option key={item} value={item}>
+									{DISTRIBUICAO_LABELS[item]}
+								</option>
+							))}
 						</select>
 
 						<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-zinc-400">

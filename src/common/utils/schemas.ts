@@ -33,7 +33,7 @@ export const solicitarFormSchema = z.object({
 	distribuicao: z.string().min(1, "Distribuição obrigatória"),
 
 	dataLimite: z.string().optional(),
-	pessoas: z.string().optional(),
+	pessoas: z.number().optional(),
 	roteiro: z.instanceof(File).optional(),
 	observacoes: z.string().optional(),
 });

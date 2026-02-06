@@ -7,22 +7,6 @@ import { criarSolicitacao } from "../../services/solicitacoes";
 export default function Step5() {
 	const { formData, setPassoAtual } = useFormContext();
 
-	/*
-
-	function handleConfirmar() {
-		// Aqui você pode:
-		// 1️⃣ Enviar para API
-		// 2️⃣ Gerar o card
-		// 3️⃣ Depois resetar o formulário
-
-		// Exemplo:
-		// await api.post("/solicitacao", formData);
-
-		setPassoAtual(6);
-	}
-
-	*/
-
 	async function handleConfirmar() {
 		try {
 			const payload = {
@@ -45,7 +29,7 @@ export default function Step5() {
 
 				thumbnail: formData.thumbnail?.name,
 
-				acessibilidade: formData.acessibilidade,
+				acessibilidade: formData.acessibilidade[0],
 
 				distribuicao: formData.distribuicao,
 
@@ -59,11 +43,14 @@ export default function Step5() {
 			await criarSolicitacao(payload);
 
 			setPassoAtual(6);
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			console.error("Erro ao enviar solicitação:", error);
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 			console.error("Resposta da API:", error.response);
 
 			alert(
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 				error.response?.data?.message ||
 					"Ocorreu um erro ao enviar a solicitação. Por favor, tente novamente."
 			);

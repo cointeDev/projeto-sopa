@@ -123,7 +123,7 @@ export default function Step4() {
 						max={maxPessoas}
 						value={formData.pessoas || ""}
 						onChange={(event) => {
-							updateField("pessoas", event.target.value);
+							updateField("pessoas", Number(event.target.value));
 						}}
 					/>
 				</div>

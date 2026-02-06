@@ -18,7 +18,7 @@ export type FormatoProducao =
 
 export type Acessibilidade = "INCLUIR_LIBRAS" | "NAO_SE_APLICA";
 
-export type Distribuicao = "interna" | "seec" | "instagram" | "outro";
+export type Distribuicao = "INTERNA" | "SEEC" | "INSTAGRAM" | "OUTRO";
 
 export interface SolicitarFormData {
 	// STEP 1
@@ -45,7 +45,7 @@ export interface SolicitarFormData {
 
 	// STEP 4
 	dataLimite: string;
-	pessoas: string;
+	pessoas: number;
 	roteiro: File | null;
 	observacoes: string;
 }
@@ -76,11 +76,17 @@ export const OPCOES_ACESSIBILIDADE: Array<Acessibilidade> = [
 ];
 
 export const OPCOES_DISTRIBUICAO: Array<Distribuicao> = [
-	"interna",
-	"seec",
-	"instagram",
-	"outro",
+	"INTERNA",
+	"SEEC",
+	"INSTAGRAM",
+	"OUTRO",
 ];
+export const DISTRIBUICAO_LABELS: Record<Distribuicao, string> = {
+	INTERNA: "Veiculação interna",
+	SEEC: "Canal da SEEC",
+	INSTAGRAM: "Instagram da SEEC",
+	OUTRO: "Outro",
+};
 
 export type CampoComErro = {
 	campo: keyof SolicitarFormData;
