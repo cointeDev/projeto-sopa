@@ -1,7 +1,7 @@
 import { TipoProducao, FormatoProducao } from "../types/solicitacao";
 
 export const FORMATOS_POR_TIPO: Record<TipoProducao, FormatoProducao[]> = {
-	"Evento in loco": ["Animações para eventos in loco"],
+	EVENTO_IN_LOCO: ["ANIMACOES_EVENTOS_IN_LOCO"],
 
 	"Evento em estúdio": [
 		"Live pré-gravada",

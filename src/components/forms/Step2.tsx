@@ -90,7 +90,7 @@ export default function Step2() {
 					<div className="p-6">
 						<h4 className="text-white font-semibold mb-3">{formData.tipo}</h4>
 						<div className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">
-							{formData.tipo === "Evento in loco" && eventoInLocoDescricao}
+							{formData.tipo === "EVENTO_IN_LOCO" && eventoInLocoDescricao}
 							{formData.tipo === "Evento em estúdio" &&
 								eventoEmEstudioDescricao}
 							{formData.tipo === "Vídeo institucional" &&
@@ -150,7 +150,7 @@ export default function Step2() {
 							{formData.formato === "Podcast / Mesacast" && podcastDescricao}
 							{formData.formato === "Gravação de programa" && programaDescricao}
 							{formData.formato === "Shorts / Reels" && shortsReelsDescricao}
-							{formData.formato === "Animações para eventos in loco" &&
+							{formData.formato === "ANIMACOES_EVENTOS_IN_LOCO" &&
 								animacoesDescricao}
 							{formData.formato === "Criação, edição e animações" &&
 								criacaoEdicaoDescricao}

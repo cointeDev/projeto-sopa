@@ -71,6 +71,7 @@ export default function Step3() {
 					<textarea
 						className="input min-h-35"
 						placeholder="Descreva o conteúdo do material"
+						maxLength={144}
 						value={formData.descricao || ""}
 						onChange={(event) => {
 							updateField("descricao", event.target.value);

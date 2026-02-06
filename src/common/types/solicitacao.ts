@@ -1,5 +1,5 @@
 export type TipoProducao =
-	| "Evento in loco"
+	| "EVENTO_IN_LOCO"
 	| "Evento em estúdio"
 	| "Vídeo institucional"
 	| "Gravação de chamada"
@@ -13,10 +13,10 @@ export type FormatoProducao =
 	| "Podcast / Mesacast"
 	| "Gravação de programa"
 	| "Shorts / Reels"
-	| "Animações para eventos in loco"
+	| "ANIMACOES_EVENTOS_IN_LOCO"
 	| "Criação, edição e animações";
 
-export type Acessibilidade = "Incluir LIBRAS" | "Não se aplica";
+export type Acessibilidade = "INCLUIR_LIBRAS" | "NAO_SE_APLICA";
 
 export type Distribuicao = "interna" | "seec" | "instagram" | "outro";
 
@@ -51,7 +51,7 @@ export interface SolicitarFormData {
 }
 
 export const TIPOS_PRODUCAO: Array<TipoProducao> = [
-	"Evento in loco",
+	"EVENTO_IN_LOCO",
 	"Evento em estúdio",
 	"Vídeo institucional",
 	"Gravação de chamada",
@@ -66,13 +66,13 @@ export const FORMATOS_PRODUCAO: Array<FormatoProducao> = [
 	"Podcast / Mesacast",
 	"Gravação de programa",
 	"Shorts / Reels",
-	"Animações para eventos in loco",
+	"ANIMACOES_EVENTOS_IN_LOCO",
 	"Criação, edição e animações",
 ];
 
 export const OPCOES_ACESSIBILIDADE: Array<Acessibilidade> = [
-	"Incluir LIBRAS",
-	"Não se aplica",
+	"INCLUIR_LIBRAS",
+	"NAO_SE_APLICA",
 ];
 
 export const OPCOES_DISTRIBUICAO: Array<Distribuicao> = [

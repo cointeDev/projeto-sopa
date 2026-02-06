@@ -143,9 +143,9 @@ export function useForm(): UseFormReturn {
 			return false;
 		}
 
-		if (!formData.data) return false;
-		if (!formData.hora) return false;
-		if (formData.hora < "09:00" || formData.hora > "17:00") return false;
+		//if (!formData.data) return false;
+		//if (!formData.hora) return false;
+		//if (formData.hora < "09:00" || formData.hora > "17:00") return false;
 
 		return true;
 	}

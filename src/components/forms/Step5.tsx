@@ -2,9 +2,12 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { useFormContext } from "../../context/FormContext";
 import { Footer } from "../common/Footer";
+import { criarSolicitacao } from "../../services/solicitacoes";
 
 export default function Step5() {
 	const { formData, setPassoAtual } = useFormContext();
+
+	/*
 
 	function handleConfirmar() {
 		// Aqui você pode:
@@ -16,6 +19,55 @@ export default function Step5() {
 		// await api.post("/solicitacao", formData);
 
 		setPassoAtual(6);
+	}
+
+	*/
+
+	async function handleConfirmar() {
+		try {
+			const payload = {
+				responsavel: formData.responsavel,
+				email: formData.email,
+				setor: formData.setor,
+				telefone: formData.telefone,
+
+				local: formData.local,
+
+				data: formData.data,
+				hora: formData.hora,
+
+				TipoProducao: formData.tipo,
+				FormatoProducao: formData.formato,
+
+				nomeProjeto: formData.nomeProjeto,
+				titulo: formData.titulo,
+				descricao: formData.descricao,
+
+				thumbnail: formData.thumbnail?.name,
+
+				acessibilidade: formData.acessibilidade,
+
+				distribuicao: formData.distribuicao,
+
+				dataLimite: formData.dataLimite,
+				pessoas: formData.pessoas,
+
+				roteiro: formData.roteiro?.name,
+				observacoes: formData.observacoes,
+			};
+
+			await criarSolicitacao(payload);
+
+			setPassoAtual(6);
+		} catch (error: any) {
+			console.error("Erro ao enviar solicitação:", error);
+			console.error("Resposta da API:", error.response);
+
+			alert(
+				error.response?.data?.message ||
+					"Ocorreu um erro ao enviar a solicitação. Por favor, tente novamente."
+			);
+		}
 	}
 
 	return (

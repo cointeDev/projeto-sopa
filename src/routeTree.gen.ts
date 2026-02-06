@@ -13,6 +13,7 @@ import { Route as TokenstatusRouteImport } from './routes/tokenstatus'
 import { Route as SolicitarRouteImport } from './routes/solicitar'
 import { Route as OperacionalRouteImport } from './routes/operacional'
 import { Route as MvpRouteImport } from './routes/mvp'
+import { Route as ModalRouteImport } from './routes/modal'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as GestorLocalRouteImport } from './routes/gestor-local'
 import { Route as GestorGeralRouteImport } from './routes/gestor-geral'
@@ -37,6 +38,11 @@ const OperacionalRoute = OperacionalRouteImport.update({
 const MvpRoute = MvpRouteImport.update({
   id: '/mvp',
   path: '/mvp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModalRoute = ModalRouteImport.update({
+  id: '/modal',
+  path: '/modal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/gestor-geral': typeof GestorGeralRoute
   '/gestor-local': typeof GestorLocalRoute
   '/login': typeof LoginRoute
+  '/modal': typeof ModalRoute
   '/mvp': typeof MvpRoute
   '/operacional': typeof OperacionalRoute
   '/solicitar': typeof SolicitarRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/gestor-geral': typeof GestorGeralRoute
   '/gestor-local': typeof GestorLocalRoute
   '/login': typeof LoginRoute
+  '/modal': typeof ModalRoute
   '/mvp': typeof MvpRoute
   '/operacional': typeof OperacionalRoute
   '/solicitar': typeof SolicitarRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/gestor-geral': typeof GestorGeralRoute
   '/gestor-local': typeof GestorLocalRoute
   '/login': typeof LoginRoute
+  '/modal': typeof ModalRoute
   '/mvp': typeof MvpRoute
   '/operacional': typeof OperacionalRoute
   '/solicitar': typeof SolicitarRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/gestor-geral'
     | '/gestor-local'
     | '/login'
+    | '/modal'
     | '/mvp'
     | '/operacional'
     | '/solicitar'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/gestor-geral'
     | '/gestor-local'
     | '/login'
+    | '/modal'
     | '/mvp'
     | '/operacional'
     | '/solicitar'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/gestor-geral'
     | '/gestor-local'
     | '/login'
+    | '/modal'
     | '/mvp'
     | '/operacional'
     | '/solicitar'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   GestorGeralRoute: typeof GestorGeralRoute
   GestorLocalRoute: typeof GestorLocalRoute
   LoginRoute: typeof LoginRoute
+  ModalRoute: typeof ModalRoute
   MvpRoute: typeof MvpRoute
   OperacionalRoute: typeof OperacionalRoute
   SolicitarRoute: typeof SolicitarRoute
@@ -175,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/mvp'
       fullPath: '/mvp'
       preLoaderRoute: typeof MvpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/modal': {
+      id: '/modal'
+      path: '/modal'
+      fullPath: '/modal'
+      preLoaderRoute: typeof ModalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -221,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   GestorGeralRoute: GestorGeralRoute,
   GestorLocalRoute: GestorLocalRoute,
   LoginRoute: LoginRoute,
+  ModalRoute: ModalRoute,
   MvpRoute: MvpRoute,
   OperacionalRoute: OperacionalRoute,
   SolicitarRoute: SolicitarRoute,

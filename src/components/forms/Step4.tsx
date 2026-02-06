@@ -45,10 +45,10 @@ export default function Step4() {
 						}}
 					>
 						<option value="">Selecione o estúdio</option>
-						<option value="Natal">Natal</option>
-						<option value="Mossoró">Mossoró</option>
-						<option value="Pau dos Ferros">Pau dos Ferros</option>
-						<option value="Caicó">Caicó</option>
+						<option value="NATAL">Natal</option>
+						<option value="MOSSORO">Mossoró</option>
+						<option value="PAU_DOS_FERROS">Pau dos Ferros</option>
+						<option value="CAICO">Caicó</option>
 						<option value="Externo">Externo</option>
 					</select>
 				</div>
@@ -78,6 +78,9 @@ export default function Step4() {
 							defaultValue={formData.data}
 							type="date"
 							min={hoje}
+							onChange={(event) => {
+								updateField("data", event.target.value);
+							}}
 						/>
 						<input
 							ref={horaRef}
@@ -87,6 +90,9 @@ export default function Step4() {
 							min="09:00"
 							max="17:00"
 							step="900"
+							onChange={(event) => {
+								updateField("hora", event.target.value);
+							}}
 						/>
 					</div>
 				</div>
@@ -172,6 +178,7 @@ export default function Step4() {
 						className="input min-h-35"
 						placeholder="Observações finais"
 						value={formData.observacoes || ""}
+						maxLength={144}
 						onChange={(event) => {
 							updateField("observacoes", event.target.value);
 						}}
