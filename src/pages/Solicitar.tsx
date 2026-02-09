@@ -24,19 +24,19 @@ function SolicitarContent() {
   const { passo, formData } = useFormContext();
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#0F172A] to-[#1E293B] flex items-center justify-center px-4">
-      <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-[350px_1fr] gap-10 my-14">
+    <div className="min-h-screen bg-[#F1F5F9] flex items-center justify-center px-4 font-inter">
+      <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-[380px_1fr] gap-10 my-14">
 
-        {/* PAINEL ESQUERDO – CONTEXTO */}
-        <aside className="bg-white/5 backdrop-blur rounded-2xl p-6 border border-white/10">
+        {/* PAINEL ESQUERDO – CONTEXTO (Estilo Glassmorphism Light) */}
+        <aside className="bg-white/40 backdrop-blur-md rounded-[2.5rem] p-6 border border-white/20 shadow-sm self-start sticky top-14">
 
-          <div className="bg-[#161825] rounded-2xl p-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)]">
+          <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl shadow-slate-200/50 border border-slate-100">
 
-            <h2 className="text-xl font-extrabold text-white mb-4">
+            <h2 className="text-2xl font-black text-[#334155] mb-4 tracking-tighter uppercase leading-tight">
               Solicitação de Produção
             </h2>
 
-            <p className="text-sm text-[#B4B9C7] mb-6">
+            <p className="text-sm font-medium text-slate-400 mb-8 leading-relaxed">
               Preencha as informações abaixo para que nossa equipe possa
               organizar sua demanda da melhor forma possível.
             </p>
@@ -44,16 +44,16 @@ function SolicitarContent() {
             {/* LISTA DE PASSOS */}
             <Stepper currentStep={passo} steps={steps} />
 
-            <div className="mt-8 border-t border-white/10 pt-4 text-sm text-[#B4B9C7]">
-              <p><strong>Responsável:</strong> {formData.responsavel || "—"}</p>
-              <p><strong>Local:</strong> {formData.local || "—"}</p>
-              <p><strong>Produção:</strong> {formData.tipo || "—"}</p>
-              <p><strong>Título:</strong> {formData.titulo || "—"}</p>
+            <div className="mt-10 border-t border-slate-100 pt-6 space-y-3 text-[11px] font-black uppercase tracking-widest text-slate-400">
+              <p><span className="text-indigo-500/50">Responsável:</span> <span className="text-[#334155]">{formData.responsavel || "—"}</span></p>
+              <p><span className="text-indigo-500/50">Local:</span> <span className="text-[#334155]">{formData.local || "—"}</span></p>
+              <p><span className="text-indigo-500/50">Produção:</span> <span className="text-[#334155]">{formData.tipo || "—"}</span></p>
+              <p><span className="text-indigo-500/50">Título:</span> <span className="text-[#334155]">{formData.titulo || "—"}</span></p>
             </div>
 
 
             <Link
-              className="block mt-8 text-sm text-indigo-400 hover:underline text-center"
+              className="block mt-10 text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-400 transition-colors text-center"
               to="/"
             >
               ← Voltar para a Home
@@ -62,8 +62,8 @@ function SolicitarContent() {
 
         </aside>
 
-        {/* PAINEL DIREITO – FORM */}
-        <section className="bg-[#161825] rounded-2xl p-10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)]">
+        {/* PAINEL DIREITO – FORM (Container Branco SOPA) */}
+        <section className="bg-white rounded-[2.5rem] p-12 shadow-2xl shadow-slate-200/50 border border-slate-100 relative">
 
           {/* PASSO 1 */}
           {passo === 1 && (
