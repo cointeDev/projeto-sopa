@@ -1,14 +1,14 @@
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
-import type { SolicitarFormData } from "../../common/types/solicitacao";
+import type { SolicitacaoAPI } from "../../common/types/solicitacao";
 
 export type AcaoGestor = "ACEITAR" | "RECUSAR" | "DEVOLVER";
 
 interface ModalGestorSolicitacaoProps {
 	open: boolean;
 	onClose: () => void;
-	dados: SolicitarFormData;
+	dados: SolicitacaoAPI;
 	onAction: (acao: AcaoGestor) => void;
 }
 

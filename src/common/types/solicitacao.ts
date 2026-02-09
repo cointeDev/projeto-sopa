@@ -50,6 +50,13 @@ export interface SolicitarFormData {
 	observacoes: string;
 }
 
+export interface SolicitacaoAPI extends SolicitarFormData {
+	id: number;
+	status: string;
+	createdAt: string;
+	EtapaId: number | null;
+}
+
 export const TIPOS_PRODUCAO: Array<TipoProducao> = [
 	"EVENTO_IN_LOCO",
 	"Evento em estúdio",
