@@ -1,99 +1,104 @@
-/* eslint-disable unicorn/prevent-abbreviations */
+ 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 
+/**
+ * Tela de Login Administrativo - Padrão Light SOPA v1.0.4
+ * Refatorada para fundo claro com container branco puro
+ */
 export function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
   function fazerLogin() {
-    // Aqui depois você liga com API / auth
+    // Integração futura com API / Auth
     console.log("Login:", { email, senha });
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0F111A] font-inter px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#F1F5F9] font-inter px-4 transition-colors duration-500">
 
-      <div className="w-full max-w-md bg-[#161825] rounded-2xl p-8 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)]">
+      <div className="w-full max-w-md bg-white rounded-[2.5rem] p-10 shadow-2xl shadow-slate-200/60 border border-slate-100 animate-in fade-in zoom-in duration-500">
 
-        {/* LOGO */}
-        <div className="flex justify-center mb-6">
+        {/* LOGO - Utilizando versão colorida ou escura para fundo claro */}
+        <div className="flex justify-center mb-8">
           <img
             alt="COINTE"
-            className="h-30"
-            src="/assets/logo_cointe_white.png"
+            className="h-24 object-contain"
+            src="/assets/logo_cointe_color.png" 
           />
         </div>
 
-        {/* TEXTO */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-extrabold text-white mb-2">
-            Bem-vindo de volta
+        {/* TEXTO DE CABEÇALHO */}
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-black text-[#334155] mb-2 tracking-tighter uppercase leading-none">
+            Bem-vindo
           </h1>
-          <p className="text-sm text-[#B4B9C7] leading-relaxed">
-            Entre com suas credenciais para acessar o painel administrativo.
+          <p className="text-sm font-medium text-slate-400 leading-relaxed uppercase tracking-widest text-[10px]">
+            Acesso ao Painel Administrativo
           </p>
         </div>
 
-        {/* FORM */}
+        {/* FORMULÁRIO */}
         <form
-          className="space-y-5"
-          onSubmit={(e) => {
-            e.preventDefault();
+          className="space-y-6"
+          onSubmit={(event_) => {
+            event_.preventDefault();
             fazerLogin();
           }}
         >
 
-          <div>
-            <label className="block text-sm font-semibold text-[#D1D5DB] mb-2">
+          <div className="space-y-2">
+            <label className="block text-[10px] font-black uppercase text-slate-400 tracking-widest pl-1">
               E-mail institucional
             </label>
             <input
               placeholder="seu.email@instituicao.com"
               type="email"
               value={email}
-              className="w-full rounded-lg bg-[#0F111A] border border-white/10
-                         px-4 py-3 text-sm text-white
-                         placeholder:text-white/30
-                         focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              onChange={(e) => { setEmail(e.target.value); }}
+              className="w-full rounded-2xl bg-[#F8FAFC] border border-slate-200
+                         px-6 py-4 text-sm font-bold text-[#334155]
+                         placeholder:text-slate-300
+                         focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20
+                         transition-all"
+              onChange={(event_) => { setEmail(event_.target.value); }}
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-[#D1D5DB] mb-2">
+          <div className="space-y-2">
+            <label className="block text-[10px] font-black uppercase text-slate-400 tracking-widest pl-1">
               Senha
             </label>
             <input
               placeholder="••••••••"
               type="password"
               value={senha}
-              className="w-full rounded-lg bg-[#0F111A] border border-white/10
-                         px-4 py-3 text-sm text-white
-                         placeholder:text-white/30
-                         focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              onChange={(e) => { setSenha(e.target.value); }}
+              className="w-full rounded-2xl bg-[#F8FAFC] border border-slate-200
+                         px-6 py-4 text-sm font-bold text-[#334155]
+                         placeholder:text-slate-300
+                         focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20
+                         transition-all"
+              onChange={(event_) => { setSenha(event_.target.value); }}
             />
           </div>
 
           <button
             type="submit"
-            className="w-full mt-6 flex items-center justify-center gap-2
-                       rounded-xl bg-indigo-500 py-4 font-bold text-white
-                       hover:bg-indigo-400
-                       shadow-[0_8px_30px_-10px_rgba(99,102,241,0.7)]
-                       hover:-translate-y-0.5 transition-all"
+            className="w-full mt-8 flex items-center justify-center gap-2
+                       rounded-2xl bg-[#4f46e5] py-5 font-black text-xs text-white
+                       uppercase tracking-[0.2em] shadow-xl shadow-indigo-100
+                       hover:bg-[#3730a3] hover:-translate-y-0.5 transition-all active:scale-95"
           >
-            Entrar
+            Entrar no Sistema
           </button>
         </form>
 
         {/* VOLTAR */}
-        <div className="mt-8 text-center">
+        <div className="mt-10 text-center border-t border-slate-50 pt-6">
           <Link
-            className="text-sm font-semibold text-indigo-400 hover:underline"
+            className="text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-400 transition-colors"
             to="/"
           >
             ← Voltar para a Home

@@ -1,11 +1,10 @@
-/* eslint-disable unicorn/prevent-abbreviations */
+ 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 
 type StatusType = "andamento" | "erro";
-
 const TOKEN_EXEMPLO = "SOPA-2025-VID-9F3A";
 
 export function TokenStatus() {
@@ -19,7 +18,6 @@ export function TokenStatus() {
     setStatus(null);
     setLoading(true);
 
-    // Simula chamada de API
     setTimeout(() => {
       if (token.trim() === TOKEN_EXEMPLO) {
         setStatus("andamento");
@@ -32,159 +30,112 @@ export function TokenStatus() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0F111A] font-inter px-6 py-10">
-
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-8">
+    <div className="min-h-screen bg-[#F1F5F9] font-inter px-6 py-10">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-10">
 
         {/* PAINEL TOKEN */}
-        <aside className="bg-[#161825] rounded-2xl p-8
-                          shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)]
-                          animate-fade-in self-start sticky top-10">
-
-          <h2 className="text-xl font-extrabold text-white mb-2">
+        <aside className="bg-white rounded-[2.5rem] p-10 shadow-2xl shadow-slate-200/60 border border-slate-100 self-start sticky top-10">
+          <h2 className="text-3xl font-black text-[#334155] mb-2 tracking-tighter uppercase">
             Consultar Pedido
           </h2>
-
-          <p className="text-sm text-[#B4B9C7] mb-4">
-            Insira o token enviado por e-mail para acompanhar sua produção.
+          <p className="text-sm font-medium text-slate-400 mb-8">
+            Acompanhe o fluxo de produção em tempo real.
           </p>
 
-          <p className="text-xs text-indigo-400 mb-6">
-            Exemplo de token válido: <strong>{TOKEN_EXEMPLO}</strong>
-          </p>
-
-          <form
-            className="space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              consultarToken();
-            }}
-          >
-            <input
-              placeholder="Cole o token aqui"
-              value={token}
-              className="w-full rounded-lg bg-[#0F111A] border border-white/10
-                         px-4 py-3 text-white placeholder:text-white/30
-                         focus:outline-none focus:ring-2 focus:ring-indigo-500
-                         transition"
-              onChange={(e) => { setToken(e.target.value); }}
-            />
+          <form className="space-y-5" onSubmit={(event_) => { event_.preventDefault(); consultarToken(); }}>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest pl-1">Token de Acesso</label>
+              <input
+                className="w-full rounded-2xl bg-[#F8FAFC] border border-slate-200 px-6 py-5 text-[#334155] font-bold outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                placeholder="Ex: SOPA-2026-..."
+                value={token}
+                onChange={(event_) => { setToken(event_.target.value); }}
+              />
+            </div>
 
             <button
+              className="w-full rounded-2xl bg-[#4f46e5] py-5 font-black text-xs text-white uppercase tracking-[0.2em] shadow-xl shadow-indigo-100 hover:bg-[#3730a3] transition-all disabled:opacity-50"
               disabled={loading}
               type="submit"
-              className="w-full rounded-xl bg-indigo-500 py-3 font-bold text-white
-                         hover:bg-indigo-400 transition
-                         disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {loading ? "Consultando..." : "Consultar"}
+              {loading ? "Processando..." : "Consultar Status"}
             </button>
           </form>
 
-          {erro && (
-            <p className="mt-4 text-sm text-red-400 animate-shake">
-              {erro}
-            </p>
-          )}
+          {erro && <p className="mt-6 text-xs font-bold text-red-500 uppercase tracking-widest text-center italic">{erro}</p>}
 
-          <div className="mt-8 text-center">
-            <Link className="text-sm text-indigo-400 hover:underline" to="/">
+          <div className="mt-10 pt-6 border-t border-slate-50 text-center">
+            <Link className="text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-400" to="/">
               ← Voltar para a Home
             </Link>
           </div>
         </aside>
 
-        {/* PAINEL STATUS */}
-        <section className="bg-[#161825] rounded-2xl p-10
-                            shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)]
-                            relative overflow-hidden">
-
-          {/* LOADING */}
+        {/* PAINEL STATUS (Estilo Quadro Light) */}
+        <section className="bg-white rounded-[2.5rem] p-12 shadow-2xl shadow-slate-200/60 border border-slate-100 relative overflow-hidden min-h-[600px]">
           {loading && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center
-                            bg-[#161825]/80 backdrop-blur-sm
-                            animate-fade-in">
-              <div className="h-10 w-10 rounded-full border-4 border-indigo-500/30
-                              border-t-indigo-500 animate-spin mb-4" />
-              <p className="text-sm text-[#B4B9C7]">
-                Buscando informações do pedido...
-              </p>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm z-20">
+              <div className="h-12 w-12 rounded-2xl border-4 border-indigo-100 border-t-indigo-600 animate-spin mb-4" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sincronizando Dados...</p>
             </div>
           )}
 
           {!status && !loading && (
-            <div className="h-full flex flex-col items-center justify-center text-center
-                            text-[#B4B9C7] animate-fade-in">
-              <p className="text-lg font-semibold mb-2">
-                Nenhum pedido consultado
-              </p>
-              <p className="text-sm">
-                Utilize um token válido para visualizar o andamento.
-              </p>
+            <div className="h-full flex flex-col items-center justify-center text-center">
+              <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeWidth={3} /></svg>
+              </div>
+              <p className="text-xl font-black text-slate-300 uppercase tracking-tighter">Nenhum pedido ativo</p>
+              <p className="text-xs font-bold text-slate-400 mt-2 uppercase tracking-widest opacity-60">Insira um token válido ao lado</p>
             </div>
           )}
 
           {status === "andamento" && !loading && (
-            <div className="animate-slide-in-right">
-
-              <header className="mb-10">
-                <h3 className="text-2xl font-extrabold text-white">
-                  Vídeo Aula de Cálculo
-                </h3>
-                <span className="inline-block mt-2 px-3 py-1 rounded-full
-                                 text-xs font-bold
-                                 bg-yellow-400/20 text-yellow-300">
-                  EM ANDAMENTO
-                </span>
+            <div className="animate-in fade-in slide-in-from-right-8 duration-700">
+              <header className="mb-12 flex justify-between items-start">
+                <div>
+                  <h3 className="text-4xl font-black text-[#334155] tracking-tighter uppercase leading-none">Vídeo Aula de Cálculo</h3>
+                  <p className="text-[10px] font-black text-slate-400 mt-3 uppercase tracking-[0.3em]">Projeto: SEEC/RN — Studio A</p>
+                </div>
+                <span className="px-5 py-2 rounded-full text-[9px] font-black uppercase tracking-widest bg-amber-50 text-amber-500 border border-amber-100">Em Produção</span>
               </header>
 
-              {/* STEPPER */}
-              <div className="flex items-center mb-12">
-                {["Recebido", "Gravação", "Edição", "Libras", "Finalizado"].map(
-                  (etapa, index) => (
-                    <div key={etapa} className="flex items-center flex-1">
-                      <div className={`h-9 w-9 rounded-full flex items-center justify-center
-                        font-bold transition
-                        ${index < 2
-                          ? "bg-indigo-500 text-white scale-110"
-                          : "border border-white/20 text-white/40"}`}>
+              {/* STEPPER DE STATUS (Estilo Horizontal Light) */}
+              <div className="flex items-center mb-16 px-4">
+                {["Recebido", "Gravação", "Edição", "Libras", "Concluído"].map((etapa, index) => (
+                  <div key={etapa} className="flex items-center flex-1 last:flex-none group">
+                    <div className="flex flex-col items-center relative">
+                      <div className={`h-12 w-12 rounded-2xl flex items-center justify-center font-black text-sm transition-all duration-500 shadow-sm
+                        ${index < 2 ? "bg-[#4f46e5] text-white scale-110 shadow-indigo-200" : "bg-slate-50 text-slate-300 border border-slate-100"}`}>
                         {index + 1}
                       </div>
-                      {index < 4 && (
-                        <div className="flex-1 h-px bg-white/10 mx-4" />
-                      )}
+                      <span className={`absolute -bottom-8 text-[8px] font-black uppercase tracking-widest whitespace-nowrap ${index < 2 ? "text-[#334155]" : "text-slate-300"}`}>{etapa}</span>
                     </div>
-                  )
-                )}
+                    {index < 4 && <div className={`flex-1 h-1 mx-4 rounded-full transition-colors duration-1000 ${index < 1 ? "bg-indigo-500" : "bg-slate-100"}`} />}
+                  </div>
+                ))}
               </div>
 
-              {/* TIMELINE */}
-              <div>
-                <h4 className="text-lg font-bold text-white mb-4">
-                  Histórico de atividades
+              {/* TIMELINE (Estilo Gestor Local) */}
+              <div className="mt-20">
+                <h4 className="text-xs font-black text-slate-300 uppercase tracking-[0.3em] mb-8 flex items-center gap-4">
+                  Histórico de Atividades <div className="h-px bg-slate-100 flex-1" />
                 </h4>
 
-                <div className="border-l border-white/10 pl-6 space-y-6">
-                  <div className="animate-fade-in">
-                    <div className="text-sm font-semibold text-white">
-                      Material em decupagem — 11/11/2025
-                    </div>
-                    <p className="text-sm text-[#B4B9C7]">
-                      A equipe de LIBRAS iniciou a decupagem do roteiro.
-                    </p>
+                <div className="space-y-8">
+                  <div className="relative pl-8 border-l-2 border-indigo-500/30">
+                    <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-4 border-indigo-500 shadow-sm" />
+                    <div className="text-xs font-black text-[#334155] uppercase tracking-widest">Material em decupagem — 11/02/2026</div>
+                    <p className="text-sm font-medium text-slate-500 mt-1 italic">A equipe de LIBRAS iniciou a decupagem do roteiro pedagógico.</p>
                   </div>
 
-                  <div className="animate-fade-in delay-150">
-                    <div className="text-sm font-semibold text-white">
-                      Material em edição — 10/11/2025
-                    </div>
-                    <p className="text-sm text-[#B4B9C7]">
-                      Editor iniciou a montagem do primeiro corte.
-                    </p>
+                  <div className="relative pl-8 border-l-2 border-slate-100">
+                    <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-4 border-slate-200" />
+                    <div className="text-xs font-black text-slate-400 uppercase tracking-widest">Solicitação Recebida — 10/02/2026</div>
+                    <p className="text-sm font-medium text-slate-400 mt-1 italic">A demanda foi triada e aprovada pelo COINTE.</p>
                   </div>
                 </div>
               </div>
-
             </div>
           )}
         </section>
