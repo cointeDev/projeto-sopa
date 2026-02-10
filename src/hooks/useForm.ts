@@ -167,12 +167,12 @@ export function useForm(): UseFormReturn {
 
 	function getMaxPessoasPorFormato(): number {
 		switch (formData.formato) {
-			case "Live remota":
+			case "LIVE_REMOTA":
 				return 8;
 
-			case "Live presencial (em estúdio)":
-			case "Podcast / Mesacast":
-			case "Gravação de programa":
+			case "LIVE_PRESENCIAL_ESTUDIO":
+			case "PODCAST_MESACAST":
+			case "GRAVACAO_PROGRAMA":
 				return 4;
 
 			default:

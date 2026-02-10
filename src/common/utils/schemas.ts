@@ -26,9 +26,9 @@ export const solicitarFormSchema = z.object({
 		.instanceof(File)
 		.refine((file) => file.size > 0, "Thumbnail obrigatório"),
 
-	acessibilidade: z
-		.array(z.string())
-		.min(1, "Ao menos uma opção de acessibilidade"),
+	acessibilidade: z.enum(["INCLUIR_LIBRAS", "NAO_SE_APLICA"], {
+		message: "Selecione uma opção de acessibilidade",
+	}),
 
 	distribuicao: z.string().min(1, "Distribuição obrigatória"),
 

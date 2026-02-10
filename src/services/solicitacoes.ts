@@ -14,7 +14,7 @@ export async function listarSolicitacoesPendentes() {
 
 export async function listarSolicitacoesAceitas() {
 	const response = await api.get("/solicitacoes", {
-		params: { status: "ACEITA" },
+		params: { status: "ACEITO" },
 	});
 
 	return response.data;
@@ -25,7 +25,7 @@ export async function aceitarSolicitacao(id: number) {
 	return response.data;
 }
 
-export async function recusarSolicitacao(id: nunmber) {
+export async function recusarSolicitacao(id: number) {
 	const response = await api.patch(`/solicitacoes/${id}/recusar`);
 	return response.data;
 }

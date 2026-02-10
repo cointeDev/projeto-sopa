@@ -17,11 +17,11 @@ export const initialData: SolicitarFormData = {
 	titulo: "",
 	descricao: "",
 	thumbnail: null,
-	acessibilidade: [],
+	acessibilidade: "",
 	distribuicao: "",
 
 	dataLimite: "",
-	pessoas: "",
+	pessoas: 0,
 	roteiro: null,
 	observacoes: "",
 };

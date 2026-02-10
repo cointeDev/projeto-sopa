@@ -22,11 +22,7 @@ import {
 	recusarSolicitacao,
 } from "../services/solicitacoes";
 
-import type {
-	SolicitacaoAPI,
-	SolicitarFormData,
-} from "../common/types/solicitacao";
-import { set } from "zod";
+import type { SolicitacaoAPI } from "../common/types/solicitacao";
 
 export type Aba = "Dashboard" | "Quadro" | "Solicitações" | "Agenda" | "Diário";
 
@@ -83,7 +79,7 @@ const mockSolicitacao: SolicitarFormData = {
 */
 
 export default function GestorLocal() {
-	const [abaAtual, setAbaAtual] = useState<Aba>("quadro");
+	const [abaAtual, setAbaAtual] = useState<Aba>("Quadro");
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [selectedCard, setSelectedCard] = useState<Card | null>(null);
 	const [cards, setCards] = useState<Array<Card>>([]);

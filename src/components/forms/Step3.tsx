@@ -3,36 +3,18 @@
 import { useFormContext } from "../../context/FormContext";
 import { Footer } from "../common/Footer";
 import {
-  OPCOES_ACESSIBILIDADE,
-  OPCOES_DISTRIBUICAO,
-  DISTRIBUICAO_LABELS,
-  type Acessibilidade,
-  type Distribuicao,
+	OPCOES_ACESSIBILIDADE,
+	OPCOES_DISTRIBUICAO,
+	DISTRIBUICAO_LABELS,
+	type Acessibilidade,
+	type Distribuicao,
+	ACESSIBILIDADE_LABELS,
 } from "../../common/types/solicitacao";
-
 
 export default function Step3() {
 	const { passo, setPassoAtual, updateField, validarPassoAtual } =
 		useFormContext();
 	const formData = useFormContext().formData;
-
-	const handleAcessibilidade = (opcao: Acessibilidade) => {
-		let novaLista = [...formData.acessibilidade];
-
-		if (opcao === "Não se aplica") {
-			novaLista = ["Não se aplica"];
-		} else {
-			novaLista = novaLista.filter((item) => item !== "Não se aplica");
-
-			if (novaLista.includes(opcao)) {
-				novaLista = novaLista.filter((item) => item !== opcao);
-			} else {
-				novaLista.push(opcao);
-			}
-		}
-
-		updateField("acessibilidade", novaLista);
-	};
 
 	return (
 		<>
@@ -136,6 +118,7 @@ export default function Step3() {
 					<h2 className="text-xg pb-3 pl-1.5 font-semibold text-white">
 						Acessibilidade
 					</h2>
+
 					<div className="flex flex-wrap gap-6 pl-1.5">
 						{OPCOES_ACESSIBILIDADE.map((item) => (
 							<label
@@ -143,24 +126,23 @@ export default function Step3() {
 								className="flex items-center space-x-3 cursor-pointer group"
 							>
 								<input
-									checked={formData.acessibilidade?.includes(item)}
-									className="w-5 h-5 rounded border-zinc-700 bg-zinc-900/50 text-indigo-500 focus:ring-indigo-500"
-									type="checkbox"
-									onChange={() => {
-										handleAcessibilidade(item);
-									}}
+									type="radio"
+									name="acessibilidade"
+									checked={formData.acessibilidade === item}
+									onChange={() => updateField("acessibilidade", item)}
+									className="w-5 h-5 border-zinc-700 bg-zinc-900/50 text-indigo-500 focus:ring-indigo-500"
 								/>
 
 								<span className="text-zinc-300 group-hover:text-white transition-colors">
-									{item}
+									{ACESSIBILIDADE_LABELS[item]}
 								</span>
 							</label>
 						))}
 					</div>
 
-					{formData.acessibilidade?.includes("Incluir LIBRAS") && (
+					{formData.acessibilidade === "INCLUIR_LIBRAS" && (
 						<div className="mt-4 pl-1.5">
-							<p className="text-sm 0   bg-white/5 border-white/10 text-white/70 border rounded-xl p-3">
+							<p className="text-sm bg-white/5 border-white/10 text-white/70 border rounded-xl p-3">
 								⚠️ Atenção: a RIEH{" "}
 								<strong>não fornece intérpretes de Libras</strong>. Caso
 								necessário, a contratação deverá ser providenciada pelo

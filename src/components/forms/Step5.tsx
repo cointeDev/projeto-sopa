@@ -3,6 +3,7 @@
 import { useFormContext } from "../../context/FormContext";
 import { Footer } from "../common/Footer";
 import { criarSolicitacao } from "../../services/solicitacoes";
+import { ACESSIBILIDADE_LABELS } from "../../common/types/solicitacao";
 
 export default function Step5() {
 	const { formData, setPassoAtual } = useFormContext();
@@ -29,7 +30,7 @@ export default function Step5() {
 
 				thumbnail: formData.thumbnail?.name,
 
-				acessibilidade: formData.acessibilidade[0],
+				acessibilidade: formData.acessibilidade,
 
 				distribuicao: formData.distribuicao,
 
@@ -43,7 +44,7 @@ export default function Step5() {
 			await criarSolicitacao(payload);
 
 			setPassoAtual(6);
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			console.error("Erro ao enviar solicitação:", error);
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -104,7 +105,9 @@ export default function Step5() {
 					</p>
 					<p>
 						<strong>Acessibilidade:</strong>{" "}
-						{formData.acessibilidade?.join(", ") || "Nenhuma"}
+						{formData.acessibilidade
+							? ACESSIBILIDADE_LABELS[formData.acessibilidade]
+							: "Não informado"}
 					</p>
 				</div>
 
