@@ -13,7 +13,12 @@ import ModalGestorSolicitacao, {
 	AcaoGestor,
 } from "../components/modals/ModalGestorSolicitacao";
 
+import ModalDevolucaoGestor from "../components/modals/ModalDevolucaoGestor";
+import { devolverSolicitacao } from "../services/solicitacoes";
+
 import { SolicitacoesList } from "../components/management/SolicitacoesList";
+
+import { ETAPAS_MAP } from "../common/types/solicitacao";
 
 import {
 	listarSolicitacoesPendentes,
@@ -22,7 +27,7 @@ import {
 	recusarSolicitacao,
 } from "../services/solicitacoes";
 
-import type { SolicitacaoAPI } from "../common/types/solicitacao";
+import type { CampoComErro, SolicitacaoAPI } from "../common/types/solicitacao";
 
 export type Aba = "Dashboard" | "Quadro" | "Solicitações" | "Agenda" | "Diário";
 
@@ -90,6 +95,8 @@ export default function GestorLocal() {
 
 	const [solicitacoes, setSolicitacoes] = useState<SolicitacaoAPI[]>([]);
 
+	const [abrirModalDevolucao, setAbrirModalDevolucao] = useState(false);
+
 	useEffect(() => {
 		async function carregarSolicitacoes() {
 			try {
@@ -106,17 +113,30 @@ export default function GestorLocal() {
 		useState<SolicitacaoAPI | null>(null);
 
 	const criarCardSolicitacao = (solicitacao: SolicitacaoAPI): Card => {
+		const etapaId = solicitacao.EtapaId ?? 1;
+
+		const etapaNome = ETAPAS_MAP[etapaId] ?? "STANDBY";
+
 		return {
-			id: Math.random().toString(36).substring(2, 9),
-			etapa: "STANDBY",
+			id: solicitacao.id.toString(),
+			etapa: etapaNome,
 			titulo: solicitacao.titulo,
 			responsavel: solicitacao.responsavel,
 			projeto: solicitacao.nomeProjeto,
-			etiquetas: [solicitacao.tipo],
-
-			solicitacao: solicitacao,
+			etiquetas: [solicitacao.TipoProducao],
+			solicitacao,
 		};
 	};
+
+	async function enviarDevolutiva(campos: CampoComErro[]) {
+		if (!solicitacaoSelecionada) return;
+
+		await devolverSolicitacao(solicitacaoSelecionada.id, { campos });
+
+		setSolicitacoes((prev) =>
+			prev.filter((s) => s.id !== solicitacaoSelecionada.id)
+		);
+	}
 
 	useEffect(() => {
 		async function carregarCards() {
@@ -166,6 +186,10 @@ export default function GestorLocal() {
 				const novoCard = criarCardSolicitacao(solicitacaoSelecionada);
 
 				setCards((prev) => [...prev, novoCard]);
+			}
+
+			if (acao === "DEVOLVER") {
+				setAbrirModalDevolucao(true);
 			}
 
 			if (acao === "RECUSAR") {
@@ -274,6 +298,12 @@ export default function GestorLocal() {
 					onAction={handleAcaoSolicitacao}
 				/>
 			)}
+
+			<ModalDevolucaoGestor
+				open={abrirModalDevolucao}
+				onClose={() => setAbrirModalDevolucao(false)}
+				onSubmit={enviarDevolutiva}
+			/>
 		</div>
 	);
 }

@@ -16,8 +16,8 @@ export const solicitarFormSchema = z.object({
 	data: z.string().min(1, "Data obrigatória"),
 	hora: z.string().min(1, "Hora obrigatória"),
 
-	tipo: z.string().min(1, "Tipo de produção obrigatória"),
-	formato: z.string().min(1, "Formato de produção obrigatório"),
+	TipoProducao: z.string().min(1, "Tipo de produção obrigatória"),
+	FormatoProducao: z.string().min(1, "Formato de produção obrigatório"),
 
 	nomeProjeto: z.string().min(1, "Nome do projeto obrigatório"),
 	titulo: z.string().min(1, "Título obrigatório"),

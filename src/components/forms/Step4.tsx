@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+import { Local } from "../../common/types/solicitacao";
 import { useFormContext } from "../../context/FormContext";
 import { Footer } from "../common/Footer";
 import { useRef, useState } from "react";
+import { OPCOES_LOCAL, LOCAL_LABELS } from "../../common/types/solicitacao";
 
 export default function Step4() {
 	const {
@@ -42,20 +44,30 @@ export default function Step4() {
 							className="w-full bg-[#F8FAFC] border border-slate-300 text-[#334155] text-sm font-bold rounded-2xl p-5 appearance-none cursor-pointer hover:bg-white transition-all shadow-sm focus:ring-2 focus:ring-indigo-500/20"
 							defaultValue={formData.local}
 							onChange={(event_) => {
-								setLocalValue(event_.target.value);
-								updateField("local", event_.target.value);
+								setLocalValue(event_.target.value as Local);
+								updateField("local", event_.target.value as Local);
 							}}
 						>
 							<option value="">Selecione o estúdio</option>
-							<option value="NATAL">Natal</option>
-							<option value="MOSSORO">Mossoró</option>
-							<option value="PAU_DOS_FERROS">Pau dos Ferros</option>
-							<option value="CAICO">Caicó</option>
-							<option value="Externo">Externo</option>
+							{OPCOES_LOCAL.map((local) => (
+								<option key={local} value={local}>
+									{LOCAL_LABELS[local]}
+								</option>
+							))}
 						</select>
 						<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-[#4f46e5]">
-							<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+							<svg
+								className="w-4 h-4"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									d="M19 9l-7 7-7-7"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth="2"
+								/>
 							</svg>
 						</div>
 					</div>
@@ -146,12 +158,24 @@ export default function Step4() {
 					<label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-slate-200 rounded-[2.5rem] cursor-pointer bg-[#F8FAFC] hover:bg-white transition-all group shadow-inner">
 						<div className="flex flex-col items-center justify-center pt-5 pb-6">
 							<div className="p-4 bg-white rounded-2xl shadow-sm mb-3 group-hover:scale-110 transition-transform border border-slate-50">
-								<svg className="w-8 h-8 text-[#4f46e5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+								<svg
+									className="w-8 h-8 text-[#4f46e5]"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth="2"
+									/>
 								</svg>
 							</div>
 							<p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">
-								{formData.roteiro ? formData.roteiro.name : "Clique para anexar o roteiro"}
+								{formData.roteiro
+									? formData.roteiro.name
+									: "Clique para anexar o roteiro"}
 							</p>
 						</div>
 						<input

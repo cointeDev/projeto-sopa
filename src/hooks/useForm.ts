@@ -76,7 +76,7 @@ export function useForm(): UseFormReturn {
 
 	function validarStep2(data: SolicitarFormData): boolean {
 		const result = solicitarFormSchema
-			.pick({ tipo: true, formato: true })
+			.pick({ TipoProducao: true, FormatoProducao: true })
 			.safeParse(data);
 
 		if (!result.success) {
@@ -86,14 +86,14 @@ export function useForm(): UseFormReturn {
 			return false;
 		}
 
-		if (!data.tipo || !data.formato) {
+		if (!data.TipoProducao || !data.FormatoProducao) {
 			toast.error("Selecione o tipo e o formato de produção.");
 			return false;
 		}
 
-		const formatosValidos = FORMATOS_POR_TIPO[data.tipo] ?? [];
+		const formatosValidos = FORMATOS_POR_TIPO[data.TipoProducao] ?? [];
 
-		if (!formatosValidos.includes(data.formato)) {
+		if (!formatosValidos.includes(data.FormatoProducao)) {
 			toast.error("Formato inválido para o tipo de produção selecionado.");
 			return false;
 		}
@@ -166,7 +166,7 @@ export function useForm(): UseFormReturn {
 	}
 
 	function getMaxPessoasPorFormato(): number {
-		switch (formData.formato) {
+		switch (formData.FormatoProducao) {
 			case "LIVE_REMOTA":
 				return 8;
 

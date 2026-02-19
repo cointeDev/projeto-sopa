@@ -11,6 +11,7 @@ import {
 	GraduationCap,
 } from "lucide-react";
 import type { Card } from "../../pages/GestorLocal";
+import { FORMATO_PRODUCAO_LABELS } from "../../common/types/solicitacao";
 
 interface DetailBoxProps {
 	icon: React.ReactNode;
@@ -128,7 +129,11 @@ export function CardDetailModal({
 								<DetailBox
 									icon={<Layers size={16} />}
 									label="Formato"
-									value={solicitacao?.formato || "-"}
+									value={
+										solicitacao?.FormatoProducao
+											? FORMATO_PRODUCAO_LABELS[solicitacao.FormatoProducao]
+											: "-"
+									}
 								/>
 								<DetailBox
 									icon={<Users size={16} />}

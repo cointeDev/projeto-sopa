@@ -58,8 +58,8 @@ export default function Step2() {
 		useFormContext();
 	const formData = useFormContext().formData;
 
-	const formatosPermitidos = formData?.tipo
-		? FORMATOS_POR_TIPO[formData.tipo]
+	const formatosPermitidos = formData?.TipoProducao
+		? FORMATOS_POR_TIPO[formData.TipoProducao]
 		: [];
 
 	return (
@@ -73,14 +73,14 @@ export default function Step2() {
 					<button
 						key={index}
 						className={`rounded-2xl border p-6 text-[10px] font-black uppercase tracking-widest transition-all ${
-							tipo === formData?.tipo
+							tipo === formData?.TipoProducao
 								? "border-[#4f46e5] bg-indigo-50 text-[#4f46e5] shadow-lg shadow-indigo-100 scale-105"
 								: "border-slate-100 bg-[#F8FAFC] text-slate-400 hover:border-indigo-200 hover:text-indigo-400"
 						}`}
 						onClick={() => {
-							updateField("tipo", tipo);
+							updateField("TipoProducao", tipo);
 							// CORREÇÃO TS(2345): Mudado de null para "" para coincidir com o tipo
-							updateField("formato", "");
+							updateField("FormatoProducao", "");
 						}}
 					>
 						{TIPO_PRODUCAO_LABELS[tipo]}
@@ -88,19 +88,23 @@ export default function Step2() {
 				))}
 			</div>
 
-			{formData?.tipo && (
+			{formData?.TipoProducao && (
 				<div className="mt-8 rounded-3xl bg-[#F8FAFC] border border-slate-100 p-8 animate-in fade-in duration-300 shadow-inner">
 					<h4 className="text-[#334155] font-black uppercase text-xs mb-4 flex items-center gap-2">
 						<div className="w-1.5 h-1.5 rounded-full bg-[#4f46e5]"></div>
-						{TIPO_PRODUCAO_LABELS[formData.tipo]}
+						{TIPO_PRODUCAO_LABELS[formData.TipoProducao]}
 					</h4>
 					<div className="text-slate-500 text-sm leading-relaxed font-medium italic">
-						{formData.tipo === "EVENTO_IN_LOCO" && eventoInLocoDescricao}
-						{formData.tipo === "EVENTO_EM_ESTUDIO" && eventoEmEstudioDescricao}
-						{formData.tipo === "VIDEO_INSTITUCIONAL" && institucionalDescricao}
-						{formData.tipo === "GRAVACAO_CHAMADA" && chamadaDescricao}
-						{formData.tipo === "GRAVACAO_VIDEOAULA" && videoaulaDescricao}
-						{formData.tipo === "EDICAO" && edicaoDescricao}
+						{formData.TipoProducao === "EVENTO_IN_LOCO" &&
+							eventoInLocoDescricao}
+						{formData.TipoProducao === "EVENTO_EM_ESTUDIO" &&
+							eventoEmEstudioDescricao}
+						{formData.TipoProducao === "VIDEO_INSTITUCIONAL" &&
+							institucionalDescricao}
+						{formData.TipoProducao === "GRAVACAO_CHAMADA" && chamadaDescricao}
+						{formData.TipoProducao === "GRAVACAO_VIDEOAULA" &&
+							videoaulaDescricao}
+						{formData.TipoProducao === "EDICAO" && edicaoDescricao}
 					</div>
 				</div>
 			)}
@@ -112,14 +116,14 @@ export default function Step2() {
 			<div className="grid grid-cols-2 md:grid-cols-3 gap-5">
 				{FORMATOS_PRODUCAO.map((formato, index) => {
 					const habilitado =
-						!formData?.tipo || formatosPermitidos?.includes(formato);
+						!formData?.TipoProducao || formatosPermitidos?.includes(formato);
 
 					return (
 						<button
 							key={index}
 							disabled={!habilitado}
 							className={`rounded-2xl border p-6 text-[9px] font-black uppercase tracking-widest transition-all ${
-								formato === formData?.formato
+								formato === formData?.FormatoProducao
 									? "border-[#4f46e5] bg-indigo-50 text-[#4f46e5] shadow-lg shadow-indigo-100 scale-105"
 									: habilitado
 										? "border-slate-100 bg-[#F8FAFC] text-slate-400 hover:border-indigo-200 hover:text-indigo-400"
@@ -127,7 +131,7 @@ export default function Step2() {
 							}`}
 							onClick={() => {
 								if (!habilitado) return;
-								updateField("formato", formato);
+								updateField("FormatoProducao", formato);
 							}}
 						>
 							{FORMATO_PRODUCAO_LABELS[formato]}
@@ -136,23 +140,26 @@ export default function Step2() {
 				})}
 			</div>
 
-			{formData?.formato && (
+			{formData?.FormatoProducao && (
 				<div className="mt-8 rounded-3xl bg-[#F8FAFC] border border-slate-100 p-8 animate-in fade-in duration-300 shadow-inner">
 					<h4 className="text-[#334155] font-black uppercase text-xs mb-4 flex items-center gap-2">
 						<div className="w-1.5 h-1.5 rounded-full bg-[#4f46e5]"></div>
-						{FORMATO_PRODUCAO_LABELS[formData.formato]}
+						{FORMATO_PRODUCAO_LABELS[formData.FormatoProducao]}
 					</h4>
 					<div className="text-slate-500 text-sm leading-relaxed font-medium italic whitespace-pre-wrap">
-						{formData.formato === "LIVE_PRE_GRAVADA" && liveDescricao}
-						{formData.formato === "LIVE_PRESENCIAL_ESTUDIO" &&
+						{formData.FormatoProducao === "LIVE_PRE_GRAVADA" && liveDescricao}
+						{formData.FormatoProducao === "LIVE_PRESENCIAL_ESTUDIO" &&
 							livePresencialDescricao}
-						{formData.formato === "LIVE_REMOTA" && liveRemotaDescricao}
-						{formData.formato === "PODCAST_MESACAST" && podcastDescricao}
-						{formData.formato === "GRAVACAO_PROGRAMA" && programaDescricao}
-						{formData.formato === "SHORTS_REELS" && shortsReelsDescricao}
-						{formData.formato === "ANIMACOES_EVENTOS_IN_LOCO" &&
+						{formData.FormatoProducao === "LIVE_REMOTA" && liveRemotaDescricao}
+						{formData.FormatoProducao === "PODCAST_MESACAST" &&
+							podcastDescricao}
+						{formData.FormatoProducao === "GRAVACAO_PROGRAMA" &&
+							programaDescricao}
+						{formData.FormatoProducao === "SHORTS_REELS" &&
+							shortsReelsDescricao}
+						{formData.FormatoProducao === "ANIMACOES_EVENTOS_IN_LOCO" &&
 							animacoesDescricao}
-						{formData.formato === "CRIACAO_EDICAO_ANIMACOES" &&
+						{formData.FormatoProducao === "CRIACAO_EDICAO_ANIMACOES" &&
 							criacaoEdicaoDescricao}
 					</div>
 				</div>

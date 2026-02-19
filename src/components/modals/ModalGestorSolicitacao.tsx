@@ -1,7 +1,11 @@
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
-import type { SolicitacaoAPI } from "../../common/types/solicitacao";
+import {
+	FORMATO_PRODUCAO_LABELS,
+	TIPO_PRODUCAO_LABELS,
+	type SolicitacaoAPI,
+} from "../../common/types/solicitacao";
 
 export type AcaoGestor = "ACEITAR" | "RECUSAR" | "DEVOLVER";
 
@@ -55,8 +59,25 @@ export default function ModalGestorSolicitacao({
 									<Info label="Email" value={dados.email} />
 									<Info label="Setor" value={dados.setor} />
 									<Info label="Telefone" value={dados.telefone} />
-									<Info label="Tipo" value={dados.tipo} />
-									<Info label="Formato" value={dados.formato} />
+
+									<Info
+										label="Tipo"
+										value={
+											dados.TipoProducao
+												? TIPO_PRODUCAO_LABELS[dados.TipoProducao]
+												: undefined
+										}
+									/>
+
+									<Info
+										label="Formato"
+										value={
+											dados.FormatoProducao
+												? FORMATO_PRODUCAO_LABELS[dados.FormatoProducao]
+												: undefined
+										}
+									/>
+
 									<Info label="Projeto" value={dados.nomeProjeto} />
 									<Info label="Título" value={dados.titulo} />
 									<Info label="Data da gravação" value={dados.data} />
@@ -108,11 +129,14 @@ export default function ModalGestorSolicitacao({
 	);
 }
 
-function Info({ label, value }: { label: string; value?: string }) {
+function Info({ label, value }: { label: string; value?: unknown }) {
+	const display =
+		value === null || value === undefined || value === "" ? "—" : String(value);
+
 	return (
 		<div>
 			<p className="text-xl font-medium text-muted-foreground">{label}</p>
-			<p className="text-lg wrap-break-word">{value || "—"}</p>
+			<p className="text-lg break-words">{display}</p>
 		</div>
 	);
 }

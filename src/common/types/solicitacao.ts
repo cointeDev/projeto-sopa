@@ -20,20 +20,21 @@ export type Acessibilidade = "INCLUIR_LIBRAS" | "NAO_SE_APLICA";
 
 export type Distribuicao = "INTERNA" | "SEEC" | "INSTAGRAM" | "OUTRO";
 
+export type Local = "NATAL" | "MOSSORO" | "CAICO" | "PAU_DOS_FERROS";
+
 export interface SolicitarFormData {
 	// STEP 1
 	responsavel: string;
 	email: string;
 	setor: string;
 	telefone: string;
-	local: string;
 	localExterno?: string;
 	data: string;
 	hora: string;
 
 	// STEP 2
-	tipo: TipoProducao | "";
-	formato: FormatoProducao | "";
+	TipoProducao: TipoProducao | "";
+	FormatoProducao: FormatoProducao | "";
 
 	// STEP 3
 	nomeProjeto: string;
@@ -44,6 +45,7 @@ export interface SolicitarFormData {
 	distribuicao: Distribuicao | "";
 
 	// STEP 4
+	local: Local | "";
 	dataLimite: string;
 	pessoas: number;
 	roteiro: File | null;
@@ -118,6 +120,36 @@ export const DISTRIBUICAO_LABELS: Record<Distribuicao, string> = {
 	SEEC: "Canal da SEEC",
 	INSTAGRAM: "Instagram da SEEC",
 	OUTRO: "Outro",
+};
+
+export const OPCOES_LOCAL: Array<Local> = [
+	"NATAL",
+	"MOSSORO",
+	"CAICO",
+	"PAU_DOS_FERROS",
+];
+
+export const LOCAL_LABELS: Record<Local, string> = {
+	NATAL: "Natal",
+	MOSSORO: "Mossoró",
+	CAICO: "Caicó",
+	PAU_DOS_FERROS: "Pau dos Ferros",
+};
+
+export const ETAPAS_MAP: Record<number, string> = {
+	1: "STANDBY",
+	2: "PARA PRODUÇÃO SEMANAL",
+	3: "AO VIVO",
+	4: "GRAVADO",
+	5: "EDIÇÃO 1",
+	6: "EDIÇÃO 2",
+	7: "EDIÇÃO 3",
+	8: "EDIÇÃO FINAL",
+	9: "LIBRAS",
+	10: "REVISÃO LP",
+	11: "PRODUÇÃO LSE",
+	12: "CONCLUÍDO",
+	13: "PUBLICADO",
 };
 
 export type CampoComErro = {
