@@ -38,4 +38,10 @@ export const solicitarFormSchema = z.object({
 	observacoes: z.string().optional(),
 });
 
+export const tokenSchema = z.string().regex(
+  /^SOPA-\d{4}\/\d{2}-[0-9a-fA-F-]{36}$/,
+  "Formato de token inválido"
+);
+
+
 export type SolicitarFormSchema = z.infer<typeof solicitarFormSchema>;

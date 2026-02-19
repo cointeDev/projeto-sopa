@@ -20,22 +20,22 @@ export async function listarSolicitacoesAceitas() {
 	return response.data;
 }
 
-export async function aceitarSolicitacao(id: number) {
+export async function aceitarSolicitacao(id: string) {
 	const response = await api.patch(`/solicitacoes/${id}/aceitar`);
 	return response.data;
 }
 
-export async function recusarSolicitacao(id: number) {
+export async function recusarSolicitacao(id: string) {
 	const response = await api.patch(`/solicitacoes/${id}/recusar`);
 	return response.data;
 }
 
-export async function devolverSolicitacao(id: number, dados: any) {
+export async function devolverSolicitacao(id: string, dados: any) {
 	const response = await api.patch(`/solicitacoes/${id}/devolver`, dados);
 	return response.data;
 }
 
-export async function atualizarEtapaSolicitacao(id: number, etapaId: number) {
+export async function atualizarEtapaSolicitacao(id: string, etapaId: number) {
 	const response = await fetch(
 		`http://localhost:3000/solicitacoes/${id}/etapa`,
 		{
@@ -50,4 +50,9 @@ export async function atualizarEtapaSolicitacao(id: number, etapaId: number) {
 	}
 
 	return response.json();
+}
+
+export async function buscarSolicitacaoPorToken(id: string) {
+  const response = await api.get(`/solicitacoes/${id}`);
+  return response.data;
 }

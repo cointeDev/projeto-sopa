@@ -180,7 +180,7 @@ export function QuadroProduction({
 		);
 
 		try {
-			await atualizarEtapaSolicitacao(Number(draggableId), novaEtapaId);
+			await atualizarEtapaSolicitacao(draggableId, novaEtapaId);
 		} catch (error) {
 			console.error("Erro ao atualizar etapa:", error);
 		}

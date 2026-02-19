@@ -53,7 +53,7 @@ export interface SolicitarFormData {
 }
 
 export interface SolicitacaoAPI extends SolicitarFormData {
-	id: number;
+	id: string;
 	status: string;
 	createdAt: string;
 	EtapaId: number | null;
