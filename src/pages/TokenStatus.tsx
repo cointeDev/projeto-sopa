@@ -281,25 +281,6 @@ export function TokenStatus() {
 								</span>
 							</header>
 
-							{/* FORMULÁRIO DE CORREÇÃO (APENAS SE ESTIVER ESTORNADO) */}
-							{solicitacao.status === "ESTORNO" &&
-								solicitacao.devolutiva &&
-								solicitacao.devolutiva.campos.length > 0 && (
-									<div className="mt-8">
-										<FormProvider>
-											<FormularioCorrecao
-												devolutiva={{
-													status: "Devolvido",
-													campos: solicitacao.devolutiva.campos as any,
-												}}
-												onSubmit={(dadosCorrigidos) =>
-													reenviarCorrecoes(dadosCorrigidos)
-												}
-											/>
-										</FormProvider>
-									</div>
-								)}
-
 							<div className="mt-12 w-full max-w-2xl">
 								{/* O STEPPER APARECE APENAS SE ESTIVER ACEITO (EM PRODUÇÃO) */}
 								{solicitacao.status === "ACEITO" && (
@@ -355,6 +336,25 @@ export function TokenStatus() {
 										))}
 									</div>
 								</div>
+
+								{/* FORMULÁRIO DE CORREÇÃO (APENAS SE ESTIVER ESTORNADO) */}
+								{solicitacao.status === "ESTORNO" &&
+									solicitacao.devolutiva &&
+									solicitacao.devolutiva.campos.length > 0 && (
+										<div className="mt-8">
+											<FormProvider>
+												<FormularioCorrecao
+													devolutiva={{
+														status: "Devolvido",
+														campos: solicitacao.devolutiva.campos as any,
+													}}
+													onSubmit={(dadosCorrigidos) =>
+														reenviarCorrecoes(dadosCorrigidos)
+													}
+												/>
+											</FormProvider>
+										</div>
+									)}
 							</div>
 						</div>
 					)}
