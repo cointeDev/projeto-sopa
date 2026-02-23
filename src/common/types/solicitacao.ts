@@ -57,6 +57,7 @@ export interface SolicitacaoAPI extends SolicitarFormData {
 	status: string;
 	createdAt: string;
 	EtapaId: number | null;
+	devolutiva?: DevolutivaGestor;
 }
 
 export const TIPOS_PRODUCAO: Array<TipoProducao> = [

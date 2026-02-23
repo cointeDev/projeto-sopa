@@ -1,9 +1,10 @@
 import type { DevolutivaGestor } from "../../common/types/solicitacao";
 import { useCamposCorrecao } from "../../common/maps/camposCorrecao";
+import { useFormContext } from "react-hook-form";
 
 interface Props {
 	devolutiva: DevolutivaGestor;
-	onSubmit?: () => void;
+	onSubmit?: (dados: any) => void;
 }
 
 // min-h-screen bg-linear-to-br from-[#0F172A] to-[#1E293B] flex items-center justify-center px-4//

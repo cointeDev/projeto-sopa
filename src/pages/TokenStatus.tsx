@@ -2,7 +2,12 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { z } from "zod";
-import { buscarSolicitacaoPorToken } from "../services/solicitacoes";
+import {
+	buscarSolicitacaoPorToken,
+	reenviarSolicitacao,
+} from "../services/solicitacoes";
+import { FormularioCorrecao } from "../components/correcao/FormularioCorrecao";
+import { FormProvider } from "../components/forms/FormProvider";
 
 // O tipo original da sua API sem modificações
 type Solicitacao = {
@@ -15,6 +20,12 @@ type Solicitacao = {
 		nome: string;
 	};
 	createdAt: string;
+	devolutiva?: {
+		campos: {
+			campo: string;
+			mensagem: string;
+		}[];
+	};
 };
 
 const tokenSchema = z
@@ -53,6 +64,8 @@ export function TokenStatus() {
 		try {
 			setLoading(true);
 			const data = await buscarSolicitacaoPorToken(token);
+			console.log("DEVOLUTIVA:", data.devolutiva);
+			console.log("CAMPOS:", data.devolutiva?.campos);
 			setSolicitacao(data);
 		} catch {
 			setErro("Token não encontrado. Verifique e tente novamente.");
@@ -128,6 +141,19 @@ export function TokenStatus() {
 		});
 
 		return eventos;
+	}
+
+	async function reenviarCorrecoes(dadosCorrigidos: any) {
+		if (!solicitacao) return;
+
+		try {
+			await reenviarSolicitacao(solicitacao.id, dadosCorrigidos);
+
+			const atualizado = await buscarSolicitacaoPorToken(token);
+			setSolicitacao(atualizado);
+		} catch {
+			alert("Erro ao reenviar solicitação.");
+		}
 	}
 
 	return (
@@ -235,6 +261,25 @@ export function TokenStatus() {
 									{traduzirStatus(solicitacao.status)}
 								</span>
 							</header>
+
+							{/* FORMULÁRIO DE CORREÇÃO (APENAS SE ESTIVER ESTORNADO) */}
+							{solicitacao.status === "ESTORNO" &&
+								solicitacao.devolutiva &&
+								solicitacao.devolutiva.campos.length > 0 && (
+									<div className="mt-8">
+										<FormProvider>
+											<FormularioCorrecao
+												devolutiva={{
+													status: "Devolvido",
+													campos: solicitacao.devolutiva.campos as any,
+												}}
+												onSubmit={(dadosCorrigidos) =>
+													reenviarCorrecoes(dadosCorrigidos)
+												}
+											/>
+										</FormProvider>
+									</div>
+								)}
 
 							<div className="mt-12 w-full max-w-2xl">
 								{/* O STEPPER APARECE APENAS SE ESTIVER ACEITO (EM PRODUÇÃO) */}

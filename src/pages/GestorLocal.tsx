@@ -128,6 +128,8 @@ export default function GestorLocal() {
 		};
 	};
 
+	/*
+
 	async function enviarDevolutiva(campos: CampoComErro[]) {
 		if (!solicitacaoSelecionada) return;
 
@@ -136,6 +138,25 @@ export default function GestorLocal() {
 		setSolicitacoes((prev) =>
 			prev.filter((s) => s.id !== solicitacaoSelecionada.id)
 		);
+	}
+	*/
+
+	async function enviarDevolutiva(campos: CampoComErro[]) {
+		if (!solicitacaoSelecionada) return;
+
+		try {
+			const resposta = await devolverSolicitacao(solicitacaoSelecionada.id, {
+				campos,
+			});
+
+			console.log("RESPOSTA DA API:", resposta);
+
+			setSolicitacoes((prev) =>
+				prev.filter((s) => s.id !== solicitacaoSelecionada.id)
+			);
+		} catch (error) {
+			console.error("ERRO AO DEVOLVER:", error);
+		}
 	}
 
 	useEffect(() => {
@@ -174,6 +195,7 @@ export default function GestorLocal() {
 		setIsModalOpen(false);
 	};
 
+	/*
 	const handleAcaoSolicitacao = async (acao: AcaoGestor) => {
 		if (!solicitacaoSelecionada) return;
 
@@ -201,6 +223,43 @@ export default function GestorLocal() {
 			);
 
 			setSolicitacaoSelecionada(null);
+		} catch (err) {
+			console.error("Erro ao atualizar solicitação", err);
+		}
+	};
+
+	*/
+
+	const handleAcaoSolicitacao = async (acao: AcaoGestor) => {
+		if (!solicitacaoSelecionada) return;
+
+		try {
+			if (acao === "ACEITAR") {
+				await aceitarSolicitacao(solicitacaoSelecionada.id);
+
+				const novoCard = criarCardSolicitacao(solicitacaoSelecionada);
+				setCards((prev) => [...prev, novoCard]);
+
+				setSolicitacoes((prev) =>
+					prev.filter((s) => s.id !== solicitacaoSelecionada.id)
+				);
+
+				setSolicitacaoSelecionada(null);
+			}
+
+			if (acao === "RECUSAR") {
+				await recusarSolicitacao(solicitacaoSelecionada.id);
+
+				setSolicitacoes((prev) =>
+					prev.filter((s) => s.id !== solicitacaoSelecionada.id)
+				);
+
+				setSolicitacaoSelecionada(null);
+			}
+
+			if (acao === "DEVOLVER") {
+				setAbrirModalDevolucao(true);
+			}
 		} catch (err) {
 			console.error("Erro ao atualizar solicitação", err);
 		}

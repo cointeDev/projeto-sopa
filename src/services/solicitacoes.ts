@@ -53,6 +53,11 @@ export async function atualizarEtapaSolicitacao(id: string, etapaId: number) {
 }
 
 export async function buscarSolicitacaoPorToken(id: string) {
-  const response = await api.get(`/solicitacoes/${id}`);
-  return response.data;
+	const response = await api.get(`/solicitacoes/${id}`);
+	return response.data;
+}
+
+export async function reenviarSolicitacao(id: string, dados: any) {
+	const response = await api.patch(`/solicitacoes/${id}/reenviar`, dados);
+	return response.data;
 }
