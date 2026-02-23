@@ -144,15 +144,34 @@ export function TokenStatus() {
 	}
 
 	async function reenviarCorrecoes(dadosCorrigidos: any) {
-		if (!solicitacao) return;
+		if (!solicitacao || !solicitacao.devolutiva) return;
+
+		// 1. Pegamos a lista de campos que o gestor pediu para corrigir
+		const camposDevolvidos = solicitacao.devolutiva.campos.map((c) => c.campo);
+
+		// 2. Criamos um objeto vazio para colocar apenas o que importa
+		const dadosFiltrados: Record<string, any> = {};
+
+		// 3. Preenchemos o objeto apenas com os campos devolvidos
+		camposDevolvidos.forEach((campo) => {
+			// Verifica se o campo existe no formData antes de adicionar
+			if (dadosCorrigidos[campo] !== undefined) {
+				dadosFiltrados[campo] = dadosCorrigidos[campo];
+			}
+		});
 
 		try {
-			await reenviarSolicitacao(solicitacao.id, dadosCorrigidos);
+			// 4. Enviamos APENAS os dados filtrados para a API!
+			// Agora o back-end não vai mais reclamar de e-mail vazio ou dados inválidos
+			await reenviarSolicitacao(solicitacao.id, dadosFiltrados);
 
 			const atualizado = await buscarSolicitacaoPorToken(token);
 			setSolicitacao(atualizado);
-		} catch {
-			alert("Erro ao reenviar solicitação.");
+
+			alert("Correções enviadas com sucesso!");
+		} catch (error) {
+			console.error(error);
+			alert("Erro ao reenviar solicitação. Verifique os dados.");
 		}
 	}
 

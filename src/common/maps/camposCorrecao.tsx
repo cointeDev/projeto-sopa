@@ -58,5 +58,39 @@ export function useCamposCorrecao(): Partial<
 				/>
 			),
 		},
+		responsavel: {
+			label: "Nome do Responsável",
+			render: () => (
+				<input
+					className="input"
+					onChange={(e) => updateField("responsavel", e.target.value)}
+				/>
+			),
+		},
+
+		setor: {
+			label: "Setor",
+			render: () => (
+				<input
+					className="input"
+					onChange={(e) => updateField("setor", e.target.value)}
+				/>
+			),
+		},
+
+		TipoProducao: {
+			label: "Tipo de Produção",
+			render: () => (
+				<select
+					className="input"
+					onChange={(e) => updateField("TipoProducao", e.target.value as any)}
+				>
+					<option value="">Selecione...</option>
+					<option value="GRAVACAO_CHAMADA">Gravação de Chamada</option>
+					<option value="EVENTO_IN_LOCO">Evento In Loco</option>
+					{/* ... outras opções ... */}
+				</select>
+			),
+		},
 	};
 }
