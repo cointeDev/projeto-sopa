@@ -21,11 +21,12 @@ type Solicitacao = {
 	};
 	createdAt: string;
 	devolutiva?: {
-		campos: {
+		campos: Array<{
 			campo: string;
 			mensagem: string;
-		}[];
+		}>;
 	};
+	motivoRejeicao?: string;
 };
 
 const tokenSchema = z
@@ -100,44 +101,102 @@ export function TokenStatus() {
 	);
 
 	// --- GERAÇÃO DINÂMICA DA TIMELINE BASEADA NA SUA API REAL ---
+	// --- GERAÇÃO DINÂMICA DA TIMELINE ---
 	function gerarTimeline(dados: Solicitacao) {
 		const eventos = [];
 
-		// 1. O evento mais recente entra primeiro (no topo)
+		// 1. Fluxo de Produção (Se estiver ACEITO e tiver uma Etapa)
 		if (dados.status === "ACEITO" && dados.Etapa) {
+			// A. Etapa Atual (Entra no topo, em destaque)
 			eventos.push({
-				id: "current",
+				id: `etapa-atual`,
 				titulo: dados.Etapa.nome,
-				data: "Atual",
-				descricao: `A produção encontra-se atualmente na etapa de ${dados.Etapa.nome.toLowerCase()}.`,
+				data: "Em andamento",
+				descricao: "A produção encontra-se atualmente nesta etapa.",
+				status: "atual", // Usaremos isso para pintar a bolinha de azul
 			});
-		} else if (dados.status === "REJEITADA" || dados.status === "ESTORNO") {
+
+			// B. Lista de todas as etapas possíveis da sua API
+			const TODAS_ETAPAS = [
+				{ id: 1, nome: "STANDBY" },
+				{ id: 2, nome: "PARA PRODUÇÃO SEMANAL" },
+				{ id: 3, nome: "AO VIVO" },
+				{ id: 4, nome: "GRAVADO" },
+				{ id: 5, nome: "EDIÇÃO 1" },
+				{ id: 6, nome: "EDIÇÃO 2" },
+				{ id: 7, nome: "EDIÇÃO 3" },
+				{ id: 8, nome: "EDIÇÃO FINAL" },
+				{ id: 9, nome: "LIBRAS" },
+				{ id: 10, nome: "REVISÃO LP" },
+				{ id: 11, nome: "PRODUÇÃO LSE" },
+				{ id: 12, nome: "CONCLUÍDO" },
+				{ id: 13, nome: "PUBLICADO" },
+			];
+
+			// C. Filtra apenas as etapas que ficaram para trás (ID menor que o atual)
+			// Usamos o .reverse() para a mais recente ficar em cima
+			const etapasConcluidas = TODAS_ETAPAS.filter(
+				(etapa) => etapa.id < dados.Etapa!.id
+			).reverse();
+
+			// Adiciona as etapas anteriores como concluídas
+			etapasConcluidas.forEach((etapa) => {
+				// Dica: Se quiser pular etapas exclusivas (ex: se é Gravado, não mostrar Ao Vivo),
+				// você pode fazer um if aqui dentro depois!
+				eventos.push({
+					id: `etapa-${etapa.id}`,
+					titulo: etapa.nome,
+					data: "Concluído",
+					descricao: "Etapa finalizada com sucesso.",
+					status: "concluido", // Bolinha verde
+				});
+			});
+
+			// D. Evento de quando o pedido foi oficialmente Aceito
+			eventos.push({
+				id: "accepted",
+				titulo: "Solicitação Aceita",
+				data: "Aprovado",
+				descricao:
+					"O pedido passou pela avaliação e entrou no fluxo de produção.",
+				status: "concluido",
+			});
+		}
+		// 2. Fluxos Alternativos (Rejeitada, Estorno, Pendente)
+		else if (dados.status === "REJEITADA") {
 			eventos.push({
 				id: "rejected",
-				titulo:
-					dados.status === "REJEITADA"
-						? "Solicitação Rejeitada"
-						: "Solicitação Devolvida",
-				data: "Atual",
-				descricao:
-					"O pedido foi analisado e retornou com pendências ou foi negado. Verifique com a coordenação.",
+				titulo: "Solicitação Rejeitada",
+				data: "Encerrado",
+				descricao: "O pedido foi analisado e não pôde seguir para produção.",
+				status: "erro", // Bolinha vermelha
+			});
+		} else if (dados.status === "ESTORNO") {
+			eventos.push({
+				id: "returned",
+				titulo: "Devolvida para Correção",
+				data: "Ação Necessária",
+				descricao: "Verifique os apontamentos da equipe, corrija e reenvie.",
+				status: "erro",
 			});
 		} else if (dados.status === "PENDENTE") {
 			eventos.push({
 				id: "pending",
 				titulo: "Aguardando Avaliação",
-				data: "Atual",
+				data: "Em Análise",
 				descricao:
-					"A equipe está analisando os dados do formulário antes de iniciar o fluxo de produção.",
+					"A equipe está analisando os dados antes de iniciar a produção.",
+				status: "atual",
 			});
 		}
 
-		// 2. O evento de criação entra depois (mais antigo, embaixo)
+		// 3. Evento Base de Criação (Fica sempre na base, lá embaixo)
 		eventos.push({
 			id: "created",
 			titulo: "Solicitação Recebida",
 			data: new Date(dados.createdAt).toLocaleDateString("pt-BR"),
-			descricao: "O pedido foi registrado no sistema com sucesso.",
+			descricao: "O pedido foi registrado no sistema.",
+			status: "concluido",
 		});
 
 		return eventos;
@@ -221,7 +280,7 @@ export function TokenStatus() {
 						</p>
 					)}
 
-					<div className="mt-10 pt-6 border-t border-slate-50 text-center">
+					<div className=" pt-6 border-t border-slate-50 text-center">
 						<Link
 							className="text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-400"
 							to="/"
@@ -283,7 +342,7 @@ export function TokenStatus() {
 
 							<div className="mt-12 w-full max-w-2xl">
 								{/* O STEPPER APARECE APENAS SE ESTIVER ACEITO (EM PRODUÇÃO) */}
-								{solicitacao.status === "ACEITO" && (
+								{/* {solicitacao.status === "ACEITO" && (
 									<div className="relative flex items-center justify-between w-full mb-16 px-2">
 										<div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[2px] bg-slate-200 -z-10"></div>
 
@@ -309,23 +368,37 @@ export function TokenStatus() {
 											);
 										})}
 									</div>
-								)}
+								)} */}
 
 								{/* TIMELINE DE HISTÓRICO GERADA COM OS DADOS DA SUA API */}
 								<div className="mt-14">
 									<h4 className="text-xl font-bold text-slate-800 mb-8 tracking-tight">
 										Histórico de atividades
 									</h4>
-
 									<div className="relative border-l-2 border-slate-200 ml-[9px] space-y-8 pb-4">
 										{gerarTimeline(solicitacao).map((item) => (
 											<div key={item.id} className="relative pl-6">
-												<div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-slate-300 ring-4 ring-white"></div>
+												{/* BOLINHA COLORIDA DINÂMICA */}
+												<div
+													className={`absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full ring-4 ring-white
+                ${item.status === "atual" ? "bg-indigo-600" : ""}
+                ${item.status === "concluido" ? "bg-emerald-500" : ""}
+                ${item.status === "erro" ? "bg-red-500" : ""}
+            `}
+												></div>
 
 												<p className="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">
 													{item.titulo}
-													<span className="font-normal text-slate-400">—</span>
-													<span className="font-medium text-slate-500 text-xs">
+													<span className="font-normal text-slate-300">—</span>
+
+													{/* TEXTO DA DATA COLORIDO DINAMICAMENTE */}
+													<span
+														className={`font-black text-[10px] uppercase tracking-widest
+                    ${item.status === "atual" ? "text-indigo-600" : ""}
+                    ${item.status === "concluido" ? "text-emerald-600" : ""}
+                    ${item.status === "erro" ? "text-red-600" : ""}
+                `}
+													>
 														{item.data}
 													</span>
 												</p>
@@ -336,6 +409,34 @@ export function TokenStatus() {
 										))}
 									</div>
 								</div>
+
+								{/* TELA DE REJEIÇÃO (APENAS SE ESTIVER REJEITADA) */}
+								{solicitacao.status === "REJEITADA" && (
+									<div className="mt-8 bg-red-50/50 border border-red-200 rounded-3xl p-8 shadow-sm">
+										<div className="flex items-center gap-3 mb-4">
+											<div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold text-lg">
+												✕
+											</div>
+											<h4 className="text-xl font-black text-red-700 tracking-tight uppercase">
+												Pedido Rejeitado
+											</h4>
+										</div>
+
+										<p className="text-sm text-red-600/80 mb-6 font-medium">
+											Infelizmente, a sua solicitação não pôde ser continuada.
+											Confira abaixo a justificativa da equipe:
+										</p>
+
+										<div className="bg-white rounded-2xl p-6 border border-red-100 shadow-sm relative overflow-hidden">
+											<div className="absolute top-0 left-0 w-1.5 h-full bg-red-400"></div>
+											<p className="text-sm font-medium text-slate-700 leading-relaxed pl-2">
+												{/* Mostra o motivo da API ou uma mensagem padrão se vier vazio */}
+												{solicitacao.motivoRejeicao ||
+													"Nenhum motivo específico foi detalhado no sistema. Por favor, entre em contato diretamente com a coordenação para mais informações."}
+											</p>
+										</div>
+									</div>
+								)}
 
 								{/* FORMULÁRIO DE CORREÇÃO (APENAS SE ESTIVER ESTORNADO) */}
 								{solicitacao.status === "ESTORNO" &&
