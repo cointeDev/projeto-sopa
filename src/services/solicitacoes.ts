@@ -25,11 +25,6 @@ export async function aceitarSolicitacao(id: string) {
 	return response.data;
 }
 
-export async function recusarSolicitacao(id: string) {
-	const response = await api.patch(`/solicitacoes/${id}/recusar`);
-	return response.data;
-}
-
 export async function devolverSolicitacao(id: string, dados: any) {
 	const response = await api.patch(`/solicitacoes/${id}/devolver`, dados);
 	return response.data;
@@ -59,5 +54,9 @@ export async function buscarSolicitacaoPorToken(id: string) {
 
 export async function reenviarSolicitacao(id: string, dados: any) {
 	const response = await api.patch(`/solicitacoes/${id}/reenviar`, dados);
+	return response.data;
+}
+export async function recusarSolicitacao(id: string, motivo: string) {
+	const response = await api.patch(`/solicitacoes/${id}/rejeitar`, { motivo });
 	return response.data;
 }

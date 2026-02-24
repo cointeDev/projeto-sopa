@@ -28,6 +28,7 @@ import {
 } from "../services/solicitacoes";
 
 import type { CampoComErro, SolicitacaoAPI } from "../common/types/solicitacao";
+import ModalRejeicaoGestor from "../components/modals/ModalRejeicaoGestor";
 
 export type Aba = "Dashboard" | "Quadro" | "Solicitações" | "Agenda" | "Diário";
 
@@ -50,38 +51,7 @@ export interface Card {
 	solicitacao?: SolicitacaoAPI;
 }
 
-// Dados mockados só para teste
 
-/*
-const mockSolicitacao: SolicitarFormData = {
-	responsavel: "João da Silva",
-	email: "joao@email.com",
-	setor: "Comunicação",
-	telefone: "(99) 99999-9999",
-	local: "Estúdio A",
-	localExterno: "",
-	data: "2026-03-10",
-	hora: "14:00",
-
-	tipo: "Evento em estúdio",
-	formato: "Podcast / Mesacast",
-
-	nomeProjeto: "Podcast Institucional",
-	titulo: "Episódio Piloto",
-	descricao:
-		"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-	thumbnail: null,
-	acessibilidade: ["NAO_SE_APLICA"],
-	distribuicao: "interna",
-
-	dataLimite: "2026-03-20",
-	pessoas: "4",
-	roteiro: null,
-	observacoes:
-		"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-};
-
-*/
 
 export default function GestorLocal() {
 	const [abaAtual, setAbaAtual] = useState<Aba>("Quadro");
@@ -96,6 +66,7 @@ export default function GestorLocal() {
 	const [solicitacoes, setSolicitacoes] = useState<SolicitacaoAPI[]>([]);
 
 	const [abrirModalDevolucao, setAbrirModalDevolucao] = useState(false);
+	const [abrirModalRejeicao, setAbrirModalRejeicao] = useState(false);
 
 	useEffect(() => {
 		async function carregarSolicitacoes() {
@@ -127,19 +98,6 @@ export default function GestorLocal() {
 			solicitacao,
 		};
 	};
-
-	/*
-
-	async function enviarDevolutiva(campos: CampoComErro[]) {
-		if (!solicitacaoSelecionada) return;
-
-		await devolverSolicitacao(solicitacaoSelecionada.id, { campos });
-
-		setSolicitacoes((prev) =>
-			prev.filter((s) => s.id !== solicitacaoSelecionada.id)
-		);
-	}
-	*/
 
 	async function enviarDevolutiva(campos: CampoComErro[]) {
 		if (!solicitacaoSelecionada) return;
@@ -195,75 +153,52 @@ export default function GestorLocal() {
 		setIsModalOpen(false);
 	};
 
-	/*
 	const handleAcaoSolicitacao = async (acao: AcaoGestor) => {
 		if (!solicitacaoSelecionada) return;
-
-		console.log("AÇÃO:", acao);
 
 		try {
 			if (acao === "ACEITAR") {
 				await aceitarSolicitacao(solicitacaoSelecionada.id);
 
 				const novoCard = criarCardSolicitacao(solicitacaoSelecionada);
-
 				setCards((prev) => [...prev, novoCard]);
+
+				setSolicitacoes((prev) =>
+					prev.filter((s) => s.id !== solicitacaoSelecionada.id)
+				);
+
+				setSolicitacaoSelecionada(null);
+			}
+
+			if (acao === "RECUSAR") {
+				setAbrirModalRejeicao(true);
 			}
 
 			if (acao === "DEVOLVER") {
 				setAbrirModalDevolucao(true);
 			}
+		} catch (err) {
+			console.error("Erro ao atualizar solicitação", err);
+		}
+	};
+	async function enviarRejeicao(motivo: string) {
+		if (!solicitacaoSelecionada) return;
 
-			if (acao === "RECUSAR") {
-				await recusarSolicitacao(solicitacaoSelecionada.id);
-			}
+		try {
+			// OBS: Certifique-se de que a função recusarSolicitacao no seu arquivo services/solicitacoes.ts
+			// foi atualizada para receber o 'motivo' como segundo parâmetro!
+			await recusarSolicitacao(solicitacaoSelecionada.id, motivo);
 
-			setSolicitacoes((prev) =>
-				prev.filter((s) => s.id !== solicitacaoSelecionada.id)
+			setSolicitacoes((previous) =>
+				previous.filter((s) => s.id !== solicitacaoSelecionada.id)
 			);
 
-			setSolicitacaoSelecionada(null);
-		} catch (err) {
-			console.error("Erro ao atualizar solicitação", err);
+			setAbrirModalRejeicao(false);
+			setSolicitacaoSelecionada(null); // Fecha o modal principal também
+		} catch (error) {
+			console.error("Erro ao recusar solicitação", error);
 		}
-	};
-
-	*/
-
-	const handleAcaoSolicitacao = async (acao: AcaoGestor) => {
-		if (!solicitacaoSelecionada) return;
-
-		try {
-			if (acao === "ACEITAR") {
-				await aceitarSolicitacao(solicitacaoSelecionada.id);
-
-				const novoCard = criarCardSolicitacao(solicitacaoSelecionada);
-				setCards((prev) => [...prev, novoCard]);
-
-				setSolicitacoes((prev) =>
-					prev.filter((s) => s.id !== solicitacaoSelecionada.id)
-				);
-
-				setSolicitacaoSelecionada(null);
-			}
-
-			if (acao === "RECUSAR") {
-				await recusarSolicitacao(solicitacaoSelecionada.id);
-
-				setSolicitacoes((prev) =>
-					prev.filter((s) => s.id !== solicitacaoSelecionada.id)
-				);
-
-				setSolicitacaoSelecionada(null);
-			}
-
-			if (acao === "DEVOLVER") {
-				setAbrirModalDevolucao(true);
-			}
-		} catch (err) {
-			console.error("Erro ao atualizar solicitação", err);
-		}
-	};
+	}
 
 	return (
 		<div className="flex h-screen flex-col overflow-hidden bg-[#F1F5F9] font-inter text-[#334155] text-left">
@@ -362,6 +297,11 @@ export default function GestorLocal() {
 				open={abrirModalDevolucao}
 				onClose={() => setAbrirModalDevolucao(false)}
 				onSubmit={enviarDevolutiva}
+			/>
+			<ModalRejeicaoGestor
+				open={abrirModalRejeicao}
+				onClose={() => setAbrirModalRejeicao(false)}
+				onSubmit={enviarRejeicao}
 			/>
 		</div>
 	);
