@@ -12,6 +12,20 @@ export async function listarSolicitacoesPendentes() {
 	return response.data;
 }
 
+export async function listarSolicitacoesOperacional() {
+	const response = await api.get("/solicitacoes", {
+		params: { status: "ACEITO" },
+	});
+
+	const solicitacoes = response.data;
+
+	const filtradas = solicitacoes.filter(
+		(s: any) => s.EtapaId !== 1 && s.EtapaId !== 12 && s.EtapaId !== 13
+	);
+
+	return filtradas;
+}
+
 export async function listarSolicitacoesAceitas() {
 	const response = await api.get("/solicitacoes", {
 		params: { status: "ACEITO" },

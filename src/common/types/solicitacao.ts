@@ -22,6 +22,34 @@ export type Distribuicao = "INTERNA" | "SEEC" | "INSTAGRAM" | "OUTRO";
 
 export type Local = "NATAL" | "MOSSORO" | "CAICO" | "PAU_DOS_FERROS";
 
+export interface Solicitacao {
+	id: string;
+	responsavel: string;
+	email: string;
+	setor: string;
+	telefone: string;
+	local: string;
+	data: string;
+	hora: string;
+	TipoProducao: string;
+	FormatoProducao: string;
+	nomeProjeto: string;
+	titulo: string;
+	descricao: string;
+	thumbnail: string | null;
+	acessibilidade: string;
+	distribuicao: string;
+	dataLimite: string;
+	pessoas: number;
+	roteiro: string;
+	observacoes: string;
+	EtapaId: number;
+	status: string;
+	devolutiva: string | null;
+	motivoRejeicao: string | null;
+	createdAt: string;
+}
+
 export interface SolicitarFormData {
 	// STEP 1
 	responsavel: string;
