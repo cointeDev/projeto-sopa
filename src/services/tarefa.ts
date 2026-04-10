@@ -1,7 +1,9 @@
 import { api } from "./api";
 
-export async function listarTarefas() {
-	const response = await api.get("/tarefas");
+export async function listarTarefas(solicitacaoId?: string) {
+	const response = await api.get("/tarefas", {
+		params: solicitacaoId ? { solicitacaoId } : undefined,
+	});
 	return response.data;
 }
 

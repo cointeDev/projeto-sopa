@@ -64,6 +64,8 @@ export default function PainelTarefas(): ReactElement {
 		setNovaTarefaDescricao("");
 	};
 
+	const ETAPAS_BLOQUEADAS = [1, 12, 13]; // STANDBY, CONCLUÍDO, PUBLICADO
+
 	const handleCriarTarefa = async (
 		solicitacaoId: string,
 		etapaId: number
@@ -83,9 +85,21 @@ export default function PainelTarefas(): ReactElement {
 			setTarefas((previous) => [...previous, novaTarefa]);
 			setNovaTarefaNome("");
 			setNovaTarefaDescricao("");
-		} catch (error) {
+		} catch (error: unknown) {
 			console.error("Erro ao criar tarefa:", error);
-			alert("Não foi possível criar a tarefa.");
+			const mensagem =
+				error &&
+				typeof error === "object" &&
+				"response" in error &&
+				error.response &&
+				typeof error.response === "object" &&
+				"data" in error.response &&
+				error.response.data &&
+				typeof error.response.data === "object" &&
+				"message" in error.response.data
+					? String((error.response.data as { message: string }).message)
+					: "Não foi possível criar a tarefa.";
+			alert(mensagem);
 		} finally {
 			setCriandoTarefa(false);
 		}
@@ -334,48 +348,61 @@ export default function PainelTarefas(): ReactElement {
 										</div>
 
 										{/* Formulário Inserir Nova Tarefa */}
-										<div className="flex items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-											<div className="flex-1">
-												<label className="mb-1 block text-[9px] font-black uppercase tracking-widest text-slate-400">
-													Nome da Tarefa
-												</label>
-												<input
-													className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none transition-all focus:border-[#4f46e5] focus:ring-1 focus:ring-[#4f46e5]"
-													placeholder="Ex: Editar áudio principal"
-													type="text"
-													value={novaTarefaNome}
-													onChange={(event_) => {
-														setNovaTarefaNome(event_.target.value);
-													}}
-												/>
+										{ETAPAS_BLOQUEADAS.includes(solicitacao.EtapaId) ? (
+											<div className="flex items-center gap-3 rounded-xl border border-amber-100 bg-amber-50 p-4 text-amber-700">
+												<svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+												</svg>
+												<p className="text-[11px] font-black uppercase tracking-widest">
+													Tarefas não podem ser criadas na etapa{" "}
+													<span className="text-amber-900">{etapaLabel}</span>.
+													Só são permitidas em etapas de produção ativa.
+												</p>
 											</div>
-											<div className="flex-1">
-												<label className="mb-1 block text-[9px] font-black uppercase tracking-widest text-slate-400">
-													Descrição
-												</label>
-												<input
-													className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none transition-all focus:border-[#4f46e5] focus:ring-1 focus:ring-[#4f46e5]"
-													placeholder="Detalhes adicionais..."
-													type="text"
-													value={novaTarefaDescricao}
-													onChange={(event_) => {
-														setNovaTarefaDescricao(event_.target.value);
+										) : (
+											<div className="flex items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+												<div className="flex-1">
+													<label className="mb-1 block text-[9px] font-black uppercase tracking-widest text-slate-400">
+														Nome da Tarefa
+													</label>
+													<input
+														className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none transition-all focus:border-[#4f46e5] focus:ring-1 focus:ring-[#4f46e5]"
+														placeholder="Ex: Editar áudio principal"
+														type="text"
+														value={novaTarefaNome}
+														onChange={(event_) => {
+															setNovaTarefaNome(event_.target.value);
+														}}
+													/>
+												</div>
+												<div className="flex-1">
+													<label className="mb-1 block text-[9px] font-black uppercase tracking-widest text-slate-400">
+														Descrição
+													</label>
+													<input
+														className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none transition-all focus:border-[#4f46e5] focus:ring-1 focus:ring-[#4f46e5]"
+														placeholder="Detalhes adicionais..."
+														type="text"
+														value={novaTarefaDescricao}
+														onChange={(event_) => {
+															setNovaTarefaDescricao(event_.target.value);
+														}}
+													/>
+												</div>
+												<button
+													className="h-[38px] rounded-lg bg-[#4f46e5] px-6 py-2 text-[10px] font-black uppercase tracking-widest text-white shadow-md transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+													disabled={criandoTarefa || !novaTarefaNome.trim()}
+													onClick={() => {
+														void handleCriarTarefa(
+															solicitacao.id,
+															solicitacao.EtapaId
+														);
 													}}
-												/>
+												>
+													{criandoTarefa ? "Adicionando..." : "Adicionar"}
+												</button>
 											</div>
-											<button
-												className="h-[38px] rounded-lg bg-[#4f46e5] px-6 py-2 text-[10px] font-black uppercase tracking-widest text-white shadow-md transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
-												disabled={criandoTarefa || !novaTarefaNome.trim()}
-												onClick={() => {
-													void handleCriarTarefa(
-														solicitacao.id,
-														solicitacao.EtapaId
-													);
-												}}
-											>
-												{criandoTarefa ? "Adicionando..." : "Adicionar"}
-											</button>
-										</div>
+										)}
 									</div>
 
 									{/* Botões de Ação Principais da Solicitação */}

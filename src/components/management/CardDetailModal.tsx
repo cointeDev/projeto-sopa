@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+import { useState, useEffect } from "react";
 import {
 	X,
 	Clock,
@@ -9,9 +10,17 @@ import {
 	Accessibility,
 	ChevronRight,
 	GraduationCap,
+	History,
+	UserCheck,
 } from "lucide-react";
 import type { Card } from "../../pages/GestorLocal";
-import { FORMATO_PRODUCAO_LABELS } from "../../common/types/solicitacao";
+import {
+	FORMATO_PRODUCAO_LABELS,
+	type HistoricoEtapa,
+	type DelegacaoEtapa,
+} from "../../common/types/solicitacao";
+import { buscarSolicitacaoPorToken } from "../../services/solicitacoes";
+import ModalDelegacaoEtapa from "../modals/ModalDelegacaoEtapa";
 
 interface DetailBoxProps {
 	icon: React.ReactNode;
@@ -45,6 +54,19 @@ export function CardDetailModal({
 	onClose: () => void;
 }) {
 	const solicitacao = card.solicitacao;
+	const [historico, setHistorico] = useState<Array<HistoricoEtapa>>([]);
+	const [delegacoes, setDelegacoes] = useState<Array<DelegacaoEtapa>>([]);
+	const [modalDelegacao, setModalDelegacao] = useState(false);
+
+	useEffect(() => {
+		if (!solicitacao?.id) return;
+		buscarSolicitacaoPorToken(solicitacao.id)
+			.then((data) => {
+				setHistorico(data.historico ?? []);
+				setDelegacoes(data.delegacoes ?? []);
+			})
+			.catch(console.error);
+	}, [solicitacao?.id]);
 	const COLORS = {
 		matematica: "#fdde82",
 		linguagens: "#bec658",
@@ -257,9 +279,84 @@ export function CardDetailModal({
 								</span>
 							</div>
 						</div>
+
+						{/* DELEGAÇÕES */}
+						{delegacoes.length > 0 && (
+							<section className="rounded-4xl bg-white p-8 border border-slate-100 shadow-sm">
+								<h3 className="mb-5 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-300">
+									<UserCheck size={14} /> Delegações
+								</h3>
+								<div className="flex flex-col gap-3">
+									{delegacoes.map((d) => (
+										<div
+											key={d.id}
+											className="flex items-center justify-between rounded-xl border border-slate-100 bg-[#F8FAFC] px-4 py-3"
+										>
+											<div>
+												<p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+													{d.etapa.nome}
+												</p>
+												<p className="text-sm font-bold text-[#334155]">
+													{d.operacional.login}
+												</p>
+											</div>
+											<span className="rounded-full bg-indigo-50 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-indigo-600">
+												{d.operacional.local}
+											</span>
+										</div>
+									))}
+								</div>
+							</section>
+						)}
+
+						{/* BOTÃO DELEGAR */}
+						{solicitacao?.id && (
+							<button
+								className="w-full rounded-2xl border-2 border-dashed border-indigo-200 py-4 text-[10px] font-black uppercase tracking-widest text-indigo-400 transition-colors hover:border-indigo-400 hover:text-indigo-600"
+								onClick={() => setModalDelegacao(true)}
+							>
+								+ Delegar Etapa
+							</button>
+						)}
+
+						{/* HISTÓRICO */}
+						{historico.length > 0 && (
+							<section className="rounded-4xl bg-white p-8 border border-slate-100 shadow-sm">
+								<h3 className="mb-5 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-300">
+									<History size={14} /> Histórico de Etapas
+								</h3>
+								<ol className="relative border-l border-slate-200 pl-5 flex flex-col gap-4">
+									{historico.map((h) => (
+										<li key={h.id} className="relative">
+											<span className="absolute -left-[1.15rem] top-1 h-3 w-3 rounded-full border-2 border-indigo-400 bg-white" />
+											<p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+												{new Date(h.createdAt).toLocaleString("pt-BR")}
+											</p>
+											<p className="text-sm font-bold text-[#334155]">
+												{h.etapa.nome}
+											</p>
+										</li>
+									))}
+								</ol>
+							</section>
+						)}
 					</div>
 				</div>
 			</div>
+
+			{solicitacao?.id && (
+				<ModalDelegacaoEtapa
+					etapaAtualId={solicitacao.EtapaId ?? 2}
+					open={modalDelegacao}
+					solicitacaoId={solicitacao.id}
+					onClose={() => setModalDelegacao(false)}
+					onSuccess={() => {
+						buscarSolicitacaoPorToken(solicitacao.id)
+							.then((data) => setDelegacoes(data.delegacoes ?? []))
+							.catch(console.error);
+					}}
+				/>
+			)}
 		</div>
 	);
 }
