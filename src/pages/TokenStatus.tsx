@@ -27,6 +27,12 @@ type Solicitacao = {
 		}>;
 	};
 	motivoRejeicao?: string;
+	historico?: Array<{
+		id: number;
+		etapaId: number;
+		etapa: { id: number; nome: string };
+		createdAt: string;
+	}>;
 };
 
 const tokenSchema = z
@@ -100,76 +106,72 @@ export function TokenStatus() {
 		(indexAtual / (fluxoProducao.length - 1)) * 100
 	);
 
-	// --- GERAÇÃO DINÂMICA DA TIMELINE BASEADA NA SUA API REAL ---
-	// --- GERAÇÃO DINÂMICA DA TIMELINE ---
+	// --- TIMELINE COM HISTÓRICO REAL DA API ---
 	function gerarTimeline(dados: Solicitacao) {
 		const eventos = [];
 
-		// 1. Fluxo de Produção (Se estiver ACEITO e tiver uma Etapa)
-		if (dados.status === "ACEITO" && dados.Etapa) {
-			// A. Etapa Atual (Entra no topo, em destaque)
-			eventos.push({
-				id: `etapa-atual`,
-				titulo: dados.Etapa.nome,
-				data: "Em andamento",
-				descricao: "A produção encontra-se atualmente nesta etapa.",
-				status: "atual", // Usaremos isso para pintar a bolinha de azul
-			});
+		// 1. Fluxo de Produção com histórico real
+		if (dados.status === "ACEITO" && dados.historico && dados.historico.length > 0) {
+			// Ordena do mais recente para o mais antigo (já vem ASC da API, invertemos)
+			const historicoOrdenado = [...dados.historico].reverse();
 
-			// B. Lista de todas as etapas possíveis da sua API
-			const TODAS_ETAPAS = [
-				{ id: 1, nome: "STANDBY" },
-				{ id: 2, nome: "PARA PRODUÇÃO SEMANAL" },
-				{ id: 3, nome: "AO VIVO" },
-				{ id: 4, nome: "GRAVADO" },
-				{ id: 5, nome: "EDIÇÃO 1" },
-				{ id: 6, nome: "EDIÇÃO 2" },
-				{ id: 7, nome: "EDIÇÃO 3" },
-				{ id: 8, nome: "EDIÇÃO FINAL" },
-				{ id: 9, nome: "LIBRAS" },
-				{ id: 10, nome: "REVISÃO LP" },
-				{ id: 11, nome: "PRODUÇÃO LSE" },
-				{ id: 12, nome: "CONCLUÍDO" },
-				{ id: 13, nome: "PUBLICADO" },
-			];
-
-			// C. Filtra apenas as etapas que ficaram para trás (ID menor que o atual)
-			// Usamos o .reverse() para a mais recente ficar em cima
-			const etapasConcluidas = TODAS_ETAPAS.filter(
-				(etapa) => etapa.id < dados.Etapa!.id
-			).reverse();
-
-			// Adiciona as etapas anteriores como concluídas
-			etapasConcluidas.forEach((etapa) => {
-				// Dica: Se quiser pular etapas exclusivas (ex: se é Gravado, não mostrar Ao Vivo),
-				// você pode fazer um if aqui dentro depois!
+			historicoOrdenado.forEach((entrada, index) => {
+				const isAtual = index === 0;
 				eventos.push({
-					id: `etapa-${etapa.id}`,
-					titulo: etapa.nome,
-					data: "Concluído",
-					descricao: "Etapa finalizada com sucesso.",
-					status: "concluido", // Bolinha verde
+					id: `historico-${entrada.id}`,
+					titulo: entrada.etapa.nome,
+					data: isAtual
+						? "Em andamento"
+						: new Date(entrada.createdAt).toLocaleString("pt-BR", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+							}),
+					descricao: isAtual
+						? "A produção encontra-se atualmente nesta etapa."
+						: "Etapa concluída e registrada no sistema.",
+					status: isAtual ? "atual" : "concluido",
 				});
 			});
 
-			// D. Evento de quando o pedido foi oficialmente Aceito
+			// Evento de aceite (antes do primeiro histórico, ou seja, na base acima do criado)
+			eventos.push({
+				id: "accepted",
+				titulo: "Solicitação Aceita",
+				data: new Date(
+					dados.historico[0].createdAt
+				).toLocaleDateString("pt-BR"),
+				descricao: "O pedido passou pela avaliação e entrou no fluxo de produção.",
+				status: "concluido",
+			});
+		}
+		// Fallback: ACEITO sem histórico ainda (não deveria ocorrer, mas por segurança)
+		else if (dados.status === "ACEITO" && dados.Etapa) {
+			eventos.push({
+				id: "etapa-atual",
+				titulo: dados.Etapa.nome,
+				data: "Em andamento",
+				descricao: "A produção encontra-se atualmente nesta etapa.",
+				status: "atual",
+			});
 			eventos.push({
 				id: "accepted",
 				titulo: "Solicitação Aceita",
 				data: "Aprovado",
-				descricao:
-					"O pedido passou pela avaliação e entrou no fluxo de produção.",
+				descricao: "O pedido passou pela avaliação e entrou no fluxo de produção.",
 				status: "concluido",
 			});
 		}
-		// 2. Fluxos Alternativos (Rejeitada, Estorno, Pendente)
+		// 2. Fluxos Alternativos
 		else if (dados.status === "REJEITADA") {
 			eventos.push({
 				id: "rejected",
 				titulo: "Solicitação Rejeitada",
 				data: "Encerrado",
 				descricao: "O pedido foi analisado e não pôde seguir para produção.",
-				status: "erro", // Bolinha vermelha
+				status: "erro",
 			});
 		} else if (dados.status === "ESTORNO") {
 			eventos.push({
@@ -184,13 +186,12 @@ export function TokenStatus() {
 				id: "pending",
 				titulo: "Aguardando Avaliação",
 				data: "Em Análise",
-				descricao:
-					"A equipe está analisando os dados antes de iniciar a produção.",
+				descricao: "A equipe está analisando os dados antes de iniciar a produção.",
 				status: "atual",
 			});
 		}
 
-		// 3. Evento Base de Criação (Fica sempre na base, lá embaixo)
+		// 3. Evento base de criação (sempre na base)
 		eventos.push({
 			id: "created",
 			titulo: "Solicitação Recebida",
