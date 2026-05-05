@@ -22,6 +22,22 @@ export type Distribuicao = "INTERNA" | "SEEC" | "INSTAGRAM" | "OUTRO";
 
 export type Local = "NATAL" | "MOSSORO" | "CAICO" | "PAU_DOS_FERROS";
 
+export interface HistoricoEtapa {
+	id: number;
+	etapaId: number;
+	etapa: { id: number; nome: string };
+	createdAt: string;
+}
+
+export interface DelegacaoEtapa {
+	id: number;
+	etapaId: number;
+	etapa: { id: number; nome: string };
+	operacionalId: number;
+	operacional: { id: number; login: string; local: string; role: string };
+	createdAt: string;
+}
+
 export interface Solicitacao {
 	id: string;
 	responsavel: string;
@@ -48,6 +64,8 @@ export interface Solicitacao {
 	devolutiva: string | null;
 	motivoRejeicao: string | null;
 	createdAt: string;
+	historico?: Array<HistoricoEtapa>;
+	delegacoes?: Array<DelegacaoEtapa>;
 }
 
 export interface SolicitarFormData {

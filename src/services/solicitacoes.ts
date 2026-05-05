@@ -74,3 +74,17 @@ export async function recusarSolicitacao(id: string, motivo: string) {
 	const response = await api.patch(`/solicitacoes/${id}/rejeitar`, { motivo });
 	return response.data;
 }
+
+export async function delegarEtapa(
+	id: string,
+	etapaId: number,
+	operacionalId: number,
+	role: "GESTOR_GERAL" | "GESTOR_LOCAL" = "GESTOR_GERAL"
+) {
+	const response = await api.post(
+		`/solicitacoes/${id}/delegar`,
+		{ etapaId, operacionalId },
+		{ params: { role } }
+	);
+	return response.data;
+}
