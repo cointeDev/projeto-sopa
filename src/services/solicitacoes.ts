@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { getUsuarioLogadoId } from "../common/utils/auth";
 
 export async function criarSolicitacao(dados: any) {
 	return api.post("/solicitacoes", dados);
@@ -18,12 +19,13 @@ export async function listarSolicitacoesOperacional() {
 	});
 
 	const solicitacoes = response.data;
+	const userId = getUsuarioLogadoId();
 
-	const filtradas = solicitacoes.filter(
-		(s: any) => s.EtapaId !== 1 && s.EtapaId !== 12 && s.EtapaId !== 13
+	if (!userId) return [];
+
+	return solicitacoes.filter((s: any) =>
+		s.delegacoes?.some((d: any) => d.operacionalId === userId)
 	);
-
-	return filtradas;
 }
 
 export async function listarSolicitacoesAceitas() {
