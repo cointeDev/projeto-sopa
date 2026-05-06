@@ -17,7 +17,7 @@ interface ApiError {
 }
 
 export default function Step5() {
-	const { formData, setPassoAtual } = useFormContext();
+	const { formData, setPassoAtual, setProtocolo } = useFormContext();
 
 	async function handleConfirmar() {
 		try {
@@ -43,7 +43,10 @@ export default function Step5() {
 				observacoes: formData.observacoes,
 			};
 
-			await criarSolicitacao(payload);
+			const resposta = await criarSolicitacao(payload);
+			if (resposta.data?.id) {
+				setProtocolo(resposta.data.id);
+			}
 			setPassoAtual(6);
 		} catch (error: unknown) {
 			// Tratamento de erro tipado para remover o 'any'

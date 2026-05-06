@@ -8,6 +8,8 @@ import { FORMATOS_POR_TIPO } from "../common/rules/formatosPorTipo";
 export interface UseFormReturn {
 	passo: number;
 	formData: SolicitarFormData;
+	protocolo: string;
+	setProtocolo: (protocolo: string) => void;
 	setPassoAtual: (novoPasso: number) => void;
 	updateField: <K extends keyof SolicitarFormData>(
 		field: K,
@@ -19,6 +21,8 @@ export interface UseFormReturn {
 }
 
 export function useForm(): UseFormReturn {
+	const [protocolo, setProtocolo] = useState<string>("");
+
 	const [passo, setPasso] = useState<number>(() => {
 		const savedPasso = Number(localStorage.getItem("passo")) || 1;
 		if (savedPasso === 6) {
@@ -183,6 +187,8 @@ export function useForm(): UseFormReturn {
 	return {
 		passo,
 		formData,
+		protocolo,
+		setProtocolo,
 		setPassoAtual,
 		updateField,
 		validarPassoAtual,
