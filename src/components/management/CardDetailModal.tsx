@@ -12,6 +12,9 @@ import {
 	GraduationCap,
 	History,
 	UserCheck,
+	GitBranch,
+	CalendarDays,
+	Timer,
 } from "lucide-react";
 import type { Card } from "../../pages/GestorLocal";
 import {
@@ -32,17 +35,13 @@ interface DetailBoxProps {
 
 function DetailBox({ icon, label, value }: DetailBoxProps) {
 	return (
-		<div className="group flex items-center gap-4 rounded-3xl border border-slate-50 bg-[#F8FAFC]/50 p-5 transition-all hover:bg-white hover:shadow-md">
-			<div className="rounded-2xl bg-white p-3 text-indigo-500 shadow-sm group-hover:bg-[#4f46e5] group-hover:text-white transition-colors">
-				{icon}
-			</div>
-			<div className="flex flex-col text-left">
-				<span className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+		<div className="flex items-start gap-3 bg-[#F8FAFC] px-5 py-4 rounded-2xl border border-slate-50">
+			<div className="text-[#4f46e5] mt-0.5 shrink-0">{icon}</div>
+			<div className="flex flex-col min-w-0">
+				<span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
 					{label}
 				</span>
-				<span className="tracking-tight text-sm font-black text-slate-800">
-					{value}
-				</span>
+				<span className="text-xs font-bold text-[#334155] wrap-break-word">{value}</span>
 			</div>
 		</div>
 	);
@@ -69,6 +68,7 @@ export function CardDetailModal({
 			})
 			.catch(console.error);
 	}, [solicitacao?.id]);
+
 	const COLORS = {
 		matematica: "#fdde82",
 		linguagens: "#bec658",
@@ -84,48 +84,52 @@ export function CardDetailModal({
 
 	return (
 		<div className="fixed inset-0 z-100 flex items-center justify-center bg-slate-900/60 p-6 backdrop-blur-md transition-all duration-500 md:p-12 text-left">
-			<div className="animate-fade-in flex h-full w-full max-w-7xl flex-col overflow-hidden rounded-[3rem] bg-white shadow-2xl ring-1 ring-white/20">
-				<header className="relative shrink-0 border-b border-slate-100 bg-white p-12 pb-8">
+			<div className="animate-fade-in flex h-full w-full max-w-7xl flex-col overflow-hidden rounded-4xl bg-white shadow-2xl shadow-slate-300/30">
+
+				{/* Header */}
+				<header className="relative shrink-0 border-b border-slate-100 bg-white px-12 py-10">
 					<div
-						className="absolute left-0 top-0 h-4 w-40 rounded-br-4xl"
+						className="absolute left-0 top-0 h-1 w-full rounded-t-4xl"
 						style={{ backgroundColor: areaColor }}
 					/>
-					<div className="flex items-start justify-between">
+					<div className="flex items-start justify-between mt-2">
 						<div className="space-y-4">
-							<div className="flex items-center gap-4">
-								<h2 className="tracking-tighter text-4xl font-black leading-none text-slate-900 uppercase">
+							<div className="flex flex-wrap items-center gap-3">
+								<span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+									Card de Produção
+								</span>
+							</div>
+							<div className="flex flex-wrap items-center gap-3">
+								<h2 className="tracking-tight text-4xl font-black leading-none text-[#334155] uppercase">
 									{solicitacao?.titulo || "-"}
 								</h2>
-								<div className="flex gap-2">
-									<span className="flex items-center gap-1 rounded-full bg-slate-100 px-4 py-1.5 text-[10px] font-black uppercase text-slate-600">
-										{solicitacao?.TipoProducao
-											? (TIPO_PRODUCAO_LABELS[solicitacao.TipoProducao as TipoProducao] ?? solicitacao.TipoProducao)
-											: "-"} <ChevronRight size={12} />
-									</span>
-									<span className="rounded-full bg-indigo-600 px-4 py-1.5 text-[10px] font-black uppercase text-white shadow-lg shadow-indigo-100">
-										{card.etapa} <ChevronRight size={12} />
-									</span>
-								</div>
+								<span className="flex items-center gap-1 rounded-full bg-slate-100 px-4 py-1.5 text-[10px] font-black uppercase text-slate-500">
+									{solicitacao?.TipoProducao
+										? (TIPO_PRODUCAO_LABELS[solicitacao.TipoProducao as TipoProducao] ?? solicitacao.TipoProducao)
+										: "-"}
+									<ChevronRight size={10} />
+								</span>
+								<span
+									className="rounded-full px-4 py-1.5 text-[10px] font-black uppercase text-white shadow-sm"
+									style={{ backgroundColor: areaColor }}
+								>
+									{card.etapa}
+								</span>
 							</div>
-							<div className="flex flex-col gap-3">
-								<div className="flex items-center gap-2 text-slate-400 font-bold">
-									<GraduationCap className="text-slate-300" size={18} />{" "}
-									<span className="text-xs uppercase tracking-widest">
+							<div className="flex flex-wrap items-center gap-4">
+								<div className="flex items-center gap-2 text-slate-400">
+									<GraduationCap size={14} className="text-slate-300" />
+									<span className="text-[10px] font-black uppercase tracking-widest">
 										{solicitacao?.setor || "SEEC/RN"}
 									</span>
 								</div>
 								<div
-									className="inline-flex items-center gap-3 rounded-xl py-2 px-4 shadow-sm border border-slate-100"
-									style={{ backgroundColor: areaColor + "20" }}
+									className="flex items-center gap-2 rounded-2xl px-4 py-2 border border-slate-50"
+									style={{ backgroundColor: areaColor + "18" }}
 								>
-									<div
-										className="w-8 h-8 rounded-lg flex items-center justify-center text-white shadow-sm"
-										style={{ backgroundColor: areaColor }}
-									>
-										<Clock size={16} />
-									</div>
+									<Clock size={12} style={{ color: areaColor }} />
 									<span
-										className="text-[11px] font-black uppercase tracking-tighter"
+										className="text-[10px] font-black uppercase tracking-tighter"
 										style={{ color: areaColor }}
 									>
 										{card.projeto}
@@ -134,24 +138,29 @@ export function CardDetailModal({
 							</div>
 						</div>
 						<button
-							className="group rounded-3xl bg-white p-4 shadow-xl shadow-slate-200/50 transition-all hover:bg-red-50 hover:text-red-500"
+							className="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors shrink-0"
 							type="button"
 							onClick={onClose}
 						>
-							<X size={28} />
+							<X size={18} />
 						</button>
 					</div>
 				</header>
 
-				<div className="custom-scrollbar grid flex-1 grid-cols-1 gap-12 overflow-y-auto p-12 lg:grid-cols-3">
-					<div className="space-y-12 lg:col-span-2">
+				{/* Body */}
+				<div className="custom-scrollbar grid flex-1 grid-cols-1 gap-10 overflow-y-auto p-12 lg:grid-cols-3">
+
+					{/* Coluna principal */}
+					<div className="space-y-10 lg:col-span-2">
+
+						{/* Detalhes */}
 						<section>
-							<h3 className="mb-6 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-slate-300">
+							<h3 className="mb-5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-300">
 								Detalhes
 							</h3>
-							<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+							<div className="grid grid-cols-1 gap-3 md:grid-cols-2">
 								<DetailBox
-									icon={<Layers size={16} />}
+									icon={<Layers size={13} />}
 									label="Formato"
 									value={
 										solicitacao?.FormatoProducao
@@ -160,59 +169,64 @@ export function CardDetailModal({
 									}
 								/>
 								<DetailBox
-									icon={<Users size={16} />}
+									icon={<Users size={13} />}
 									label="Participantes"
-									value={`${solicitacao?.pessoas || 0} Participantes`}
+									value={`${solicitacao?.pessoas || 0} participantes`}
 								/>
 								<div
-									className={`flex items-center gap-4 rounded-3xl p-5 border border-slate-50 ${solicitacao?.acessibilidade?.includes("LIBRAS") ? "bg-emerald-50/30" : "bg-[#F8FAFC]/50"}`}
+									className={`flex items-start gap-3 px-5 py-4 rounded-2xl border transition-colors ${
+										solicitacao?.acessibilidade?.includes("LIBRAS")
+											? "border-emerald-100 bg-emerald-50"
+											: "border-slate-50 bg-[#F8FAFC]"
+									}`}
 								>
 									<div
-										className={`p-3 rounded-2xl ${solicitacao?.acessibilidade?.includes("LIBRAS") ? "bg-emerald-500 text-white" : "bg-slate-200 text-slate-400"}`}
+										className={`mt-0.5 shrink-0 ${
+											solicitacao?.acessibilidade?.includes("LIBRAS")
+												? "text-emerald-500"
+												: "text-slate-300"
+										}`}
 									>
-										<Accessibility size={16} />
+										<Accessibility size={13} />
 									</div>
 									<div className="flex flex-col">
-										<span className="text-[9px] font-black uppercase text-slate-400">
+										<span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
 											LIBRAS
 										</span>
-										<span className="text-sm font-black text-slate-800">
-											{solicitacao?.acessibilidade?.includes("LIBRAS")
-												? "Sim"
-												: "Não"}
+										<span className="text-xs font-bold text-[#334155]">
+											{solicitacao?.acessibilidade?.includes("LIBRAS") ? "Sim" : "Não"}
 										</span>
 									</div>
 								</div>
-								<div className="flex items-center gap-4 rounded-3xl p-5 border border-slate-50 bg-[#F8FAFC]/50">
-									<div className="p-3 rounded-2xl bg-slate-200 text-slate-400">
-										<Users size={16} />
+								<div className="flex items-start gap-3 px-5 py-4 rounded-2xl border border-slate-50 bg-[#F8FAFC]">
+									<div className="text-slate-300 mt-0.5 shrink-0">
+										<Users size={13} />
 									</div>
 									<div className="flex flex-col">
-										<span className="text-[9px] font-black uppercase text-slate-400">
+										<span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
 											Legendagem
 										</span>
-										<span className="text-sm font-black text-slate-800">
-											Não
-										</span>
+										<span className="text-xs font-bold text-[#334155]">Não</span>
 									</div>
 								</div>
 							</div>
 						</section>
 
+						{/* Roteiro */}
 						<section>
-							<h3 className="mb-6 text-[11px] font-black uppercase tracking-widest text-slate-300">
+							<h3 className="mb-5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-300">
 								Roteiro
 							</h3>
-							<div className="flex items-center justify-between bg-white border border-slate-100 rounded-4xl p-6 shadow-sm">
+							<div className="flex items-center justify-between bg-[#F8FAFC] border border-slate-50 rounded-3xl p-6">
 								<div className="flex items-center gap-4">
-									<div className="bg-indigo-50 p-4 rounded-2xl text-indigo-600">
-										<FileText size={24} />
+									<div className="bg-indigo-50 p-4 rounded-2xl text-indigo-500">
+										<FileText size={20} />
 									</div>
 									<div>
-										<p className="font-black text-slate-800 text-sm">
+										<p className="font-black text-[#334155] text-sm">
 											{solicitacao?.roteiro || "Sem roteiro"}
 										</p>
-										<span className="text-[10px] text-slate-400 font-bold uppercase">
+										<span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
 											{solicitacao?.createdAt
 												? new Date(solicitacao.createdAt).toLocaleDateString("pt-BR")
 												: ""}
@@ -220,91 +234,125 @@ export function CardDetailModal({
 									</div>
 								</div>
 								<button
-									className="p-3 bg-slate-50 rounded-xl text-slate-400 hover:bg-slate-100 transition-colors"
+									className="w-9 h-9 bg-white rounded-2xl flex items-center justify-center text-slate-300 hover:text-[#4f46e5] border border-slate-100 transition-colors"
 									type="button"
 								>
-									<ChevronRight size={20} />
+									<ChevronRight size={16} />
 								</button>
 							</div>
 						</section>
 					</div>
 
-					<div className="space-y-10">
-						<section className="rounded-4xl bg-white p-10 border border-slate-100 shadow-sm">
-							<h3 className="mb-8 text-[10px] font-black uppercase tracking-widest text-slate-300">
-								Datas
-							</h3>
-							<div className="space-y-5">
-								<div className="flex justify-between items-center text-sm font-bold text-slate-600">
-									<span>Data da gravação</span>
-									<span>{solicitacao?.data || "-"}</span>
-								</div>
-								<div className="flex justify-between items-center text-sm font-bold text-slate-600">
-									<span>Início da edição</span>
-									<span>-</span>
-								</div>
-								<div className="flex justify-between items-center text-sm font-bold text-slate-600">
-									<span>Previsão de término</span>
-									<span>{solicitacao?.dataLimite || "-"}</span>
-								</div>
+					{/* Coluna lateral */}
+					<div className="space-y-6">
 
-								<div className="mt-8 pt-8 border-t border-slate-50">
-									<div className="flex items-center justify-between mb-4">
-										<span className="rounded-full bg-indigo-600 px-4 py-1.5 text-[9px] font-black uppercase text-white">
-											{card.etapa}
+						{/* Datas + Pipeline */}
+						<section className="rounded-4xl bg-white border border-slate-100 shadow-sm overflow-hidden">
+							<div className="px-8 pt-8 pb-6 border-b border-slate-50">
+								<h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-300 mb-5">
+									Datas
+								</h3>
+								<div className="space-y-4">
+									<div className="flex items-center gap-3 bg-[#F8FAFC] rounded-2xl border border-slate-50 px-4 py-3">
+										<CalendarDays size={13} className="text-[#4f46e5] shrink-0" />
+										<div className="flex flex-col">
+											<span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
+												Data da gravação
+											</span>
+											<span className="text-xs font-bold text-[#334155]">
+												{solicitacao?.data || "-"}
+											</span>
+										</div>
+									</div>
+									<div className="flex items-center gap-3 bg-[#F8FAFC] rounded-2xl border border-slate-50 px-4 py-3">
+										<Timer size={13} className="text-[#4f46e5] shrink-0" />
+										<div className="flex flex-col">
+											<span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
+												Previsão de término
+											</span>
+											<span className="text-xs font-bold text-[#334155]">
+												{solicitacao?.dataLimite || "-"}
+											</span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							{/* Pipeline */}
+							<div className="px-8 py-6">
+								<h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-300 mb-5">
+									Pipeline
+								</h3>
+								<div className="flex items-center justify-between mb-3">
+									<span
+										className="rounded-full px-3 py-1 text-[9px] font-black uppercase text-white shadow-sm"
+										style={{ backgroundColor: areaColor }}
+									>
+										{card.etapa}
+									</span>
+									<span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">
+										75%
+									</span>
+								</div>
+								<div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-4">
+									<div
+										className="h-full w-[75%] rounded-full shadow-sm"
+										style={{ backgroundColor: areaColor }}
+									/>
+								</div>
+								<div className="grid grid-cols-2 gap-y-1.5">
+									{["Solicitado", "Pré-produção", "Gravado", card.etapa].map((label, i) => (
+										<span
+											key={label}
+											className="text-[8px] font-black uppercase tracking-widest"
+											style={{ color: i >= 2 ? areaColor : "#cbd5e1" }}
+										>
+											{label}
 										</span>
-									</div>
-									<div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden mb-4">
-										<div className="bg-indigo-600 h-full w-[75%] shadow-[0_0_10px_rgba(79,70,229,0.4)]"></div>
-									</div>
-									<div className="grid grid-cols-2 gap-y-2 text-[8px] font-black uppercase text-slate-300">
-										<span>Solicitado</span>
-										<span>Pré-produção</span>
-										<span className="text-indigo-400">Gravado</span>
-										<span className="text-indigo-600">{card.etapa}</span>
-									</div>
+									))}
 								</div>
 							</div>
 						</section>
 
-						<div className="flex items-center gap-4 p-6 rounded-4xl bg-slate-50/50 border border-slate-100">
-							<div className="w-12 h-12 rounded-full bg-indigo-100 overflow-hidden">
+						{/* Responsável */}
+						<div className="flex items-center gap-4 p-5 rounded-4xl bg-[#F8FAFC] border border-slate-100">
+							<div className="w-11 h-11 rounded-full bg-indigo-100 overflow-hidden shrink-0">
 								<img
 									alt="Avatar"
 									src={`https://ui-avatars.com/api/?name=${encodeURIComponent(solicitacao?.responsavel || "?")}&background=4f46e5&color=fff`}
 								/>
 							</div>
 							<div className="flex flex-col">
-								<span className="text-sm font-black text-slate-800">
+								<span className="text-xs font-black text-[#334155]">
 									{solicitacao?.responsavel || "Sem responsável"}
 								</span>
-								<span className="text-[9px] font-black text-slate-400 uppercase">
+								<span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
 									Responsável
 								</span>
 							</div>
 						</div>
 
-						{/* DELEGAÇÕES */}
+						{/* Delegações */}
 						{delegacoes.length > 0 && (
-							<section className="rounded-4xl bg-white p-8 border border-slate-100 shadow-sm">
-								<h3 className="mb-5 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-300">
-									<UserCheck size={14} /> Delegações
+							<section className="rounded-4xl bg-white border border-slate-100 shadow-sm p-8">
+								<h3 className="mb-5 flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-300">
+									<UserCheck size={13} /> Delegações
 								</h3>
 								<div className="flex flex-col gap-3">
 									{delegacoes.map((d) => (
 										<div
 											key={d.id}
-											className="flex items-center justify-between rounded-xl border border-slate-100 bg-[#F8FAFC] px-4 py-3"
+											className="flex items-center justify-between rounded-2xl border border-slate-50 bg-[#F8FAFC] px-4 py-3"
 										>
 											<div>
-												<p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+												<p className="text-[8px] font-black uppercase tracking-widest text-slate-400">
 													{d.etapa.nome}
 												</p>
-												<p className="text-sm font-bold text-[#334155]">
+												<p className="text-xs font-bold text-[#334155]">
 													{d.operacional.login}
 												</p>
 											</div>
-											<span className="rounded-full bg-indigo-50 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-indigo-600">
+											<span className="rounded-full bg-indigo-50 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-indigo-500">
 												{d.operacional.local}
 											</span>
 										</div>
@@ -313,30 +361,31 @@ export function CardDetailModal({
 							</section>
 						)}
 
-						{/* BOTÃO DELEGAR */}
+						{/* Botão Delegar */}
 						{solicitacao?.id && (
 							<button
-								className="w-full rounded-2xl border-2 border-dashed border-indigo-200 py-4 text-[10px] font-black uppercase tracking-widest text-indigo-400 transition-colors hover:border-indigo-400 hover:text-indigo-600"
+								className="w-full rounded-3xl border-2 border-dashed border-indigo-200 py-4 text-[9px] font-black uppercase tracking-[0.2em] text-indigo-400 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2"
 								onClick={() => setModalDelegacao(true)}
 							>
-								+ Delegar Etapa
+								<GitBranch size={13} />
+								Delegar Etapa
 							</button>
 						)}
 
-						{/* HISTÓRICO */}
+						{/* Histórico */}
 						{historico.length > 0 && (
-							<section className="rounded-4xl bg-white p-8 border border-slate-100 shadow-sm">
-								<h3 className="mb-5 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-300">
-									<History size={14} /> Histórico de Etapas
+							<section className="rounded-4xl bg-white border border-slate-100 shadow-sm p-8">
+								<h3 className="mb-5 flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-300">
+									<History size={13} /> Histórico de Etapas
 								</h3>
-								<ol className="relative border-l border-slate-200 pl-5 flex flex-col gap-4">
+								<ol className="relative border-l border-slate-100 pl-5 flex flex-col gap-4">
 									{historico.map((h) => (
 										<li key={h.id} className="relative">
-											<span className="absolute -left-[1.15rem] top-1 h-3 w-3 rounded-full border-2 border-indigo-400 bg-white" />
-											<p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+											<span className="absolute -left-[1.15rem] top-1 h-2.5 w-2.5 rounded-full border-2 border-indigo-400 bg-white" />
+											<p className="text-[8px] font-black uppercase tracking-widest text-slate-400">
 												{new Date(h.createdAt).toLocaleString("pt-BR")}
 											</p>
-											<p className="text-sm font-bold text-[#334155]">
+											<p className="text-xs font-bold text-[#334155]">
 												{h.etapa.nome}
 											</p>
 										</li>

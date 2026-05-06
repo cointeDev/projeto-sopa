@@ -1,5 +1,22 @@
 import { Fragment } from "react";
-import { Dialog, Transition } from "@headlessui/react";
+import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react";
+import {
+	X,
+	User,
+	Mail,
+	Building2,
+	Phone,
+	Film,
+	FileVideo,
+	FolderOpen,
+	Type,
+	CalendarDays,
+	Clock,
+	Users,
+	AlertCircle,
+	StickyNote,
+	AlignLeft,
+} from "lucide-react";
 
 import {
 	FORMATO_PRODUCAO_LABELS,
@@ -25,7 +42,7 @@ export default function ModalGestorSolicitacao({
 	return (
 		<Transition appear show={open} as={Fragment}>
 			<Dialog as="div" className="relative z-50" onClose={onClose}>
-				<Transition.Child
+				<TransitionChild
 					as={Fragment}
 					enter="ease-out duration-300"
 					enterFrom="opacity-0"
@@ -34,12 +51,12 @@ export default function ModalGestorSolicitacao({
 					leaveFrom="opacity-100"
 					leaveTo="opacity-0"
 				>
-					<div className="fixed inset-0 bg-black/40" />
-				</Transition.Child>
+					<div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+				</TransitionChild>
 
 				<div className="fixed inset-0 overflow-y-auto">
 					<div className="flex min-h-full items-center justify-center p-4">
-						<Transition.Child
+						<TransitionChild
 							as={Fragment}
 							enter="ease-out duration-300"
 							enterFrom="opacity-0 scale-95"
@@ -48,80 +65,88 @@ export default function ModalGestorSolicitacao({
 							leaveFrom="opacity-100 scale-100"
 							leaveTo="opacity-0 scale-95"
 						>
-							<Dialog.Panel className="w-full max-w-5xl rounded-2xl bg-white py-6 px-12 shadow-xl">
-								<Dialog.Title className="text-3xl font-semibold mb-4">
-									Revisão da Solicitação
-								</Dialog.Title>
+							<DialogPanel className="w-full max-w-5xl rounded-4xl bg-white p-10 shadow-xl shadow-slate-200/50">
+								{/* Header */}
+								<div className="flex items-start justify-between mb-8">
+									<div className="space-y-1">
+										<p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+											Revisão de Solicitação
+										</p>
+										<DialogTitle className="text-3xl font-black text-[#334155] uppercase tracking-tight">
+											{dados.titulo || "Sem título"}
+										</DialogTitle>
+									</div>
+									<button
+										onClick={onClose}
+										className="w-9 h-9 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200 transition-colors"
+									>
+										<X size={16} />
+									</button>
+								</div>
 
-								{/* DADOS DO FORM */}
-								<div className="grid grid-cols-3 gap-5 text-9xl">
-									<Info label="Responsável" value={dados.responsavel} />
-									<Info label="Email" value={dados.email} />
-									<Info label="Setor" value={dados.setor} />
-									<Info label="Telefone" value={dados.telefone} />
-
-									<Info
+								{/* Info Grid */}
+								<div className="grid grid-cols-3 gap-3 mb-8">
+									<InfoChip icon={<User size={13} />} label="Responsável" value={dados.responsavel} />
+									<InfoChip icon={<Mail size={13} />} label="Email" value={dados.email} />
+									<InfoChip icon={<Building2 size={13} />} label="Setor" value={dados.setor} />
+									<InfoChip icon={<Phone size={13} />} label="Telefone" value={dados.telefone} />
+									<InfoChip
+										icon={<Film size={13} />}
 										label="Tipo"
-										value={
-											dados.TipoProducao
-												? TIPO_PRODUCAO_LABELS[dados.TipoProducao]
-												: undefined
-										}
+										value={dados.TipoProducao ? TIPO_PRODUCAO_LABELS[dados.TipoProducao] : undefined}
 									/>
-
-									<Info
+									<InfoChip
+										icon={<FileVideo size={13} />}
 										label="Formato"
-										value={
-											dados.FormatoProducao
-												? FORMATO_PRODUCAO_LABELS[dados.FormatoProducao]
-												: undefined
-										}
+										value={dados.FormatoProducao ? FORMATO_PRODUCAO_LABELS[dados.FormatoProducao] : undefined}
 									/>
-
-									<Info label="Projeto" value={dados.nomeProjeto} />
-									<Info label="Título" value={dados.titulo} />
-									<Info label="Data da gravação" value={dados.data} />
-									<Info label="Hora da gravação" value={dados.hora} />
-									<Info label="Pessoas" value={dados.pessoas} />
-									<Info label="Data limite" value={dados.dataLimite} />
-									<Info label="Roteiro" value={dados.roteiro} />
+									<InfoChip icon={<FolderOpen size={13} />} label="Projeto" value={dados.nomeProjeto} />
+									<InfoChip icon={<Type size={13} />} label="Título" value={dados.titulo} />
+									<InfoChip icon={<CalendarDays size={13} />} label="Data da gravação" value={dados.data} />
+									<InfoChip icon={<Clock size={13} />} label="Hora da gravação" value={dados.hora} />
+									<InfoChip icon={<Users size={13} />} label="Pessoas" value={dados.pessoas} />
+									<InfoChip icon={<AlertCircle size={13} />} label="Data limite" value={dados.dataLimite} />
+									<InfoChip icon={<StickyNote size={13} />} label="Roteiro" value={dados.roteiro} />
 									<div className="col-span-2">
-										<Info label="Observações" value={dados.observacoes} />
+										<InfoChip icon={<AlignLeft size={13} />} label="Observações" value={dados.observacoes} />
 									</div>
 								</div>
 
-								<div className="mt-4">
-									<p className="text-lg font-medium">Descrição</p>
-									<p className="text-lg text-muted-foreground wrap-break-word">
-										{dados.descricao}
-									</p>
-								</div>
+								{/* Descrição */}
+								{dados.descricao && (
+									<div className="bg-[#F8FAFC] rounded-3xl border border-slate-50 p-6 mb-8">
+										<p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-2">
+											Descrição
+										</p>
+										<p className="text-sm font-medium text-[#334155] leading-relaxed wrap-break-word">
+											{dados.descricao}
+										</p>
+									</div>
+								)}
 
-								{/* AÇÕES */}
-								<div className="mt-12 flex justify-end gap-3">
+								{/* Ações */}
+								<div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
 									<button
-										className="rounded-lg bg-blue-500 px-4 py-2 text-white"
+										className="px-5 py-2.5 rounded-2xl bg-red-50 text-red-600 text-xs font-black uppercase tracking-wider hover:bg-red-100 transition-colors"
 										onClick={() => onAction("RECUSAR")}
 									>
 										Rejeitar
 									</button>
-
 									<button
-										className="rounded-lg bg-blue-500 px-4 py-2 text-white"
+										className="px-5 py-2.5 rounded-2xl bg-amber-50 text-amber-600 text-xs font-black uppercase tracking-wider hover:bg-amber-100 transition-colors"
 										onClick={() => onAction("DEVOLVER")}
 									>
 										Estornar
 									</button>
-
 									<button
-										className="rounded-lg bg-blue-500 px-4 py-2 text-white"
+										className="px-5 py-2.5 rounded-2xl bg-indigo-600 text-white text-xs font-black uppercase tracking-wider hover:bg-indigo-700 transition-colors"
 										onClick={() => onAction("ACEITAR")}
 									>
 										Aceitar
 									</button>
 								</div>
-							</Dialog.Panel>
-						</Transition.Child>
+							</DialogPanel>
+						</TransitionChild>
 					</div>
 				</div>
 			</Dialog>
@@ -129,14 +154,27 @@ export default function ModalGestorSolicitacao({
 	);
 }
 
-function Info({ label, value }: { label: string; value?: unknown }) {
+function InfoChip({
+	icon,
+	label,
+	value,
+}: {
+	icon: React.ReactNode;
+	label: string;
+	value?: unknown;
+}) {
 	const display =
 		value === null || value === undefined || value === "" ? "—" : String(value);
 
 	return (
-		<div>
-			<p className="text-xl font-medium text-muted-foreground">{label}</p>
-			<p className="text-lg break-words">{display}</p>
+		<div className="flex items-start gap-3 bg-[#F8FAFC] px-5 py-4 rounded-2xl border border-slate-50">
+			<div className="text-[#4f46e5] mt-0.5 shrink-0">{icon}</div>
+			<div className="flex flex-col min-w-0">
+				<span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+					{label}
+				</span>
+				<span className="text-xs font-bold text-[#334155] wrap-break-word">{display}</span>
+			</div>
 		</div>
 	);
 }
