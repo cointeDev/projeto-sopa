@@ -276,7 +276,7 @@ export function CardDetailModal({
 							</div>
 							<div className="flex flex-col">
 								<span className="text-sm font-black text-slate-800">
-									{solicitacao?.responsavel || "-"}
+									{solicitacao?.responsavel || "Sem responsável"}
 								</span>
 								<span className="text-[9px] font-black text-slate-400 uppercase">
 									Responsável

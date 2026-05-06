@@ -45,7 +45,7 @@ export function SolicitacoesTab({ solicitacoes, onAceitar, setSolicitacoes }: So
                                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Solicitante</span>
                                             <div className="flex items-center gap-3 text-sm font-bold text-[#334155]">
                                                 <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center border border-slate-100"><User className="text-[#4f46e5]" size={14} /></div>
-                                                {sol.responsavel}
+                                                {sol.responsavel || "Sem responsável"}
                                             </div>
                                         </div>
                                         <div className="flex-1 bg-[#F8FAFC] p-6 rounded-2xl border border-slate-50">

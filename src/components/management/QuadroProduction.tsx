@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
+﻿/* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { useState, useMemo } from "react";
 import {
@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import type { Card, Projeto } from "../../pages/GestorLocal";
 
-import { ETAPAS_MAP } from "../../common/types/solicitacao";
+import { ETAPAS_MAP, LOCAL_LABELS, type Local } from "../../common/types/solicitacao";
 import { atualizarEtapaSolicitacao } from "../../services/solicitacoes";
 
 const colunasBasePadrao = [
@@ -108,7 +108,7 @@ export function QuadroProduction({
 	const [filtroProjeto, setFiltroProjeto] = useState<string>("Geral");
 	const [colunasComparacao, setColunasComparacao] = useState<[string, string]>([
 		"STANDBY",
-		"PARA PRODUÇÃO SEMANAL",
+		"PARA PRODUÃ‡ÃƒO SEMANAL",
 	]);
 
 	const colunasAtivas = useMemo(() => {
@@ -169,7 +169,7 @@ export function QuadroProduction({
 		const novaEtapaId = ETAPAS_MAP_INVERSO[novaEtapaNome];
 
 		if (!novaEtapaId) {
-			console.error("Etapa não encontrada:", novaEtapaNome);
+			console.error("Etapa nÃ£o encontrada:", novaEtapaNome);
 			return;
 		}
 
@@ -208,7 +208,7 @@ export function QuadroProduction({
 									setFiltroProjeto(event_.target.value);
 								}}
 							>
-								<option value="Geral">Visão Geral</option>
+								<option value="Geral">VisÃ£o Geral</option>
 								{projetos.map((p) => (
 									<option key={p.id} value={p.nome}>
 										{p.nome}
@@ -242,7 +242,7 @@ export function QuadroProduction({
 				<nav className="mb-8 inline-block max-w-max text-left">
 					<div className="mb-3 flex items-center gap-2">
 						<span className="text-[10px] font-black text-slate-400 uppercase tracking-widest shrink-0">
-							Salto Rápido:
+							Salto RÃ¡pido:
 						</span>
 						{visaoQuadro === "focada" && (
 							<ArrowRightLeft
@@ -331,26 +331,45 @@ export function QuadroProduction({
 													>
 														{(p: DraggableProvided) => (
 															<div
-																{...p.draggableProps}
-																{...p.dragHandleProps}
-																ref={p.innerRef}
-																className="mb-3 rounded-2xl border-l-[6px] bg-white p-4 shadow-sm text-left transition-all hover:shadow-md cursor-pointer"
-																style={{
-																	...p.draggableProps.style,
-																	borderLeftColor:
-																		card.corDestaque || "#cbd5e1",
-																}}
-																onClick={() => {
-																	onCardClick(card);
-																}}
-															>
-																<h4 className="text-slate-800 font-black text-xs uppercase leading-tight">
-																	{card.titulo}
-																</h4>
-																<div className="mt-3 flex items-center gap-2 text-[9px] font-bold uppercase text-slate-400">
-																	<User size={10} /> {card.responsavel}
+																	{...p.draggableProps}
+																	{...p.dragHandleProps}
+																	ref={p.innerRef}
+																	className="mb-3 rounded-2xl border-l-4 bg-white p-4 shadow-sm text-left transition-all hover:shadow-md cursor-pointer"
+																	style={{
+																		...p.draggableProps.style,
+																		borderLeftColor: card.corDestaque || "#4f46e5",
+																	}}
+																	onClick={() => {
+																		onCardClick(card);
+																	}}
+																>
+																	<span className="text-[8px] font-black text-slate-300 uppercase tracking-widest block mb-1 truncate">
+																		{card.projeto}
+																	</span>
+																	<h4 className="text-[#334155] font-black text-[11px] uppercase leading-tight tracking-tight mb-3">
+																		{card.titulo}
+																	</h4>
+																	<div className="flex items-center justify-between gap-2">
+																		<div className="flex items-center gap-1.5 text-[9px] font-bold uppercase text-slate-400 min-w-0">
+																			<div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+																				<User size={9} />
+																			</div>
+																			<span className="truncate">{card.responsavel || "Sem responsável"}</span>
+																		</div>
+																		{card.solicitacao?.local && (
+																			<span className="text-[8px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-400 px-2 py-0.5 rounded-full shrink-0">
+																				{LOCAL_LABELS[card.solicitacao.local as Local] ?? card.solicitacao.local}
+																			</span>
+																		)}
+																	</div>
+																	{card.solicitacao?.delegacoes && card.solicitacao.delegacoes.length > 0 && (
+																		<div className="mt-3 pt-3 border-t border-slate-50">
+																			<span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest">
+																				{card.solicitacao.delegacoes.length} delegaç{card.solicitacao.delegacoes.length === 1 ? "ão" : "ões"}
+																			</span>
+																		</div>
+																	)}
 																</div>
-															</div>
 														)}
 													</Draggable>
 												))}
