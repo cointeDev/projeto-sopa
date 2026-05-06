@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { User, Layout, ArrowUpRight } from "lucide-react"; 
-import type { Solicitacao } from "../../pages/GestorLocal";
+import { User, Layout, ArrowUpRight } from "lucide-react";
+import type { SolicitacaoAPI } from "../../common/types/solicitacao";
 
 interface SolicitacoesTabProps {
-    solicitacoes: Array<Solicitacao>;
-    onAceitar: (sol: Solicitacao) => void;
-    setSolicitacoes: React.Dispatch<React.SetStateAction<Array<Solicitacao>>>;
+    solicitacoes: Array<SolicitacaoAPI>;
+    onAceitar: (sol: SolicitacaoAPI) => void;
+    setSolicitacoes: React.Dispatch<React.SetStateAction<Array<SolicitacaoAPI>>>;
 }
 
 export function SolicitacoesTab({ solicitacoes, onAceitar, setSolicitacoes }: SolicitacoesTabProps) {
-    const handleStatus = (id: string, status: "Recusado" | "Devolvido") => {
-        setSolicitacoes((previous: Array<Solicitacao>) => {
-            return previous.map((item: Solicitacao) => { return item.id === id ? { ...item, status } : item; });
+    const handleStatus = (id: string, status: "RECUSADO" | "DEVOLVIDO") => {
+        setSolicitacoes((previous: Array<SolicitacaoAPI>) => {
+            return previous.map((item: SolicitacaoAPI) => { return item.id === id ? { ...item, status } : item; });
         });
     };
 
-    const ativos = solicitacoes.filter(s => s.status === "Pendente" || s.status === "Devolvido");
+    const ativos = solicitacoes.filter(s => s.status === "PENDENTE" || s.status === "DEVOLVIDO");
 
     return (
         <div className="p-12 space-y-10 text-left bg-[#F8FAFC]">
@@ -52,7 +52,7 @@ export function SolicitacoesTab({ solicitacoes, onAceitar, setSolicitacoes }: So
                                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Projeto</span>
                                             <div className="flex items-center gap-3 text-sm font-bold text-[#334155]">
                                                 <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center border border-slate-100"><Layout className="text-[#4f46e5]" size={14} /></div>
-                                                {sol.projeto}
+                                                {sol.nomeProjeto}
                                             </div>
                                         </div>
                                     </div>
@@ -69,7 +69,7 @@ export function SolicitacoesTab({ solicitacoes, onAceitar, setSolicitacoes }: So
                                     <button 
                                         className="bg-white text-slate-400 font-black text-[10px] uppercase px-8 py-4 rounded-2xl border border-slate-100 hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all" 
                                         type="button" 
-                                        onClick={() => { handleStatus(sol.id, "Devolvido"); }}
+                                        onClick={() => { handleStatus(sol.id, "DEVOLVIDO"); }}
                                     >
                                         Devolver para ajustes
                                     </button>

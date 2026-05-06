@@ -59,9 +59,7 @@ export default function GestorLocal() {
 	const [selectedCard, setSelectedCard] = useState<Card | null>(null);
 	const [cards, setCards] = useState<Array<Card>>([]);
 	const [visaoQuadro, setVisaoQuadro] = useState<"geral" | "focada">("geral");
-	const [projetos, setProjetos] = useState<Array<Projeto>>([
-		{ id: "1", nome: "Se Liga no Enem", etapas: ["STANDBY", "CONCLUÍDO"] },
-	]);
+	const [projetos, setProjetos] = useState<Array<Projeto>>([]);
 
 	const [solicitacoes, setSolicitacoes] = useState<SolicitacaoAPI[]>([]);
 

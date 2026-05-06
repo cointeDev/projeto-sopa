@@ -16,6 +16,8 @@ import {
 import type { Card } from "../../pages/GestorLocal";
 import {
 	FORMATO_PRODUCAO_LABELS,
+	TIPO_PRODUCAO_LABELS,
+	type TipoProducao,
 	type HistoricoEtapa,
 	type DelegacaoEtapa,
 } from "../../common/types/solicitacao";
@@ -96,10 +98,12 @@ export function CardDetailModal({
 								</h2>
 								<div className="flex gap-2">
 									<span className="flex items-center gap-1 rounded-full bg-slate-100 px-4 py-1.5 text-[10px] font-black uppercase text-slate-600">
-										Gravação <ChevronRight size={12} />
+										{solicitacao?.TipoProducao
+											? (TIPO_PRODUCAO_LABELS[solicitacao.TipoProducao as TipoProducao] ?? solicitacao.TipoProducao)
+											: "-"} <ChevronRight size={12} />
 									</span>
 									<span className="rounded-full bg-indigo-600 px-4 py-1.5 text-[10px] font-black uppercase text-white shadow-lg shadow-indigo-100">
-										Em Edição <ChevronRight size={12} />
+										{card.etapa} <ChevronRight size={12} />
 									</span>
 								</div>
 							</div>
@@ -107,7 +111,7 @@ export function CardDetailModal({
 								<div className="flex items-center gap-2 text-slate-400 font-bold">
 									<GraduationCap className="text-slate-300" size={18} />{" "}
 									<span className="text-xs uppercase tracking-widest">
-										SEEC/RN
+										{solicitacao?.setor || "SEEC/RN"}
 									</span>
 								</div>
 								<div
@@ -124,9 +128,7 @@ export function CardDetailModal({
 										className="text-[11px] font-black uppercase tracking-tighter"
 										style={{ color: areaColor }}
 									>
-										{tags.includes("Matemática")
-											? "Matemática e suas Tecnologias"
-											: card.projeto}
+										{card.projeto}
 									</span>
 								</div>
 							</div>
@@ -211,7 +213,9 @@ export function CardDetailModal({
 											{solicitacao?.roteiro || "Sem roteiro"}
 										</p>
 										<span className="text-[10px] text-slate-400 font-bold uppercase">
-											5 dias atrás
+											{solicitacao?.createdAt
+												? new Date(solicitacao.createdAt).toLocaleDateString("pt-BR")
+												: ""}
 										</span>
 									</div>
 								</div>
@@ -237,7 +241,7 @@ export function CardDetailModal({
 								</div>
 								<div className="flex justify-between items-center text-sm font-bold text-slate-600">
 									<span>Início da edição</span>
-									<span>25/04/2024</span>
+									<span>-</span>
 								</div>
 								<div className="flex justify-between items-center text-sm font-bold text-slate-600">
 									<span>Previsão de término</span>
@@ -247,7 +251,7 @@ export function CardDetailModal({
 								<div className="mt-8 pt-8 border-t border-slate-50">
 									<div className="flex items-center justify-between mb-4">
 										<span className="rounded-full bg-indigo-600 px-4 py-1.5 text-[9px] font-black uppercase text-white">
-											Em Edição
+											{card.etapa}
 										</span>
 									</div>
 									<div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden mb-4">
@@ -257,7 +261,7 @@ export function CardDetailModal({
 										<span>Solicitado</span>
 										<span>Pré-produção</span>
 										<span className="text-indigo-400">Gravado</span>
-										<span className="text-indigo-600">Em edição</span>
+										<span className="text-indigo-600">{card.etapa}</span>
 									</div>
 								</div>
 							</div>
@@ -267,7 +271,7 @@ export function CardDetailModal({
 							<div className="w-12 h-12 rounded-full bg-indigo-100 overflow-hidden">
 								<img
 									alt="Avatar"
-									src="https://ui-avatars.com/api/?name=Luis+Alberto&background=4f46e5&color=fff"
+									src={`https://ui-avatars.com/api/?name=${encodeURIComponent(solicitacao?.responsavel || "?")}&background=4f46e5&color=fff`}
 								/>
 							</div>
 							<div className="flex flex-col">
