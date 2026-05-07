@@ -1,4 +1,5 @@
 import { redirect } from "@tanstack/react-router";
+import { api } from "../../services/api";
 
 type UserRole = "GESTOR_GERAL" | "GESTOR_LOCAL" | "OPERACIONAL";
 
@@ -44,5 +45,14 @@ export function protectRoute(allowedRoles: Array<UserRole>): void {
 		throw redirect({
 			to: "/login",
 		});
+	}
+}
+
+export async function logout(): Promise<void> {
+	try {
+		await api.post("/auth/logout");
+	} finally {
+		localStorage.removeItem("auth_token");
+		localStorage.removeItem("user_role");
 	}
 }

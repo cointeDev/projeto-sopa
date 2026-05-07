@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { logout } from "../common/utils/auth";
 import Agenda from "../components/management/Agenda";
 import PainelTarefas from "../components/PainelTarefas";
 
@@ -8,7 +9,13 @@ type AbaOperacional = "tarefas" | "quadro" | "agenda";
 
 export default function Operacional() {
 	const [abaAtual, setAbaAtual] = useState<AbaOperacional>("tarefas");
+	const navigate = useNavigate();
 	const userName = "João";
+
+	async function handleLogout() {
+		await logout();
+		void navigate({ to: "/login" });
+	}
 
 	return (
 		<div className="min-h-screen bg-[#F1F5F9] px-6 py-10 font-inter">
@@ -36,12 +43,12 @@ export default function Operacional() {
 						)}
 					</nav>
 
-					<Link
+					<button
 						className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-red-500 transition-colors"
-						to="/"
+						onClick={() => { void handleLogout(); }}
 					>
 						Sair
-					</Link>
+					</button>
 				</header>
 
 				{/* CONTEÚDO OPERACIONAL */}

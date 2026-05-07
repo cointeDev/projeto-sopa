@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { useState, useEffect } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { logout } from "../common/utils/auth";
 import {
 	CreateCardModal,
 	type NovoCardInterface,
@@ -55,6 +57,12 @@ export interface Card {
 
 export default function GestorLocal() {
 	const [abaAtual, setAbaAtual] = useState<Aba>("Quadro");
+	const navigate = useNavigate();
+
+	async function handleLogout() {
+		await logout();
+		void navigate({ to: "/login" });
+	}
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [selectedCard, setSelectedCard] = useState<Card | null>(null);
 	const [cards, setCards] = useState<Array<Card>>([]);
@@ -222,14 +230,22 @@ export default function GestorLocal() {
 						</button>
 					))}
 				</nav>
-				<button
-					className="rounded-2xl bg-[#4f46e5] px-8 py-3 text-[11px] font-black text-white shadow-xl hover:bg-[#3730a3]"
-					onClick={() => {
-						setIsModalOpen(true);
-					}}
-				>
-					+ NOVO CARD
-				</button>
+				<div className="flex items-center gap-4">
+					<button
+						className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-red-500 transition-colors"
+						onClick={() => { void handleLogout(); }}
+					>
+						Sair
+					</button>
+					<button
+						className="rounded-2xl bg-[#4f46e5] px-8 py-3 text-[11px] font-black text-white shadow-xl hover:bg-[#3730a3]"
+						onClick={() => {
+							setIsModalOpen(true);
+						}}
+					>
+						+ NOVO CARD
+					</button>
+				</div>
 			</header>
 
 			<main className="bg-[#F8FAFC] flex-1 overflow-hidden">
