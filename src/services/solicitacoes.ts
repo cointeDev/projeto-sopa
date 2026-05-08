@@ -90,3 +90,10 @@ export async function delegarEtapa(
 	);
 	return response.data;
 }
+
+export async function listarOperacionais(local?: string) {
+	const response = await api.get("/users/operacionais", {
+		params: local ? { local } : {},
+	});
+	return response.data as Array<{ id: number; login: string; local: string }>;
+}

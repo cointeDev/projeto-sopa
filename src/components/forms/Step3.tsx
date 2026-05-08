@@ -87,8 +87,18 @@ export default function Step3() {
 						) : (
 							<div className="flex flex-col items-center justify-center pt-5 pb-6">
 								<div className="p-5 bg-white rounded-3xl shadow-sm mb-4 group-hover:scale-110 transition-transform border border-slate-50">
-									<svg className="w-8 h-8 text-[#4f46e5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+									<svg
+										className="w-8 h-8 text-[#4f46e5]"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth="2"
+										/>
 									</svg>
 								</div>
 								<p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">
@@ -114,7 +124,7 @@ export default function Step3() {
 					</h2>
 
 					<div className="flex flex-wrap gap-6 pl-1.5">
-						{(OPCOES_ACESSIBILIDADE).map((item) => (
+						{OPCOES_ACESSIBILIDADE.map((item) => (
 							<label
 								key={String(item)}
 								className="flex items-center space-x-3 cursor-pointer group"
@@ -138,8 +148,10 @@ export default function Step3() {
 					{formData.acessibilidade === "INCLUIR_LIBRAS" && (
 						<div className="mt-4 pl-1.5 animate-in fade-in duration-300">
 							<p className="text-xs bg-indigo-50 border border-indigo-100 text-indigo-600 font-medium rounded-2xl p-4 italic">
-								⚠️ Atenção: a RIEH <strong>não fornece intérpretes de Libras</strong>. Caso
-								necessário, a contratação deverá ser providenciada pelo solicitante.
+								⚠️ Atenção: a RIEH{" "}
+								<strong>não fornece intérpretes de Libras</strong>. Caso
+								necessário, a contratação deverá ser providenciada pelo
+								solicitante.
 							</p>
 						</div>
 					)}
@@ -154,21 +166,34 @@ export default function Step3() {
 							className="w-full bg-[#F8FAFC] border border-slate-300 text-[#334155] text-sm font-bold rounded-2xl p-5 appearance-none cursor-pointer hover:bg-white transition-all shadow-sm focus:ring-2 focus:ring-indigo-500/20"
 							value={formData.distribuicao}
 							onChange={(event_) => {
-								updateField("distribuicao", event_.target.value as Distribuicao);
+								updateField(
+									"distribuicao",
+									event_.target.value as Distribuicao
+								);
 							}}
 						>
 							<option disabled value="">
 								Selecione onde será distribuído...
 							</option>
-							{(OPCOES_DISTRIBUICAO).map((item) => (
+							{OPCOES_DISTRIBUICAO.map((item) => (
 								<option key={String(item)} value={item}>
 									{DISTRIBUICAO_LABELS[item]}
 								</option>
 							))}
 						</select>
 						<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-[#4f46e5]">
-							<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+							<svg
+								className="w-4 h-4"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									d="M19 9l-7 7-7-7"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth="2"
+								/>
 							</svg>
 						</div>
 					</div>
@@ -188,7 +213,12 @@ export default function Step3() {
 					className="rounded-[1.25rem] bg-[#4f46e5] px-14 py-5 text-xs font-black text-white shadow-xl shadow-indigo-100 uppercase tracking-widest active:scale-95 transition-all hover:bg-[#3730a3]"
 					onClick={() => {
 						if (!validarPassoAtual()) return;
-						setPassoAtual(passo + 1);
+
+						if (formData.TipoProducao === "EDICAO") {
+							setPassoAtual(7);
+						} else {
+							setPassoAtual(4);
+						}
 					}}
 				>
 					Continuar →

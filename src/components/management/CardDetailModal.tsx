@@ -41,7 +41,9 @@ function DetailBox({ icon, label, value }: DetailBoxProps) {
 				<span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
 					{label}
 				</span>
-				<span className="text-xs font-bold text-[#334155] wrap-break-word">{value}</span>
+				<span className="text-xs font-bold text-[#334155] wrap-break-word">
+					{value}
+				</span>
 			</div>
 		</div>
 	);
@@ -82,10 +84,11 @@ export function CardDetailModal({
 	else if (tags.includes("Humanas")) areaColor = COLORS.humanas;
 	else if (tags.includes("Natureza")) areaColor = COLORS.natureza;
 
+	const isEdicao = solicitacao?.TipoProducao === "EDICAO";
+
 	return (
 		<div className="fixed inset-0 z-100 flex items-center justify-center bg-slate-900/60 p-6 backdrop-blur-md transition-all duration-500 md:p-12 text-left">
 			<div className="animate-fade-in flex h-full w-full max-w-7xl flex-col overflow-hidden rounded-4xl bg-white shadow-2xl shadow-slate-300/30">
-
 				{/* Header */}
 				<header className="relative shrink-0 border-b border-slate-100 bg-white px-12 py-10">
 					<div
@@ -105,7 +108,9 @@ export function CardDetailModal({
 								</h2>
 								<span className="flex items-center gap-1 rounded-full bg-slate-100 px-4 py-1.5 text-[10px] font-black uppercase text-slate-500">
 									{solicitacao?.TipoProducao
-										? (TIPO_PRODUCAO_LABELS[solicitacao.TipoProducao as TipoProducao] ?? solicitacao.TipoProducao)
+										? (TIPO_PRODUCAO_LABELS[
+												solicitacao.TipoProducao as TipoProducao
+											] ?? solicitacao.TipoProducao)
 										: "-"}
 									<ChevronRight size={10} />
 								</span>
@@ -149,10 +154,8 @@ export function CardDetailModal({
 
 				{/* Body */}
 				<div className="custom-scrollbar grid flex-1 grid-cols-1 gap-10 overflow-y-auto p-12 lg:grid-cols-3">
-
 					{/* Coluna principal */}
 					<div className="space-y-10 lg:col-span-2">
-
 						{/* Detalhes */}
 						<section>
 							<h3 className="mb-5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-300">
@@ -194,7 +197,9 @@ export function CardDetailModal({
 											LIBRAS
 										</span>
 										<span className="text-xs font-bold text-[#334155]">
-											{solicitacao?.acessibilidade?.includes("LIBRAS") ? "Sim" : "Não"}
+											{solicitacao?.acessibilidade?.includes("LIBRAS")
+												? "Sim"
+												: "Não"}
 										</span>
 									</div>
 								</div>
@@ -206,7 +211,9 @@ export function CardDetailModal({
 										<span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
 											Legendagem
 										</span>
-										<span className="text-xs font-bold text-[#334155]">Não</span>
+										<span className="text-xs font-bold text-[#334155]">
+											Não
+										</span>
 									</div>
 								</div>
 							</div>
@@ -228,7 +235,9 @@ export function CardDetailModal({
 										</p>
 										<span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
 											{solicitacao?.createdAt
-												? new Date(solicitacao.createdAt).toLocaleDateString("pt-BR")
+												? new Date(solicitacao.createdAt).toLocaleDateString(
+														"pt-BR"
+													)
 												: ""}
 										</span>
 									</div>
@@ -245,7 +254,6 @@ export function CardDetailModal({
 
 					{/* Coluna lateral */}
 					<div className="space-y-6">
-
 						{/* Datas + Pipeline */}
 						<section className="rounded-4xl bg-white border border-slate-100 shadow-sm overflow-hidden">
 							<div className="px-8 pt-8 pb-6 border-b border-slate-50">
@@ -253,17 +261,23 @@ export function CardDetailModal({
 									Datas
 								</h3>
 								<div className="space-y-4">
-									<div className="flex items-center gap-3 bg-[#F8FAFC] rounded-2xl border border-slate-50 px-4 py-3">
-										<CalendarDays size={13} className="text-[#4f46e5] shrink-0" />
-										<div className="flex flex-col">
-											<span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
-												Data da gravação
-											</span>
-											<span className="text-xs font-bold text-[#334155]">
-												{solicitacao?.data || "-"}
-											</span>
+									{!isEdicao && (
+										<div className="flex items-center gap-3 bg-[#F8FAFC] rounded-2xl border border-slate-50 px-4 py-3">
+											<CalendarDays
+												size={13}
+												className="text-[#4f46e5] shrink-0"
+											/>
+											<div className="flex flex-col">
+												<span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
+													Data da gravação
+												</span>
+												<span className="text-xs font-bold text-[#334155]">
+													{solicitacao?.data || "-"}
+												</span>
+											</div>
 										</div>
-									</div>
+									)}
+
 									<div className="flex items-center gap-3 bg-[#F8FAFC] rounded-2xl border border-slate-50 px-4 py-3">
 										<Timer size={13} className="text-[#4f46e5] shrink-0" />
 										<div className="flex flex-col">
@@ -301,15 +315,17 @@ export function CardDetailModal({
 									/>
 								</div>
 								<div className="grid grid-cols-2 gap-y-1.5">
-									{["Solicitado", "Pré-produção", "Gravado", card.etapa].map((label, i) => (
-										<span
-											key={label}
-											className="text-[8px] font-black uppercase tracking-widest"
-											style={{ color: i >= 2 ? areaColor : "#cbd5e1" }}
-										>
-											{label}
-										</span>
-									))}
+									{["Solicitado", "Pré-produção", "Gravado", card.etapa].map(
+										(label, i) => (
+											<span
+												key={label}
+												className="text-[8px] font-black uppercase tracking-widest"
+												style={{ color: i >= 2 ? areaColor : "#cbd5e1" }}
+											>
+												{label}
+											</span>
+										)
+									)}
 								</div>
 							</div>
 						</section>
@@ -402,6 +418,7 @@ export function CardDetailModal({
 					etapaAtualId={solicitacao.EtapaId ?? 2}
 					open={modalDelegacao}
 					solicitacaoId={solicitacao.id}
+					localSolicitacao={solicitacao.local}
 					onClose={() => setModalDelegacao(false)}
 					onSuccess={() => {
 						buscarSolicitacaoPorToken(solicitacao.id)

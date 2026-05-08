@@ -1,5 +1,11 @@
 import { Fragment } from "react";
-import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react";
+import {
+	Dialog,
+	DialogPanel,
+	DialogTitle,
+	Transition,
+	TransitionChild,
+} from "@headlessui/react";
 import {
 	X,
 	User,
@@ -39,6 +45,7 @@ export default function ModalGestorSolicitacao({
 	dados,
 	onAction,
 }: ModalGestorSolicitacaoProps) {
+	const isEdicao = dados.TipoProducao === "EDICAO";
 	return (
 		<Transition appear show={open} as={Fragment}>
 			<Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -86,29 +93,95 @@ export default function ModalGestorSolicitacao({
 
 								{/* Info Grid */}
 								<div className="grid grid-cols-3 gap-3 mb-8">
-									<InfoChip icon={<User size={13} />} label="Responsável" value={dados.responsavel} />
-									<InfoChip icon={<Mail size={13} />} label="Email" value={dados.email} />
-									<InfoChip icon={<Building2 size={13} />} label="Setor" value={dados.setor} />
-									<InfoChip icon={<Phone size={13} />} label="Telefone" value={dados.telefone} />
+									<InfoChip
+										icon={<User size={13} />}
+										label="Responsável"
+										value={dados.responsavel}
+									/>
+									<InfoChip
+										icon={<Mail size={13} />}
+										label="Email"
+										value={dados.email}
+									/>
+									<InfoChip
+										icon={<Building2 size={13} />}
+										label="Setor"
+										value={dados.setor}
+									/>
+									<InfoChip
+										icon={<Phone size={13} />}
+										label="Telefone"
+										value={dados.telefone}
+									/>
 									<InfoChip
 										icon={<Film size={13} />}
 										label="Tipo"
-										value={dados.TipoProducao ? TIPO_PRODUCAO_LABELS[dados.TipoProducao] : undefined}
+										value={
+											dados.TipoProducao
+												? TIPO_PRODUCAO_LABELS[dados.TipoProducao]
+												: undefined
+										}
 									/>
 									<InfoChip
 										icon={<FileVideo size={13} />}
 										label="Formato"
-										value={dados.FormatoProducao ? FORMATO_PRODUCAO_LABELS[dados.FormatoProducao] : undefined}
+										value={
+											dados.FormatoProducao
+												? FORMATO_PRODUCAO_LABELS[dados.FormatoProducao]
+												: undefined
+										}
 									/>
-									<InfoChip icon={<FolderOpen size={13} />} label="Projeto" value={dados.nomeProjeto} />
-									<InfoChip icon={<Type size={13} />} label="Título" value={dados.titulo} />
-									<InfoChip icon={<CalendarDays size={13} />} label="Data da gravação" value={dados.data} />
-									<InfoChip icon={<Clock size={13} />} label="Hora da gravação" value={dados.hora} />
-									<InfoChip icon={<Users size={13} />} label="Pessoas" value={dados.pessoas} />
-									<InfoChip icon={<AlertCircle size={13} />} label="Data limite" value={dados.dataLimite} />
-									<InfoChip icon={<StickyNote size={13} />} label="Roteiro" value={dados.roteiro} />
+									<InfoChip
+										icon={<FolderOpen size={13} />}
+										label="Projeto"
+										value={dados.nomeProjeto}
+									/>
+									<InfoChip
+										icon={<Type size={13} />}
+										label="Título"
+										value={dados.titulo}
+									/>
+									{isEdicao ? (
+										<InfoChip
+											icon={<FolderOpen size={13} />}
+											label="Material de edição"
+											value={dados.materialEdicao}
+										/>
+									) : (
+										<>
+											<InfoChip
+												icon={<CalendarDays size={13} />}
+												label="Data da gravação"
+												value={dados.data}
+											/>
+											<InfoChip
+												icon={<Clock size={13} />}
+												label="Hora da gravação"
+												value={dados.hora}
+											/>
+											<InfoChip
+												icon={<Users size={13} />}
+												label="Pessoas"
+												value={dados.pessoas}
+											/>
+										</>
+									)}
+									<InfoChip
+										icon={<AlertCircle size={13} />}
+										label="Data limite"
+										value={dados.dataLimite}
+									/>
+									<InfoChip
+										icon={<StickyNote size={13} />}
+										label="Roteiro"
+										value={dados.roteiro}
+									/>
 									<div className="col-span-2">
-										<InfoChip icon={<AlignLeft size={13} />} label="Observações" value={dados.observacoes} />
+										<InfoChip
+											icon={<AlignLeft size={13} />}
+											label="Observações"
+											value={dados.observacoes}
+										/>
 									</div>
 								</div>
 
@@ -173,7 +246,9 @@ function InfoChip({
 				<span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
 					{label}
 				</span>
-				<span className="text-xs font-bold text-[#334155] wrap-break-word">{display}</span>
+				<span className="text-xs font-bold text-[#334155] wrap-break-word">
+					{display}
+				</span>
 			</div>
 		</div>
 	);

@@ -14,6 +14,7 @@ import {
 	LOCAL_LABELS,
 	TIPO_PRODUCAO_LABELS,
 } from "../common/types/solicitacao";
+import StepEdicao from "../components/forms/StepEdicao";
 
 const steps = [
 	"Informações",
@@ -26,6 +27,8 @@ const steps = [
 
 function SolicitarContent() {
 	const { passo, formData } = useFormContext();
+
+	const logicCurrentStep = passo === 7 ? 4 : passo;
 
 	return (
 		<div className="min-h-screen bg-[#F1F5F9] flex items-center justify-center px-4 font-inter">
@@ -43,7 +46,7 @@ function SolicitarContent() {
 						</p>
 
 						{/* LISTA DE PASSOS */}
-						<Stepper currentStep={passo} steps={steps} />
+						<Stepper currentStep={logicCurrentStep} steps={steps} />
 
 						<div className="mt-10 border-t border-slate-100 pt-6 space-y-3 text-[11px] font-black uppercase tracking-widest text-slate-400">
 							<p>
@@ -100,6 +103,9 @@ function SolicitarContent() {
 
 					{/* PASSO 6 */}
 					{passo === 6 && <Step6 />}
+
+					{/* PASSO 7 EDIÇÃO */}
+					{passo === 7 && <StepEdicao />}
 				</section>
 			</div>
 		</div>

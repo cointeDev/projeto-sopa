@@ -178,7 +178,7 @@ export default function Step2() {
 					className="rounded-[1.25rem] bg-[#4f46e5] px-14 py-5 text-xs font-black text-white shadow-xl shadow-indigo-100 uppercase tracking-widest active:scale-95 transition-all hover:bg-[#3730a3]"
 					onClick={() => {
 						if (!validarPassoAtual()) return;
-						setPassoAtual(passo + 1);
+						setPassoAtual(3);
 					}}
 				>
 					Continuar →

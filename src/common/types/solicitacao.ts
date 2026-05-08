@@ -58,6 +58,7 @@ export interface Solicitacao {
 	dataLimite: string;
 	pessoas: number;
 	roteiro: string;
+	materialEdicao: string;
 	observacoes: string;
 	EtapaId: number;
 	status: string;
@@ -96,6 +97,9 @@ export interface SolicitarFormData {
 	pessoas: number;
 	roteiro: File | null;
 	observacoes: string;
+
+	// STEP EDIÇÃO
+	materialEdicao: File | null;
 }
 
 export interface SolicitacaoAPI extends SolicitarFormData {

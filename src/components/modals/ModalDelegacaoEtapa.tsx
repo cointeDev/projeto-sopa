@@ -1,14 +1,28 @@
-import { Fragment, useState } from "react";
-import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react";
+import { Fragment, useState, useEffect } from "react";
+import {
+	Dialog,
+	DialogPanel,
+	DialogTitle,
+	Transition,
+	TransitionChild,
+} from "@headlessui/react";
 import { X, GitBranch, CheckCircle } from "lucide-react";
 import { ETAPAS_MAP } from "../../common/types/solicitacao";
-import { delegarEtapa } from "../../services/solicitacoes";
+import { delegarEtapa, listarOperacionais } from "../../services/solicitacoes";
+
+interface Operacional {
+	id: number;
+	login: string;
+	nome: string;
+	local: string;
+}
 
 interface ModalDelegacaoEtapaProps {
 	open: boolean;
 	onClose: () => void;
 	solicitacaoId: string;
 	etapaAtualId: number;
+	localSolicitacao?: string;
 	role?: "GESTOR_GERAL" | "GESTOR_LOCAL";
 	onSuccess?: () => void;
 }
@@ -20,14 +34,26 @@ export default function ModalDelegacaoEtapa({
 	etapaAtualId,
 	role = "GESTOR_GERAL",
 	onSuccess,
+	localSolicitacao,
 }: ModalDelegacaoEtapaProps) {
 	const [etapaId, setEtapaId] = useState<number>(etapaAtualId);
 	const [operacionalId, setOperacionalId] = useState<string>("");
+	const [operacionais, setOperacionais] = useState<Operacional[]>([]);
+	const [carregando, setCarregando] = useState(false);
 	const [salvando, setSalvando] = useState(false);
 	const [erro, setErro] = useState<string | null>(null);
 	const [sucesso, setSucesso] = useState(false);
 
-	// Etapas válidas para delegação (excluindo STANDBY=1, CONCLUÍDO=12, PUBLICADO=13)
+	// Carrega lista de operacionais ao abrir o modal
+	useEffect(() => {
+		if (!open) return;
+		setCarregando(true);
+		listarOperacionais(localSolicitacao)
+			.then(setOperacionais)
+			.catch(() => setErro("Erro ao carregar operacionais."))
+			.finally(() => setCarregando(false));
+	}, [open, localSolicitacao]);
+
 	const etapasValidas = Object.entries(ETAPAS_MAP).filter(
 		([id]) => Number(id) !== 1 && Number(id) !== 12 && Number(id) !== 13
 	);
@@ -35,7 +61,7 @@ export default function ModalDelegacaoEtapa({
 	async function handleSubmit() {
 		const opId = Number(operacionalId);
 		if (!operacionalId || isNaN(opId) || opId <= 0) {
-			setErro("Informe um ID de operacional válido.");
+			setErro("Selecione um operacional.");
 			return;
 		}
 
@@ -61,7 +87,7 @@ export default function ModalDelegacaoEtapa({
 				typeof error.response.data === "object" &&
 				"message" in error.response.data
 					? String((error.response.data as { message: string }).message)
-					: "Erro ao delegar etapa. Verifique o ID do operacional.";
+					: "Erro ao delegar etapa.";
 			setErro(mensagem);
 		} finally {
 			setSalvando(false);
@@ -75,6 +101,14 @@ export default function ModalDelegacaoEtapa({
 		setEtapaId(etapaAtualId);
 		onClose();
 	}
+
+	// Label do local formatado
+	const LOCAL_LABELS: Record<string, string> = {
+		NATAL: "Natal",
+		MOSSORO: "Mossoró",
+		CAICO: "Caicó",
+		PAU_DOS_FERROS: "Pau dos Ferros",
+	};
 
 	return (
 		<Transition appear show={open} as={Fragment}>
@@ -123,6 +157,7 @@ export default function ModalDelegacaoEtapa({
 								</div>
 
 								<div className="flex flex-col gap-5">
+									{/* Select de Etapa */}
 									<div>
 										<label className="mb-2 block text-[8px] font-black uppercase tracking-widest text-slate-400">
 											Etapa
@@ -140,20 +175,31 @@ export default function ModalDelegacaoEtapa({
 										</select>
 									</div>
 
+									{/* Select de Operacional */}
 									<div>
 										<label className="mb-2 block text-[8px] font-black uppercase tracking-widest text-slate-400">
-											ID do Operacional
+											Operacional
 										</label>
-										<input
-											className="w-full rounded-3xl border border-slate-100 bg-[#F8FAFC] px-5 py-3.5 text-xs font-bold text-[#334155] outline-none focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 transition-all placeholder:text-slate-300"
-											min={1}
-											placeholder="Ex: 3"
-											type="number"
-											value={operacionalId}
-											onChange={(e) => setOperacionalId(e.target.value)}
-										/>
+										{carregando ? (
+											<div className="w-full rounded-3xl border border-slate-100 bg-[#F8FAFC] px-5 py-3.5 text-xs font-bold text-slate-300">
+												Carregando operacionais...
+											</div>
+										) : (
+											<select
+												className="w-full rounded-3xl border border-slate-100 bg-[#F8FAFC] px-5 py-3.5 text-xs font-bold text-[#334155] outline-none focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 transition-all"
+												value={operacionalId}
+												onChange={(e) => setOperacionalId(e.target.value)}
+											>
+												<option value="">Selecione um operacional</option>
+												{operacionais.map((op) => (
+													<option key={op.id} value={op.id}>
+														{op.nome} — {LOCAL_LABELS[op.local] ?? op.local}
+													</option>
+												))}
+											</select>
+										)}
 										<p className="mt-2 text-[9px] font-black text-slate-300 uppercase tracking-widest">
-											Informe o ID do usuário com role operacional
+											Selecione o operacional responsável pela etapa
 										</p>
 									</div>
 
@@ -180,7 +226,7 @@ export default function ModalDelegacaoEtapa({
 									</button>
 									<button
 										className="px-5 py-2.5 rounded-2xl bg-indigo-600 text-white text-xs font-black uppercase tracking-wider hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-										disabled={salvando || sucesso}
+										disabled={salvando || sucesso || carregando}
 										onClick={() => void handleSubmit()}
 									>
 										{salvando ? "Salvando..." : "Delegar"}

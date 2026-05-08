@@ -29,6 +29,8 @@ import {
 
 import type { CampoComErro, SolicitacaoAPI } from "../common/types/solicitacao";
 import ModalRejeicaoGestor from "../components/modals/ModalRejeicaoGestor";
+import Agenda from "../components/management/Agenda";
+import Diario from "../components/management/Diario";
 
 export type Aba = "Dashboard" | "Quadro" | "Solicitações" | "Agenda" | "Diário";
 
@@ -47,11 +49,10 @@ export interface Card {
 	etiquetas?: Array<string>;
 	corDestaque?: string;
 	fluxoEtapas?: Array<string>;
+	dataLimite?: string;
 
 	solicitacao?: SolicitacaoAPI;
 }
-
-
 
 export default function GestorLocal() {
 	const [abaAtual, setAbaAtual] = useState<Aba>("Quadro");
@@ -86,6 +87,8 @@ export default function GestorLocal() {
 
 		const etapaNome = ETAPAS_MAP[etapaId] ?? "STANDBY";
 
+		console.log("SOLICITAÇÃO RECEBIDA:", JSON.stringify(solicitacao, null, 2));
+
 		return {
 			id: solicitacao.id.toString(),
 			etapa: etapaNome,
@@ -94,6 +97,7 @@ export default function GestorLocal() {
 			projeto: solicitacao.nomeProjeto,
 			etiquetas: [solicitacao.TipoProducao],
 			solicitacao,
+			dataLimite: solicitacao.dataLimite,
 		};
 	};
 
@@ -260,6 +264,12 @@ export default function GestorLocal() {
 						/>
 					</div>
 				)}
+				{abaAtual === "Agenda" && (
+					<div className="h-full overflow-hidden">
+						<Agenda scope="local" cards={cards} />
+					</div>
+				)}
+				{abaAtual === "Diário" && <Diario />}
 			</main>
 
 			{selectedCard && (

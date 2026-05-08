@@ -19,6 +19,8 @@ interface ApiError {
 export default function Step5() {
 	const { formData, setPassoAtual, setProtocolo } = useFormContext();
 
+	const isEdicao = formData.TipoProducao === "EDICAO";
+
 	async function handleConfirmar() {
 		try {
 			const payload = {
@@ -41,6 +43,7 @@ export default function Step5() {
 				pessoas: formData.pessoas,
 				roteiro: formData.roteiro?.name,
 				observacoes: formData.observacoes,
+				materialEdicao: formData.materialEdicao?.name,
 			};
 
 			const resposta = await criarSolicitacao(payload);
@@ -122,12 +125,14 @@ export default function Step5() {
 									: "Não informado"}
 							</span>
 						</p>
-						<p className="text-slate-400 font-medium">
-							Pessoas em cena:{" "}
-							<span className="text-[#334155] font-bold">
-								{formData.pessoas || "0"}
-							</span>
-						</p>
+						{!isEdicao && (
+							<p className="text-slate-400 font-medium">
+								Pessoas em cena:{" "}
+								<span className="text-[#334155] font-bold">
+									{formData.pessoas || "0"}
+								</span>
+							</p>
+						)}
 						<p className="text-slate-400 font-medium">
 							Acessibilidade:{" "}
 							<span className="text-[#334155] font-bold">
@@ -182,7 +187,11 @@ export default function Step5() {
 					className="rounded-2xl border border-slate-200 bg-white px-10 py-5 text-xs font-black text-slate-400 uppercase tracking-widest transition-all hover:bg-slate-50"
 					type="button"
 					onClick={() => {
-						setPassoAtual(4);
+						if (formData.TipoProducao === "EDICAO") {
+							setPassoAtual(7);
+						} else {
+							setPassoAtual(4);
+						}
 					}}
 				>
 					← Ajustar
