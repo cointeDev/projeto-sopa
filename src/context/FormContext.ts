@@ -4,6 +4,8 @@ import type { SolicitarFormData } from "../common/types/solicitacao";
 export interface FormContextType {
 	passo: number;
 	formData: SolicitarFormData;
+	protocolo: string;
+	setProtocolo: (protocolo: string) => void;
 	setPassoAtual: (passo: number) => void;
 	updateField: <K extends keyof SolicitarFormData>(
 		field: K,

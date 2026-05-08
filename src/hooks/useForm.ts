@@ -8,6 +8,8 @@ import { FORMATOS_POR_TIPO } from "../common/rules/formatosPorTipo";
 export interface UseFormReturn {
 	passo: number;
 	formData: SolicitarFormData;
+	protocolo: string;
+	setProtocolo: (protocolo: string) => void;
 	setPassoAtual: (novoPasso: number) => void;
 	updateField: <K extends keyof SolicitarFormData>(
 		field: K,
@@ -19,6 +21,8 @@ export interface UseFormReturn {
 }
 
 export function useForm(): UseFormReturn {
+	const [protocolo, setProtocolo] = useState<string>("");
+
 	const [passo, setPasso] = useState<number>(() => {
 		const savedPasso = Number(localStorage.getItem("passo")) || 1;
 		if (savedPasso === 6) {
@@ -57,10 +61,10 @@ export function useForm(): UseFormReturn {
 				email: true,
 				setor: true,
 				telefone: true,
-				local: true,
-				localExterno: true,
-				data: true,
-				hora: true,
+				//local: true,
+				//localExterno: true,
+				//data: true,
+				//hora: true,
 			})
 			.safeParse(data);
 
@@ -76,7 +80,7 @@ export function useForm(): UseFormReturn {
 
 	function validarStep2(data: SolicitarFormData): boolean {
 		const result = solicitarFormSchema
-			.pick({ tipo: true, formato: true })
+			.pick({ TipoProducao: true, FormatoProducao: true })
 			.safeParse(data);
 
 		if (!result.success) {
@@ -86,14 +90,14 @@ export function useForm(): UseFormReturn {
 			return false;
 		}
 
-		if (!data.tipo || !data.formato) {
+		if (!data.TipoProducao || !data.FormatoProducao) {
 			toast.error("Selecione o tipo e o formato de produção.");
 			return false;
 		}
 
-		const formatosValidos = FORMATOS_POR_TIPO[data.tipo] ?? [];
+		const formatosValidos = FORMATOS_POR_TIPO[data.TipoProducao] ?? [];
 
-		if (!formatosValidos.includes(data.formato)) {
+		if (!formatosValidos.includes(data.FormatoProducao)) {
 			toast.error("Formato inválido para o tipo de produção selecionado.");
 			return false;
 		}
@@ -126,8 +130,13 @@ export function useForm(): UseFormReturn {
 	function validarStep4(data: SolicitarFormData): boolean {
 		const result = solicitarFormSchema
 			.pick({
+				local: true,
+				data: true,
+				hora: true,
 				dataLimite: true,
 				pessoas: true,
+				roteiro: true,
+				observacoes: true,
 			})
 			.safeParse(data);
 
@@ -137,6 +146,10 @@ export function useForm(): UseFormReturn {
 			});
 			return false;
 		}
+
+		//if (!formData.data) return false;
+		//if (!formData.hora) return false;
+		//if (formData.hora < "09:00" || formData.hora > "17:00") return false;
 
 		return true;
 	}
@@ -157,13 +170,13 @@ export function useForm(): UseFormReturn {
 	}
 
 	function getMaxPessoasPorFormato(): number {
-		switch (formData.formato) {
-			case "Live remota":
+		switch (formData.FormatoProducao) {
+			case "LIVE_REMOTA":
 				return 8;
 
-			case "Live presencial (em estúdio)":
-			case "Podcast / Mesacast":
-			case "Gravação de programa":
+			case "LIVE_PRESENCIAL_ESTUDIO":
+			case "PODCAST_MESACAST":
+			case "GRAVACAO_PROGRAMA":
 				return 4;
 
 			default:
@@ -174,6 +187,8 @@ export function useForm(): UseFormReturn {
 	return {
 		passo,
 		formData,
+		protocolo,
+		setProtocolo,
 		setPassoAtual,
 		updateField,
 		validarPassoAtual,

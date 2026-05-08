@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { Link } from "@tanstack/react-router"
+import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
+import { logout } from "../common/utils/auth"
 import { KpiCard } from "../components/management/KpiCard"
 import Agenda from "../components/management/Agenda"
 import Diario from "../components/management/Diario"
@@ -21,10 +22,10 @@ function Tab({
 }) {
     return (
         <button
-            className={`pb-3 text-sm font-semibold transition
+            className={`pb-3 text-[11px] font-black uppercase tracking-widest transition-all
         ${active
-                    ? "text-white border-b-2 border-indigo-500"
-                    : "text-[#B4B9C7] hover:text-white"
+                    ? "text-[#4f46e5] border-b-2 border-[#4f46e5]"
+                    : "text-slate-400 hover:text-indigo-400"
                 }`}
             onClick={onClick}
         >
@@ -43,41 +44,47 @@ function getGreeting() {
 
 export function GestorGeral() {
     const [abaAtual, setAbaAtual] = useState<Aba>("visao-geral")
+    const navigate = useNavigate()
 
     const userName = "Gestor Geral"
     const greeting = getGreeting()
 
+    async function handleLogout() {
+        await logout()
+        void navigate({ to: "/login" })
+    }
+
     return (
-        <div className="min-h-screen bg-[#0F111A] font-inter px-6 py-10">
+        <div className="min-h-screen bg-[#F1F5F9] font-inter px-6 py-10">
 
             <div className="max-w-7xl mx-auto space-y-10">
 
-                {/* HEADER */}
+                {/* HEADER - Padrão Light v1.0.4 */}
                 <header
-                    className="bg-[#161825] rounded-2xl px-8 py-6
-                     shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)]
-                     flex items-center justify-between animate-fade-in"
+                    className="bg-white rounded-[2.5rem] px-10 py-8
+                      shadow-2xl shadow-slate-200/50 border border-slate-100
+                      flex items-center justify-between animate-in fade-in duration-500"
                 >
                     <div>
-                        <h1 className="text-2xl font-extrabold text-white">
+                        <h1 className="text-3xl font-black text-[#334155] tracking-tighter uppercase leading-none">
                             {greeting}, {userName}
                         </h1>
-                        <p className="text-sm text-[#B4B9C7]">
+                        <p className="text-sm font-medium text-slate-400 mt-2">
                             Visão global da produção audiovisual
                         </p>
                     </div>
 
-                    <Link
-                        className="text-sm font-semibold text-indigo-400 hover:underline"
-                        to="/"
+                    <button
+                        className="text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-400 transition-colors"
+                        onClick={() => { void handleLogout() }}
                     >
-                        Sair
-                    </Link>
+                        Sair do sistema
+                    </button>
                 </header>
 
                 {/* NAV ABAS */}
                 <nav
-                    className="flex gap-6 border-b border-white/10 pb-2 animate-fade-in"
+                    className="flex gap-8 border-b border-slate-200 pb-2 animate-in fade-in duration-500"
                 >
                     <Tab
                         active={abaAtual === "visao-geral"}
@@ -103,9 +110,9 @@ export function GestorGeral() {
 
                 {/* CONTEÚDO */}
                 {abaAtual === "visao-geral" && (
-                    <section className="animate-fade-in space-y-10">
+                    <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">
 
-                        {/* KPIs */}
+                        {/* KPIs - Devem ser ajustados internamente para o Padrão Light */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                             <KpiCard label="Pedidos Ativos" value="42" />
                             <KpiCard label="Em Gravação" value="8" />
@@ -115,19 +122,19 @@ export function GestorGeral() {
 
                         {/* BI */}
                         <div
-                            className="bg-[#161825] rounded-2xl p-8
-                         shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)]"
+                            className="bg-white rounded-[2.5rem] p-10
+                         shadow-2xl shadow-slate-200/50 border border-slate-100"
                         >
-                            <h3 className="text-lg font-bold text-white mb-2">
+                            <h3 className="text-xl font-black text-[#334155] mb-2 uppercase tracking-tight">
                                 Indicadores Gerais
                             </h3>
-                            <p className="text-sm text-[#B4B9C7] mb-6">
+                            <p className="text-sm font-medium text-slate-400 mb-8">
                                 Produção por estúdio, tipo e período
                             </p>
 
                             <div
-                                className="h-64 rounded-xl border border-dashed border-white/10
-                           flex items-center justify-center text-[#B4B9C7]"
+                                className="h-72 rounded-4xl border-2 border-dashed border-slate-100
+                           flex items-center justify-center text-slate-300 font-bold uppercase text-[10px] tracking-widest bg-[#F8FAFC]"
                             >
                                 Área reservada para gráficos (BI)
                             </div>
@@ -136,24 +143,22 @@ export function GestorGeral() {
                     </section>
                 )}
 
+                {/* AGENDA GLOBAL */}
                 {abaAtual === "agenda-global" && (
-                    <section className="animate-slide-in-right space-y-6">
+                    <section className="animate-in fade-in slide-in-from-right-4 duration-500 space-y-6">
 
                         <div
-                            className="bg-[#161825] rounded-2xl p-8
-                         shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)]"
+                            className="bg-white rounded-[2.5rem] p-10
+                         shadow-2xl shadow-slate-200/50 border border-slate-100"
                         >
-                            <h3 className="text-lg font-bold text-white mb-2">
+                            <h3 className="text-xl font-black text-[#334155] mb-2 uppercase tracking-tight">
                                 Agenda Consolidada
                             </h3>
-                            <p className="text-sm text-[#B4B9C7] mb-6">
+                            <p className="text-sm font-medium text-slate-400 mb-8">
                                 Ocupação de todos os estúdios
                             </p>
 
-                            <div
-                                className="bg-[#1e1e25] rounded-xl border border-dashed border-white/10
-                           flex items-center justify-center text-[#B4B9C7]"
-                            >
+                            <div className="bg-[#F8FAFC] rounded-4xl p-4 border border-slate-100 shadow-inner">
                                 <Agenda scope="geral" />
                             </div>
                         </div>
@@ -161,24 +166,22 @@ export function GestorGeral() {
                     </section>
                 )}
 
+                {/* DIÁRIO */}
                 {abaAtual === "diario" && (
-                    <section className="animate-slide-in-right space-y-6">
+                    <section className="animate-in fade-in slide-in-from-right-4 duration-500 space-y-6">
 
                         <div
-                            className="bg-[#161825] rounded-2xl p-8
-                         shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)]"
+                            className="bg-white rounded-[2.5rem] p-10
+                         shadow-2xl shadow-slate-200/50 border border-slate-100"
                         >
-                            <h3 className="text-lg font-bold text-white mb-2">
+                            <h3 className="text-xl font-black text-[#334155] mb-2 uppercase tracking-tight">
                                 Diário por estúdio
                             </h3>
-                            <p className="text-sm text-[#B4B9C7] mb-6">
+                            <p className="text-sm font-medium text-slate-400 mb-8">
                                 Resumo das demandas diárias por estúdio
                             </p>
 
-                            <div
-                                className="bg-[#1e1e25] rounded-xl border border-dashed border-white/10
-                           flex items-center justify-center text-[#B4B9C7]"
-                            >
+                            <div className="bg-[#F8FAFC] rounded-4xl p-4 border border-slate-100 shadow-inner">
                                 <Diario />
                             </div>
                         </div>

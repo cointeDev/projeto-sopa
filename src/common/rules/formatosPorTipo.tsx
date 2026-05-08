@@ -1,31 +1,31 @@
 import { TipoProducao, FormatoProducao } from "../types/solicitacao";
 
 export const FORMATOS_POR_TIPO: Record<TipoProducao, FormatoProducao[]> = {
-	"Evento in loco": ["Animações para eventos in loco"],
+	EVENTO_IN_LOCO: ["ANIMACOES_EVENTOS_IN_LOCO"],
 
-	"Evento em estúdio": [
-		"Live pré-gravada",
-		"Live presencial (em estúdio)",
-		"Criação, edição e animações",
+	EVENTO_EM_ESTUDIO: [
+		"LIVE_PRE_GRAVADA",
+		"LIVE_PRESENCIAL_ESTUDIO",
+		"CRIACAO_EDICAO_ANIMACOES",
 	],
 
-	"Vídeo institucional": [
-		"Live pré-gravada",
-		"Live presencial (em estúdio)",
-		"Live remota",
-		"Podcast / Mesacast",
-		"Gravação de programa",
-		"Criação, edição e animações",
+	VIDEO_INSTITUCIONAL: [
+		"LIVE_PRE_GRAVADA",
+		"LIVE_PRESENCIAL_ESTUDIO",
+		"LIVE_REMOTA",
+		"PODCAST_MESACAST",
+		"GRAVACAO_PROGRAMA",
+		"CRIACAO_EDICAO_ANIMACOES",
 	],
 
-	"Gravação de chamada": ["Shorts / Reels"],
+	GRAVACAO_CHAMADA: ["SHORTS_REELS"],
 
-	"Gravação de videoaula": [
-		"Live pré-gravada",
-		"Live presencial (em estúdio)",
-		"Gravação de programa",
-		"Criação, edição e animações",
+	GRAVACAO_VIDEOAULA: [
+		"LIVE_PRE_GRAVADA",
+		"LIVE_PRESENCIAL_ESTUDIO",
+		"GRAVACAO_PROGRAMA",
+		"CRIACAO_EDICAO_ANIMACOES",
 	],
 
-	Edição: ["Criação, edição e animações", "Shorts / Reels"],
+	EDICAO: ["CRIACAO_EDICAO_ANIMACOES", "SHORTS_REELS"],
 };

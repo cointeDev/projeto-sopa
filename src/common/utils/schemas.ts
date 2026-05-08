@@ -16,8 +16,8 @@ export const solicitarFormSchema = z.object({
 	data: z.string().min(1, "Data obrigatória"),
 	hora: z.string().min(1, "Hora obrigatória"),
 
-	tipo: z.string().min(1, "Tipo de produção obrigatória"),
-	formato: z.string().min(1, "Formato de produção obrigatório"),
+	TipoProducao: z.string().min(1, "Tipo de produção obrigatória"),
+	FormatoProducao: z.string().min(1, "Formato de produção obrigatório"),
 
 	nomeProjeto: z.string().min(1, "Nome do projeto obrigatório"),
 	titulo: z.string().min(1, "Título obrigatório"),
@@ -26,16 +26,22 @@ export const solicitarFormSchema = z.object({
 		.instanceof(File)
 		.refine((file) => file.size > 0, "Thumbnail obrigatório"),
 
-	acessibilidade: z
-		.array(z.string())
-		.min(1, "Ao menos uma opção de acessibilidade"),
+	acessibilidade: z.enum(["INCLUIR_LIBRAS", "NAO_SE_APLICA"], {
+		message: "Selecione uma opção de acessibilidade",
+	}),
 
 	distribuicao: z.string().min(1, "Distribuição obrigatória"),
 
 	dataLimite: z.string().optional(),
-	pessoas: z.string().optional(),
+	pessoas: z.number().optional(),
 	roteiro: z.instanceof(File).optional(),
 	observacoes: z.string().optional(),
 });
+
+export const tokenSchema = z.string().regex(
+  /^SOPA-\d{4}\/\d{2}-[0-9a-fA-F-]{36}$/,
+  "Formato de token inválido"
+);
+
 
 export type SolicitarFormSchema = z.infer<typeof solicitarFormSchema>;

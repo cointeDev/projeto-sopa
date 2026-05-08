@@ -1,27 +1,73 @@
 export type TipoProducao =
-	| "Evento in loco"
-	| "Evento em estúdio"
-	| "Vídeo institucional"
-	| "Gravação de chamada"
-	| "Gravação de videoaula"
-	| "Edição";
+	| "EVENTO_IN_LOCO"
+	| "EVENTO_EM_ESTUDIO"
+	| "VIDEO_INSTITUCIONAL"
+	| "GRAVACAO_CHAMADA"
+	| "GRAVACAO_VIDEOAULA"
+	| "EDICAO";
 
 export type FormatoProducao =
-	| "Live pré-gravada"
-	| "Live presencial (em estúdio)"
-	| "Live remota"
-	| "Podcast / Mesacast"
-	| "Gravação de programa"
-	| "Shorts / Reels"
-	| "Animações para eventos in loco"
-	| "Criação, edição e animações";
+	| "LIVE_PRE_GRAVADA"
+	| "LIVE_PRESENCIAL_ESTUDIO"
+	| "LIVE_REMOTA"
+	| "PODCAST_MESACAST"
+	| "GRAVACAO_PROGRAMA"
+	| "SHORTS_REELS"
+	| "ANIMACOES_EVENTOS_IN_LOCO"
+	| "CRIACAO_EDICAO_ANIMACOES";
 
-export type Acessibilidade =
-	| "Incluir LIBRAS"
-	| "Incluir Legenda"
-	| "Não se aplica";
+export type Acessibilidade = "INCLUIR_LIBRAS" | "NAO_SE_APLICA";
 
-export type Distribuicao = "interna" | "seec" | "instagram" | "outro";
+export type Distribuicao = "INTERNA" | "SEEC" | "INSTAGRAM" | "OUTRO";
+
+export type Local = "NATAL" | "MOSSORO" | "CAICO" | "PAU_DOS_FERROS";
+
+export interface HistoricoEtapa {
+	id: number;
+	etapaId: number;
+	etapa: { id: number; nome: string };
+	createdAt: string;
+}
+
+export interface DelegacaoEtapa {
+	id: number;
+	etapaId: number;
+	etapa: { id: number; nome: string };
+	operacionalId: number;
+	operacional: { id: number; login: string; local: string; role: string };
+	createdAt: string;
+}
+
+export interface Solicitacao {
+	id: string;
+	responsavel: string;
+	email: string;
+	setor: string;
+	telefone: string;
+	local: string;
+	data: string;
+	hora: string;
+	TipoProducao: string;
+	FormatoProducao: string;
+	nomeProjeto: string;
+	titulo: string;
+	descricao: string;
+	thumbnail: string | null;
+	acessibilidade: string;
+	distribuicao: string;
+	dataLimite: string;
+	pessoas: number;
+	roteiro: string;
+	materialEdicao: string;
+	observacoes: string;
+	EtapaId: number;
+	status: string;
+	devolutiva: string | null;
+	motivoRejeicao: string | null;
+	createdAt: string;
+	historico?: Array<HistoricoEtapa>;
+	delegacoes?: Array<DelegacaoEtapa>;
+}
 
 export interface SolicitarFormData {
 	// STEP 1
@@ -29,59 +75,140 @@ export interface SolicitarFormData {
 	email: string;
 	setor: string;
 	telefone: string;
-	local: string;
 	localExterno?: string;
 	data: string;
 	hora: string;
 
 	// STEP 2
-	tipo: TipoProducao | "";
-	formato: FormatoProducao | "";
+	TipoProducao: TipoProducao | "";
+	FormatoProducao: FormatoProducao | "";
 
 	// STEP 3
 	nomeProjeto: string;
 	titulo: string;
 	descricao: string;
 	thumbnail: File | null;
-	acessibilidade: Array<Acessibilidade>;
+	acessibilidade: Acessibilidade | "";
 	distribuicao: Distribuicao | "";
 
 	// STEP 4
+	local: Local | "";
 	dataLimite: string;
-	pessoas: string;
+	pessoas: number;
 	roteiro: File | null;
 	observacoes: string;
+
+	// STEP EDIÇÃO
+	materialEdicao: File | null;
+}
+
+export interface SolicitacaoAPI extends SolicitarFormData {
+	id: string;
+	status: string;
+	createdAt: string;
+	EtapaId: number | null;
+	devolutiva?: DevolutivaGestor;
 }
 
 export const TIPOS_PRODUCAO: Array<TipoProducao> = [
-	"Evento in loco",
-	"Evento em estúdio",
-	"Vídeo institucional",
-	"Gravação de chamada",
-	"Gravação de videoaula",
-	"Edição",
+	"EVENTO_IN_LOCO",
+	"EVENTO_EM_ESTUDIO",
+	"VIDEO_INSTITUCIONAL",
+	"GRAVACAO_CHAMADA",
+	"GRAVACAO_VIDEOAULA",
+	"EDICAO",
 ];
+
+export const TIPO_PRODUCAO_LABELS: Record<TipoProducao, string> = {
+	EVENTO_IN_LOCO: "Evento in loco",
+	EVENTO_EM_ESTUDIO: "Evento em estúdio",
+	VIDEO_INSTITUCIONAL: "Vídeo institucional",
+	GRAVACAO_CHAMADA: "Gravação de chamada",
+	GRAVACAO_VIDEOAULA: "Gravação de videoaula",
+	EDICAO: "Edição",
+};
 
 export const FORMATOS_PRODUCAO: Array<FormatoProducao> = [
-	"Live pré-gravada",
-	"Live presencial (em estúdio)",
-	"Live remota",
-	"Podcast / Mesacast",
-	"Gravação de programa",
-	"Shorts / Reels",
-	"Animações para eventos in loco",
-	"Criação, edição e animações",
+	"LIVE_PRE_GRAVADA",
+	"LIVE_PRESENCIAL_ESTUDIO",
+	"LIVE_REMOTA",
+	"PODCAST_MESACAST",
+	"GRAVACAO_PROGRAMA",
+	"SHORTS_REELS",
+	"ANIMACOES_EVENTOS_IN_LOCO",
+	"CRIACAO_EDICAO_ANIMACOES",
 ];
+
+export const FORMATO_PRODUCAO_LABELS: Record<FormatoProducao, string> = {
+	LIVE_PRE_GRAVADA: "Live pré-gravada",
+	LIVE_PRESENCIAL_ESTUDIO: "Live presencial (em estúdio)",
+	LIVE_REMOTA: "Live remota",
+	PODCAST_MESACAST: "Podcast / Mesacast",
+	GRAVACAO_PROGRAMA: "Gravação de programa",
+	SHORTS_REELS: "Shorts / Reels",
+	ANIMACOES_EVENTOS_IN_LOCO: "Animações para eventos in loco",
+	CRIACAO_EDICAO_ANIMACOES: "Criação, edição e animações",
+};
 
 export const OPCOES_ACESSIBILIDADE: Array<Acessibilidade> = [
-	"Incluir LIBRAS",
-	"Incluir Legenda",
-	"Não se aplica",
+	"INCLUIR_LIBRAS",
+	"NAO_SE_APLICA",
 ];
 
+export const ACESSIBILIDADE_LABELS: Record<Acessibilidade, string> = {
+	INCLUIR_LIBRAS: "Incluir LIBRAS",
+	NAO_SE_APLICA: "Não se aplica",
+};
+
 export const OPCOES_DISTRIBUICAO: Array<Distribuicao> = [
-	"interna",
-	"seec",
-	"instagram",
-	"outro",
+	"INTERNA",
+	"SEEC",
+	"INSTAGRAM",
+	"OUTRO",
 ];
+export const DISTRIBUICAO_LABELS: Record<Distribuicao, string> = {
+	INTERNA: "Veiculação interna",
+	SEEC: "Canal da SEEC",
+	INSTAGRAM: "Instagram da SEEC",
+	OUTRO: "Outro",
+};
+
+export const OPCOES_LOCAL: Array<Local> = [
+	"NATAL",
+	"MOSSORO",
+	"CAICO",
+	"PAU_DOS_FERROS",
+];
+
+export const LOCAL_LABELS: Record<Local, string> = {
+	NATAL: "Natal",
+	MOSSORO: "Mossoró",
+	CAICO: "Caicó",
+	PAU_DOS_FERROS: "Pau dos Ferros",
+};
+
+export const ETAPAS_MAP: Record<number, string> = {
+	1: "STANDBY",
+	2: "PARA PRODUÇÃO SEMANAL",
+	3: "AO VIVO",
+	4: "GRAVADO",
+	5: "EDIÇÃO 1",
+	6: "EDIÇÃO 2",
+	7: "EDIÇÃO 3",
+	8: "EDIÇÃO FINAL",
+	9: "LIBRAS",
+	10: "REVISÃO LP",
+	11: "PRODUÇÃO LSE",
+	12: "CONCLUÍDO",
+	13: "PUBLICADO",
+};
+
+export type CampoComErro = {
+	campo: keyof SolicitarFormData;
+	mensagem: string;
+};
+
+export type DevolutivaGestor = {
+	status: "Devolvido";
+	campos: Array<CampoComErro>;
+};
