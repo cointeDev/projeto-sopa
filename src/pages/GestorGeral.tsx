@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { Link } from "@tanstack/react-router"
+import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
+import { logout } from "../common/utils/auth"
 import { KpiCard } from "../components/management/KpiCard"
 import Agenda from "../components/management/Agenda"
 import Diario from "../components/management/Diario"
@@ -43,9 +44,15 @@ function getGreeting() {
 
 export function GestorGeral() {
     const [abaAtual, setAbaAtual] = useState<Aba>("visao-geral")
+    const navigate = useNavigate()
 
     const userName = "Gestor Geral"
     const greeting = getGreeting()
+
+    async function handleLogout() {
+        await logout()
+        void navigate({ to: "/login" })
+    }
 
     return (
         <div className="min-h-screen bg-[#F1F5F9] font-inter px-6 py-10">
@@ -67,12 +74,12 @@ export function GestorGeral() {
                         </p>
                     </div>
 
-                    <Link
+                    <button
                         className="text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-400 transition-colors"
-                        to="/"
+                        onClick={() => { void handleLogout() }}
                     >
                         Sair do sistema
-                    </Link>
+                    </button>
                 </header>
 
                 {/* NAV ABAS */}
