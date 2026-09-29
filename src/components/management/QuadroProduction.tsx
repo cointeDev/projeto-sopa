@@ -21,10 +21,15 @@ import {
 	CheckCircle,
 	UploadCloud,
 	ArrowRightLeft,
+	ArrowRight,
 } from "lucide-react";
 import type { Card, Projeto } from "../../pages/GestorLocal";
 
-import { ETAPAS_MAP, LOCAL_LABELS, type Local } from "../../common/types/solicitacao";
+import {
+	ETAPAS_MAP,
+	LOCAL_LABELS,
+	type Local,
+} from "../../common/types/solicitacao";
 import { atualizarEtapaSolicitacao } from "../../services/solicitacoes";
 
 const colunasBasePadrao = [
@@ -108,7 +113,7 @@ export function QuadroProduction({
 	const [filtroProjeto, setFiltroProjeto] = useState<string>("Geral");
 	const [colunasComparacao, setColunasComparacao] = useState<[string, string]>([
 		"STANDBY",
-		"PARA PRODUÃ‡ÃƒO SEMANAL",
+		"PARA PRODUÇÃO SEMANAL",
 	]);
 
 	const colunasAtivas = useMemo(() => {
@@ -144,46 +149,39 @@ export function QuadroProduction({
 		}
 	};
 
-	/*
-
-	const onDragEnd = (result: DropResult) => {
-		const { destination, draggableId } = result;
-		if (!destination) return;
-		setCards((previous) =>
-			previous.map(
-				(c): Card =>
-					c.id === draggableId ? { ...c, etapa: destination.droppableId } : c
-			)
-		);
-	};
-
-    */
-
-	const onDragEnd = async (result: DropResult) => {
-		const { destination, draggableId, source } = result;
-		if (!destination) return;
-
-		if (destination.droppableId === source.droppableId) return;
-
-		const novaEtapaNome = destination.droppableId;
+	const MoverCardParaEtapa = async (cardId: string, novaEtapaNome: string) => {
 		const novaEtapaId = ETAPAS_MAP_INVERSO[novaEtapaNome];
+		if (!novaEtapaId) return;
 
-		if (!novaEtapaId) {
-			console.error("Etapa nÃ£o encontrada:", novaEtapaNome);
-			return;
-		}
-
-		setCards((previous) =>
-			previous.map((c) =>
-				c.id === draggableId ? { ...c, etapa: novaEtapaNome } : c
-			)
+		setCards((prev) =>
+			prev.map((c) => (c.id === cardId ? { ...c, etapa: novaEtapaNome } : c))
 		);
 
 		try {
-			await atualizarEtapaSolicitacao(draggableId, novaEtapaId);
+			await atualizarEtapaSolicitacao(cardId, novaEtapaId);
 		} catch (error) {
-			console.error("Erro ao atualizar etapa:", error);
+			console.error("Erro ao atualizar etapa do card:", error);
 		}
+	};
+
+	const avancarProximaEtapa = async (
+		e: React.MouseEvent,
+		card: Card,
+		etapaAtual: string
+	) => {
+		e.stopPropagation();
+		const indexAtual = colunasAtivas.indexOf(etapaAtual);
+		if (indexAtual !== -1 && indexAtual < colunasAtivas.length - 1) {
+			const proximaEtapa = colunasAtivas[indexAtual + 1];
+			await MoverCardParaEtapa(card.id, proximaEtapa);
+		}
+	};
+
+	const onDragEnd = async (result: DropResult) => {
+		const { destination, draggableId, source } = result;
+		if (!destination || destination.droppableId === source.droppableId) return;
+
+		await MoverCardParaEtapa(draggableId, destination.droppableId);
 	};
 
 	const colunasParaExibir =
@@ -208,7 +206,7 @@ export function QuadroProduction({
 									setFiltroProjeto(event_.target.value);
 								}}
 							>
-								<option value="Geral">VisÃ£o Geral</option>
+								<option value="Geral">Visão Geral</option>
 								{projetos.map((p) => (
 									<option key={p.id} value={p.nome}>
 										{p.nome}
@@ -242,7 +240,7 @@ export function QuadroProduction({
 				<nav className="mb-8 inline-block max-w-max text-left">
 					<div className="mb-3 flex items-center gap-2">
 						<span className="text-[10px] font-black text-slate-400 uppercase tracking-widest shrink-0">
-							Salto RÃ¡pido:
+							Salto Rápido:
 						</span>
 						{visaoQuadro === "focada" && (
 							<ArrowRightLeft
@@ -292,6 +290,9 @@ export function QuadroProduction({
 									(filtroProjeto === "Geral" || c.projeto === filtroProjeto)
 							);
 
+							const eUltimaColuna =
+								colunasAtivas.indexOf(nome) === colunasAtivas.length - 1;
+
 							return (
 								<Droppable key={nome} droppableId={nome}>
 									{(provided: DroppableProvided) => (
@@ -331,45 +332,71 @@ export function QuadroProduction({
 													>
 														{(p: DraggableProvided) => (
 															<div
-																	{...p.draggableProps}
-																	{...p.dragHandleProps}
-																	ref={p.innerRef}
-																	className="mb-3 rounded-2xl border-l-4 bg-white p-4 shadow-sm text-left transition-all hover:shadow-md cursor-pointer"
-																	style={{
-																		...p.draggableProps.style,
-																		borderLeftColor: card.corDestaque || "#4f46e5",
-																	}}
-																	onClick={() => {
-																		onCardClick(card);
-																	}}
-																>
-																	<span className="text-[8px] font-black text-slate-300 uppercase tracking-widest block mb-1 truncate">
-																		{card.projeto}
-																	</span>
-																	<h4 className="text-[#334155] font-black text-[11px] uppercase leading-tight tracking-tight mb-3">
-																		{card.titulo}
-																	</h4>
-																	<div className="flex items-center justify-between gap-2">
-																		<div className="flex items-center gap-1.5 text-[9px] font-bold uppercase text-slate-400 min-w-0">
-																			<div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
-																				<User size={9} />
-																			</div>
-																			<span className="truncate">{card.responsavel || "Sem responsável"}</span>
+																{...p.draggableProps}
+																{...p.dragHandleProps}
+																ref={p.innerRef}
+																className="group relative mb-3 rounded-2xl border-l-4 bg-white p-4 shadow-sm text-left transition-all hover:shadow-md cursor-pointer"
+																style={{
+																	...p.draggableProps.style,
+																	borderLeftColor:
+																		card.corDestaque || "#4f46e5",
+																}}
+																onClick={() => {
+																	onCardClick(card);
+																}}
+															>
+																<span className="text-[8px] font-black text-slate-300 uppercase tracking-widest block mb-1 truncate">
+																	{card.projeto}
+																</span>
+																<h4 className="text-[#334155] font-black text-[11px] uppercase leading-tight tracking-tight mb-3 pr-6">
+																	{card.titulo}
+																</h4>
+
+																{/* Botão de Avançar Etapa (Seta rápida) */}
+																{!eUltimaColuna && (
+																	<button
+																		type="button"
+																		title="Avançar para a próxima etapa"
+																		onClick={(e) =>
+																			avancarProximaEtapa(e, card, nome)
+																		}
+																		className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white"
+																	>
+																		<ArrowRight size={12} />
+																	</button>
+																)}
+
+																<div className="flex items-center justify-between gap-2">
+																	<div className="flex items-center gap-1.5 text-[9px] font-bold uppercase text-slate-400 min-w-0">
+																		<div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+																			<User size={9} />
 																		</div>
-																		{card.solicitacao?.local && (
-																			<span className="text-[8px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-400 px-2 py-0.5 rounded-full shrink-0">
-																				{LOCAL_LABELS[card.solicitacao.local as Local] ?? card.solicitacao.local}
-																			</span>
-																		)}
+																		<span className="truncate">
+																			{card.responsavel || "Sem responsável"}
+																		</span>
 																	</div>
-																	{card.solicitacao?.delegacoes && card.solicitacao.delegacoes.length > 0 && (
+																	{card.solicitacao?.local && (
+																		<span className="text-[8px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-400 px-2 py-0.5 rounded-full shrink-0">
+																			{LOCAL_LABELS[
+																				card.solicitacao.local as Local
+																			] ?? card.solicitacao.local}
+																		</span>
+																	)}
+																</div>
+																{card.solicitacao?.delegacoes &&
+																	card.solicitacao.delegacoes.length > 0 && (
 																		<div className="mt-3 pt-3 border-t border-slate-50">
 																			<span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest">
-																				{card.solicitacao.delegacoes.length} delegaç{card.solicitacao.delegacoes.length === 1 ? "ão" : "ões"}
+																				{card.solicitacao.delegacoes.length}{" "}
+																				delegaç
+																				{card.solicitacao.delegacoes.length ===
+																				1
+																					? "ão"
+																					: "ões"}
 																			</span>
 																		</div>
 																	)}
-																</div>
+															</div>
 														)}
 													</Draggable>
 												))}

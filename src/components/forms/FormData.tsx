@@ -19,6 +19,7 @@ export const initialData: SolicitarFormData = {
 	thumbnail: null,
 	acessibilidade: "",
 	distribuicao: "",
+	distribuicaoOutro: "",
 
 	dataLimite: "",
 	pessoas: 0,

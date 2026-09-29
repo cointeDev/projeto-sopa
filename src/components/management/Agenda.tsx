@@ -20,13 +20,12 @@ import "tippy.js/dist/tippy.css";
 import type { AgendaScope } from "./AgendaTypes";
 import type { Card } from "../../pages/GestorLocal";
 import type { AgendaEvent } from "./AgendaTypes";
+import { ModalNovaAgenda } from "../modals/ModalNovaAgenda";
 
-// Converte data de DD/MM/YYYY para YYYY-MM-DD (formato que o FullCalendar entende)
+// Converte data de DD/MM/YYYY para YYYY-MM-DD
 function converterData(data?: string): string | undefined {
 	if (!data) return undefined;
-	// Se já estiver no formato correto, retorna como está
 	if (/^\d{4}-\d{2}-\d{2}/.test(data)) return data;
-	// Converte de DD/MM/YYYY para YYYY-MM-DD
 	return moment(data, "DD/MM/YYYY").format("YYYY-MM-DD");
 }
 
@@ -34,7 +33,6 @@ function cardParaEvento(card: Card): AgendaEvent | null {
 	const solicitacao = card.solicitacao;
 	if (!solicitacao) return null;
 
-	// Monta o start com data + hora
 	const dataBase = solicitacao.data ?? solicitacao.dataLimite;
 	if (!dataBase) return null;
 
@@ -42,8 +40,6 @@ function cardParaEvento(card: Card): AgendaEvent | null {
 		? `${dataBase}T${solicitacao.hora}:00`
 		: dataBase;
 
-	// End deve ser no mesmo dia do start com +1h, não o dataLimite
-	// O dataLimite fica só como metadado no description/fase
 	const end = solicitacao.hora
 		? `${dataBase}T${adicionarUmaHora(solicitacao.hora)}`
 		: undefined;
@@ -52,17 +48,17 @@ function cardParaEvento(card: Card): AgendaEvent | null {
 		id: card.id,
 		title: card.titulo,
 		start,
-		end, // fim no mesmo dia
+		end,
 		fase: card.etapa,
+		dataLimite: solicitacao.dataLimite,
 		description:
 			`${solicitacao.descricao ?? ""} | Prazo: ${solicitacao.dataLimite ?? ""}`.trim(),
 	};
 }
 
-// Soma 1 hora ao horário "HH:mm" e retorna "HH:mm:00"
 function adicionarUmaHora(hora: string): string {
 	const [h, m] = hora.split(":").map(Number);
-	const novaHora = (h + 1) % 24;
+	const novaHora = (h! + 1) % 24;
 	return `${String(novaHora).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`;
 }
 
@@ -73,6 +69,36 @@ const fasesDoDia: Record<number, string> = {
 	4: "Decupagem",
 	5: "Ajustes e Entrega",
 };
+
+// Um evento é concluído se tiver etapa final OU se for um evento da agenda com data já passada
+function eventoConcluido(evento: AgendaEvent): boolean {
+	const etapa = evento.fase?.trim().toUpperCase();
+	if (etapa === "CONCLUÍDO" || etapa === "PUBLICADO") {
+		return true;
+	}
+
+	if (evento.tipo) {
+		const dataFimEfetiva = evento.dataFim || evento.dataInicio;
+		if (dataFimEfetiva) {
+			return moment(dataFimEfetiva, "YYYY-MM-DD").isBefore(moment(), "day");
+		}
+	}
+
+	return false;
+}
+
+// Um evento está em atraso se tiver data limite expirada e não estiver concluído
+function eventoAtrasado(evento: AgendaEvent): boolean {
+	if (eventoConcluido(evento)) {
+		return false;
+	}
+
+	if (!evento.dataLimite) {
+		return false;
+	}
+
+	return moment(evento.dataLimite, "YYYY-MM-DD").isBefore(moment(), "day");
+}
 
 function Agenda({ scope, cards = [] }: { scope: AgendaScope; cards?: Card[] }) {
 	const eventosDoCards: AgendaEvent[] = cards
@@ -88,6 +114,58 @@ function Agenda({ scope, cards = [] }: { scope: AgendaScope; cards?: Card[] }) {
 
 	const diaSemana = moment(selectedDate).isoWeekday();
 	const faseAtual = fasesDoDia[diaSemana] ?? "";
+	const [modalAgendaAberto, setModalAgendaAberto] = useState(false);
+	const [eventosBloqueio, setEventosBloqueio] = useState<any[]>([]);
+
+	const carregarAgendas = async () => {
+		try {
+			const res = await axios.get("http://localhost:3000/agenda-eventos");
+			const dadosBackend = res.data;
+
+			const formatados = dadosBackend.map((item: any) => {
+				if (item.tipo === "frequente") {
+					return {
+						id: item.id,
+						title: item.titulo,
+						daysOfWeek: item.diasSemana,
+						startTime: item.horaInicio ? `${item.horaInicio}:00` : undefined,
+						endTime: item.horaFim ? `${item.horaFim}:00` : undefined,
+						startRecur: item.dataInicio,
+						endRecur: item.dataFim,
+						tipo: "frequente",
+						dataInicio: item.dataInicio,
+						dataFim: item.dataFim,
+						color: "#6366f1",
+						description: "Uso interno / Projeto Frequente",
+					};
+				}
+
+				return {
+					id: item.id,
+					title: item.titulo,
+					start: item.horaInicio
+						? `${item.dataInicio}T${item.horaInicio}:00`
+						: item.dataInicio,
+					end: item.horaFim
+						? `${item.dataInicio}T${item.horaFim}:00`
+						: undefined,
+					tipo: "unico",
+					dataInicio: item.dataInicio,
+					dataFim: item.dataFim,
+					color: "#818cf8",
+					description: "Projeto Único",
+				};
+			});
+
+			setEventosBloqueio(formatados);
+		} catch (error) {
+			console.error("Erro ao buscar agendas bloqueadas", error);
+		}
+	};
+
+	useEffect(() => {
+		void carregarAgendas();
+	}, []);
 
 	useEffect(() => {
 		setEvents(
@@ -145,18 +223,22 @@ function Agenda({ scope, cards = [] }: { scope: AgendaScope; cards?: Card[] }) {
 			.catch(console.error);
 	}, []);
 
-	// Contadores para o header
-	const total = events.length;
-	const emAtraso = events.filter(
-		(e) => e.end && moment(e.end).isBefore(moment(), "day")
+	// Contadores Unificados
+	const todosEventos = [...events, ...eventosBloqueio];
+
+	const total = todosEventos.length;
+
+	const concluido = todosEventos.filter(eventoConcluido).length;
+
+	const emAtraso = todosEventos.filter(eventoAtrasado).length;
+
+	const emProgresso = todosEventos.filter(
+		(evento) => !eventoConcluido(evento) && !eventoAtrasado(evento)
 	).length;
-	const emProgresso = total - emAtraso;
 
 	return (
 		<div className="flex gap-6 w-full h-full p-8 font-inter bg-[#F8FAFC] overflow-hidden">
-			{/* Coluna principal */}
 			<div className="flex-1 flex flex-col gap-6 min-w-0 h-full overflow-hidden">
-				{/* Header */}
 				<div className="flex items-center gap-4">
 					<div className="flex-1">
 						<p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
@@ -168,6 +250,13 @@ function Agenda({ scope, cards = [] }: { scope: AgendaScope; cards?: Card[] }) {
 					</div>
 
 					<div className="flex gap-3">
+						<StatChip
+							label="Concluídos"
+							value={concluido}
+							color="text-green-600"
+							bg="bg-green-50"
+							border="border-green-200"
+						/>
 						<StatChip
 							label="Em Progresso"
 							value={emProgresso}
@@ -189,11 +278,17 @@ function Agenda({ scope, cards = [] }: { scope: AgendaScope; cards?: Card[] }) {
 							bg="bg-slate-50"
 							border="border-slate-200"
 						/>
+
+						<button
+							type="button"
+							onClick={() => setModalAgendaAberto(true)}
+							className="ml-2 rounded-2xl bg-indigo-600 px-5 py-3 text-[10px] font-black text-white uppercase tracking-widest shadow-lg hover:bg-indigo-700 transition-all cursor-pointer"
+						>
+							+ Nova Agenda
+						</button>
 					</div>
 				</div>
 
-				{/* Calendário */}
-				{/* Calendário */}
 				<div className="bg-white rounded-3xl border border-slate-100 shadow-sm shadow-slate-100 flex-1 min-h-0 flex flex-col">
 					<style>{`
         .fc .fc-toolbar { padding: 1.25rem 1.5rem; border-bottom: 1px solid #f1f5f9; }
@@ -215,17 +310,17 @@ function Agenda({ scope, cards = [] }: { scope: AgendaScope; cards?: Card[] }) {
         .fc-theme-standard .fc-scrollgrid { border-radius: 0; }
     `}</style>
 
-					{/*  flex-1 + min-h-0 é o que permite o FullCalendar crescer corretamente */}
 					<div className="flex-1 min-h-0">
 						<FullCalendar
 							droppable
 							editable
-							nowIndicator
+							nowIndicator={false}
+							allDaySlot={false}
 							weekNumbers
 							datesSet={handleDatesSet}
 							eventDrop={handleEventDrop}
 							eventResize={handleEventResize}
-							events={[...events, ...feriados]}
+							events={[...events, ...feriados, ...eventosBloqueio]}
 							height="100%"
 							scrollTime="08:00:00"
 							initialView="timeGridWeek"
@@ -267,7 +362,6 @@ function Agenda({ scope, cards = [] }: { scope: AgendaScope; cards?: Card[] }) {
 						/>
 					</div>
 
-					{/* Faixa de fases */}
 					{viewType !== "dayGridMonth" && (
 						<div
 							className={`grid text-center py-2.5 border-t border-slate-100 ${
@@ -299,86 +393,17 @@ function Agenda({ scope, cards = [] }: { scope: AgendaScope; cards?: Card[] }) {
 				</div>
 			</div>
 
-			{/* Painel lateral */}
-			<div className="w-72 shrink-0 flex flex-col gap-4 overflow-y-auto">
-				<div>
-					<p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
-						Visão geral
-					</p>
-					<h3 className="text-lg font-black text-[#334155] uppercase tracking-tight">
-						Em andamento
-					</h3>
-				</div>
-
-				<div className="flex flex-col gap-3">
-					{events.length === 0 && (
-						<p className="text-xs text-slate-400 font-medium">
-							Nenhuma demanda em andamento.
-						</p>
-					)}
-					{events.map((evento, index) => {
-						const atrasado = evento.end
-							? moment(evento.end).isBefore(moment(), "day")
-							: false;
-						// Progresso mockado por etapa — substitua pela lógica real quando disponível
-						const etapaIndex = Object.values(fasesDoDia).indexOf(
-							evento.fase ?? ""
-						);
-						const progresso =
-							etapaIndex >= 0 ? ((etapaIndex + 1) / 5) * 100 : 0;
-
-						return (
-							<div
-								key={evento.id ?? index}
-								className="bg-white rounded-2xl border border-slate-100 p-4 flex flex-col gap-2 shadow-sm"
-							>
-								<p className="text-xs font-black text-[#334155] leading-snug">
-									{evento.title}
-								</p>
-
-								<div className="flex items-center gap-1.5">
-									<span className="text-[8px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full">
-										{evento.fase ?? "—"}
-									</span>
-									{atrasado && (
-										<span className="text-[8px] font-black uppercase tracking-widest text-red-500 bg-red-50 px-2 py-0.5 rounded-full">
-											Atrasado
-										</span>
-									)}
-								</div>
-
-								{evento.end && (
-									<p className="text-[9px] text-slate-400 font-medium">
-										Prazo:{" "}
-										<span
-											className={`font-bold ${atrasado ? "text-red-500" : "text-slate-500"}`}
-										>
-											{moment(evento.end).format("DD/MM/YYYY")}
-										</span>
-									</p>
-								)}
-
-								<div className="flex flex-col gap-1">
-									<div className="w-full bg-slate-100 rounded-full h-1.5">
-										<div
-											className="bg-indigo-500 h-1.5 rounded-full transition-all"
-											style={{ width: `${progresso}%` }}
-										/>
-									</div>
-									<p className="text-[9px] text-slate-400 font-medium">
-										Fase {etapaIndex >= 0 ? etapaIndex + 1 : "—"} de 5
-									</p>
-								</div>
-							</div>
-						);
-					})}
-				</div>
-			</div>
+			<ModalNovaAgenda
+				isOpen={modalAgendaAberto}
+				onClose={() => setModalAgendaAberto(false)}
+				onSuccess={() => {
+					void carregarAgendas();
+				}}
+			/>
 		</div>
 	);
 }
 
-// Componente auxiliar para os chips de estatísticas
 function StatChip({
 	label,
 	value,

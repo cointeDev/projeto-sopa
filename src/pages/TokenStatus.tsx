@@ -111,7 +111,11 @@ export function TokenStatus() {
 		const eventos = [];
 
 		// 1. Fluxo de Produção com histórico real
-		if (dados.status === "ACEITO" && dados.historico && dados.historico.length > 0) {
+		if (
+			dados.status === "ACEITO" &&
+			dados.historico &&
+			dados.historico.length > 0
+		) {
 			// Ordena do mais recente para o mais antigo (já vem ASC da API, invertemos)
 			const historicoOrdenado = [...dados.historico].reverse();
 
@@ -140,10 +144,11 @@ export function TokenStatus() {
 			eventos.push({
 				id: "accepted",
 				titulo: "Solicitação Aceita",
-				data: new Date(
-					dados.historico[0].createdAt
-				).toLocaleDateString("pt-BR"),
-				descricao: "O pedido passou pela avaliação e entrou no fluxo de produção.",
+				data: new Date(dados.historico[0].createdAt).toLocaleDateString(
+					"pt-BR"
+				),
+				descricao:
+					"O pedido passou pela avaliação e entrou no fluxo de produção.",
 				status: "concluido",
 			});
 		}
@@ -160,7 +165,8 @@ export function TokenStatus() {
 				id: "accepted",
 				titulo: "Solicitação Aceita",
 				data: "Aprovado",
-				descricao: "O pedido passou pela avaliação e entrou no fluxo de produção.",
+				descricao:
+					"O pedido passou pela avaliação e entrou no fluxo de produção.",
 				status: "concluido",
 			});
 		}
@@ -186,7 +192,8 @@ export function TokenStatus() {
 				id: "pending",
 				titulo: "Aguardando Avaliação",
 				data: "Em Análise",
-				descricao: "A equipe está analisando os dados antes de iniciar a produção.",
+				descricao:
+					"A equipe está analisando os dados antes de iniciar a produção.",
 				status: "atual",
 			});
 		}

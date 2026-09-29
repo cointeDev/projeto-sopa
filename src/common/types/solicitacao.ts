@@ -2,7 +2,7 @@ export type TipoProducao =
 	| "EVENTO_IN_LOCO"
 	| "EVENTO_EM_ESTUDIO"
 	| "VIDEO_INSTITUCIONAL"
-	| "GRAVACAO_CHAMADA"
+	//| "GRAVACAO_CHAMADA"
 	| "GRAVACAO_VIDEOAULA"
 	| "EDICAO";
 
@@ -20,7 +20,9 @@ export type Acessibilidade = "INCLUIR_LIBRAS" | "NAO_SE_APLICA";
 
 export type Distribuicao = "INTERNA" | "SEEC" | "INSTAGRAM" | "OUTRO";
 
-export type Local = "NATAL" | "MOSSORO" | "CAICO" | "PAU_DOS_FERROS";
+export type Local = "NATAL";
+
+// export type Local = "NATAL" | "MOSSORO" | "CAICO" | "PAU_DOS_FERROS";
 
 export interface HistoricoEtapa {
 	id: number;
@@ -90,6 +92,7 @@ export interface SolicitarFormData {
 	thumbnail: File | null;
 	acessibilidade: Acessibilidade | "";
 	distribuicao: Distribuicao | "";
+	distribuicaoOutro?: string;
 
 	// STEP 4
 	local: Local | "";
@@ -114,7 +117,7 @@ export const TIPOS_PRODUCAO: Array<TipoProducao> = [
 	"EVENTO_IN_LOCO",
 	"EVENTO_EM_ESTUDIO",
 	"VIDEO_INSTITUCIONAL",
-	"GRAVACAO_CHAMADA",
+	//"GRAVACAO_CHAMADA",
 	"GRAVACAO_VIDEOAULA",
 	"EDICAO",
 ];
@@ -123,7 +126,7 @@ export const TIPO_PRODUCAO_LABELS: Record<TipoProducao, string> = {
 	EVENTO_IN_LOCO: "Evento in loco",
 	EVENTO_EM_ESTUDIO: "Evento em estúdio",
 	VIDEO_INSTITUCIONAL: "Vídeo institucional",
-	GRAVACAO_CHAMADA: "Gravação de chamada",
+	//GRAVACAO_CHAMADA: "Gravação de chamada",
 	GRAVACAO_VIDEOAULA: "Gravação de videoaula",
 	EDICAO: "Edição",
 };
@@ -175,16 +178,16 @@ export const DISTRIBUICAO_LABELS: Record<Distribuicao, string> = {
 
 export const OPCOES_LOCAL: Array<Local> = [
 	"NATAL",
-	"MOSSORO",
-	"CAICO",
-	"PAU_DOS_FERROS",
+	//"MOSSORO",
+	//"CAICO",
+	//"PAU_DOS_FERROS",
 ];
 
 export const LOCAL_LABELS: Record<Local, string> = {
 	NATAL: "Natal",
-	MOSSORO: "Mossoró",
-	CAICO: "Caicó",
-	PAU_DOS_FERROS: "Pau dos Ferros",
+	//MOSSORO: "Mossoró",
+	//CAICO: "Caicó",
+	//PAU_DOS_FERROS: "Pau dos Ferros",
 };
 
 export const ETAPAS_MAP: Record<number, string> = {

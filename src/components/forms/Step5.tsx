@@ -39,6 +39,7 @@ export default function Step5() {
 				thumbnail: formData.thumbnail?.name,
 				acessibilidade: formData.acessibilidade,
 				distribuicao: formData.distribuicao,
+				distribuicaoOutro: formData.distribuicaoOutro,
 				dataLimite: formData.dataLimite,
 				pessoas: formData.pessoas,
 				roteiro: formData.roteiro?.name,
@@ -114,9 +115,20 @@ export default function Step5() {
 						<p className="text-slate-400 font-medium">
 							Distribuição:{" "}
 							<span className="text-[#334155] font-bold">
-								{formData.distribuicao || "Não informado"}
+								{formData.distribuicao === "OUTRO"
+									? "Outro"
+									: formData.distribuicao || "Não informado"}
 							</span>
 						</p>
+
+						{formData.distribuicao === "OUTRO" && (
+							<p className="text-slate-400 font-medium">
+								Destino:{" "}
+								<span className="text-[#334155] font-bold">
+									{formData.distribuicaoOutro || "Não informado"}
+								</span>
+							</p>
+						)}
 						<p className="text-slate-400 font-medium">
 							Entrega:{" "}
 							<span className="text-[#334155] font-bold">
