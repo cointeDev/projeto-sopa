@@ -17,7 +17,7 @@ const eventoEmEstudioDescricao = `Gravação de eventos institucionais ou acadê
 
 const institucionalDescricao = `Produção audiovisual realizada em estúdio ou em ambiente controlado, geralmente com múltiplos participantes, voltada à comunicação institucional e à divulgação oficial de ações, projetos ou atividades da instituição.`;
 
-const chamadaDescricao = `Produção de vídeo curto com finalidade promocional, utilizado como convite, anúncio ou lembrete de eventos, projetos ou ações institucionais, prioritariamente destinado a redes sociais e canais digitais.`;
+//const chamadaDescricao = `Produção de vídeo curto com finalidade promocional, utilizado como convite, anúncio ou lembrete de eventos, projetos ou ações institucionais, prioritariamente destinado a redes sociais e canais digitais.`;
 
 const videoaulaDescricao = `Produção de aula em formato audiovisual, com foco em conteúdo educativo e didático, podendo incluir exposição oral, apresentações visuais, recursos gráficos e animações de apoio pedagógico.`;
 
@@ -69,23 +69,31 @@ export default function Step2() {
 			</h3>
 
 			<div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-				{TIPOS_PRODUCAO.map((tipo, index) => (
-					<button
-						key={index}
-						className={`rounded-2xl border p-6 text-[10px] font-black uppercase tracking-widest transition-all ${
-							tipo === formData?.TipoProducao
-								? "border-[#4f46e5] bg-indigo-50 text-[#4f46e5] shadow-lg shadow-indigo-100 scale-105"
-								: "border-slate-100 bg-[#F8FAFC] text-slate-400 hover:border-indigo-200 hover:text-indigo-400"
-						}`}
-						onClick={() => {
-							updateField("TipoProducao", tipo);
-							// CORREÇÃO TS(2345): Mudado de null para "" para coincidir com o tipo
-							updateField("FormatoProducao", "");
-						}}
-					>
-						{TIPO_PRODUCAO_LABELS[tipo]}
-					</button>
-				))}
+				{TIPOS_PRODUCAO.map((tipo, index) => {
+					const desabilitado = tipo === "EVENTO_IN_LOCO";
+
+					return (
+						<button
+							key={index}
+							disabled={desabilitado}
+							title={desabilitado ? "Indisponível no momento" : ""}
+							className={`rounded-2xl border p-6 text-[10px] font-black uppercase tracking-widest transition-all ${
+								tipo === formData?.TipoProducao
+									? "border-[#4f46e5] bg-indigo-50 text-[#4f46e5] shadow-lg shadow-indigo-100 scale-105"
+									: desabilitado
+										? "border-slate-50 bg-slate-50/50 text-slate-200 cursor-not-allowed opacity-40"
+										: "border-slate-100 bg-[#F8FAFC] text-slate-400 hover:border-indigo-200 hover:text-indigo-400"
+							}`}
+							onClick={() => {
+								if (desabilitado) return;
+								updateField("TipoProducao", tipo);
+								updateField("FormatoProducao", "");
+							}}
+						>
+							{TIPO_PRODUCAO_LABELS[tipo]}
+						</button>
+					);
+				})}
 			</div>
 
 			{formData?.TipoProducao && (
@@ -101,7 +109,6 @@ export default function Step2() {
 							eventoEmEstudioDescricao}
 						{formData.TipoProducao === "VIDEO_INSTITUCIONAL" &&
 							institucionalDescricao}
-						{formData.TipoProducao === "GRAVACAO_CHAMADA" && chamadaDescricao}
 						{formData.TipoProducao === "GRAVACAO_VIDEOAULA" &&
 							videoaulaDescricao}
 						{formData.TipoProducao === "EDICAO" && edicaoDescricao}

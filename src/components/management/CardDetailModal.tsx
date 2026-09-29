@@ -20,12 +20,17 @@ import type { Card } from "../../pages/GestorLocal";
 import {
 	FORMATO_PRODUCAO_LABELS,
 	TIPO_PRODUCAO_LABELS,
+	ETAPAS_MAP,
 	type TipoProducao,
 	type HistoricoEtapa,
 	type DelegacaoEtapa,
 } from "../../common/types/solicitacao";
-import { buscarSolicitacaoPorToken } from "../../services/solicitacoes";
+import {
+	buscarSolicitacaoPorToken,
+	atualizarEtapaSolicitacao,
+} from "../../services/solicitacoes";
 import ModalDelegacaoEtapa from "../modals/ModalDelegacaoEtapa";
+import ModalSolicitante from "../modals/ModalSolicitante";
 
 interface DetailBoxProps {
 	icon: React.ReactNode;
@@ -49,17 +54,27 @@ function DetailBox({ icon, label, value }: DetailBoxProps) {
 	);
 }
 
+const ETAPAS_MAP_INVERSO: Record<string, number> = Object.fromEntries(
+	Object.entries(ETAPAS_MAP).map(([id, nome]) => [nome, Number(id)])
+);
+
+interface CardDetailModalProps {
+	card: Card;
+	onClose: () => void;
+	onUpdateEtapa?: (cardId: string, novaEtapa: string) => void;
+}
+
 export function CardDetailModal({
 	card,
 	onClose,
-}: {
-	card: Card;
-	onClose: () => void;
-}) {
+	onUpdateEtapa,
+}: CardDetailModalProps) {
 	const solicitacao = card.solicitacao;
 	const [historico, setHistorico] = useState<Array<HistoricoEtapa>>([]);
 	const [delegacoes, setDelegacoes] = useState<Array<DelegacaoEtapa>>([]);
 	const [modalDelegacao, setModalDelegacao] = useState(false);
+	const [modalSolicitante, setModalSolicitante] = useState(false);
+	const [alterandoEtapa, setAlterandoEtapa] = useState(false);
 
 	useEffect(() => {
 		if (!solicitacao?.id) return;
@@ -70,6 +85,26 @@ export function CardDetailModal({
 			})
 			.catch(console.error);
 	}, [solicitacao?.id]);
+
+	const handleMoverEtapa = async (novaEtapaNome: string) => {
+		if (novaEtapaNome === card.etapa || !solicitacao?.id) return;
+		const novaEtapaId = ETAPAS_MAP_INVERSO[novaEtapaNome];
+		if (!novaEtapaId) return;
+
+		setAlterandoEtapa(true);
+		try {
+			await atualizarEtapaSolicitacao(solicitacao.id, novaEtapaId);
+			if (onUpdateEtapa) {
+				onUpdateEtapa(card.id, novaEtapaNome);
+			}
+			const data = await buscarSolicitacaoPorToken(solicitacao.id);
+			setHistorico(data.historico ?? []);
+		} catch (error) {
+			console.error("Erro ao alterar etapa:", error);
+		} finally {
+			setAlterandoEtapa(false);
+		}
+	};
 
 	const COLORS = {
 		matematica: "#fdde82",
@@ -114,12 +149,30 @@ export function CardDetailModal({
 										: "-"}
 									<ChevronRight size={10} />
 								</span>
-								<span
-									className="rounded-full px-4 py-1.5 text-[10px] font-black uppercase text-white shadow-sm"
-									style={{ backgroundColor: areaColor }}
-								>
-									{card.etapa}
-								</span>
+
+								{/* Seletor direto de Etapa */}
+								<div className="relative">
+									<select
+										disabled={alterandoEtapa}
+										value={card.etapa}
+										onChange={(e) => handleMoverEtapa(e.target.value)}
+										className="appearance-none cursor-pointer rounded-full px-4 py-1.5 pr-8 text-[10px] font-black uppercase text-white shadow-sm border-0 outline-none transition-all hover:opacity-90 disabled:opacity-50"
+										style={{ backgroundColor: areaColor }}
+									>
+										{Object.values(ETAPAS_MAP).map((nomeEtapa) => (
+											<option
+												key={nomeEtapa}
+												value={nomeEtapa}
+												className="bg-white text-slate-800 font-bold"
+											>
+												Etapa: {nomeEtapa}
+											</option>
+										))}
+									</select>
+									<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-white">
+										<ChevronRight size={12} className="rotate-90" />
+									</div>
+								</div>
 							</div>
 							<div className="flex flex-wrap items-center gap-4">
 								<div className="flex items-center gap-2 text-slate-400">
@@ -143,7 +196,7 @@ export function CardDetailModal({
 							</div>
 						</div>
 						<button
-							className="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors shrink-0"
+							className="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors shrink-0 cursor-pointer"
 							type="button"
 							onClick={onClose}
 						>
@@ -331,7 +384,17 @@ export function CardDetailModal({
 						</section>
 
 						{/* Responsável */}
-						<div className="flex items-center gap-4 p-5 rounded-4xl bg-[#F8FAFC] border border-slate-100">
+						<div
+							role="button"
+							tabIndex={0}
+							onClick={() => setModalSolicitante(true)}
+							onKeyDown={(e) => {
+								if (e.key === "Enter" || e.key === " ") {
+									setModalSolicitante(true);
+								}
+							}}
+							className="flex cursor-pointer items-center gap-4 p-5 rounded-4xl bg-[#F8FAFC] border border-slate-100 transition-all hover:border-indigo-200 hover:bg-indigo-50"
+						>
 							<div className="w-11 h-11 rounded-full bg-indigo-100 overflow-hidden shrink-0">
 								<img
 									alt="Avatar"
@@ -380,7 +443,7 @@ export function CardDetailModal({
 						{/* Botão Delegar */}
 						{solicitacao?.id && (
 							<button
-								className="w-full rounded-3xl border-2 border-dashed border-indigo-200 py-4 text-[9px] font-black uppercase tracking-[0.2em] text-indigo-400 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2"
+								className="w-full rounded-3xl border-2 border-dashed border-indigo-200 py-4 text-[9px] font-black uppercase tracking-[0.2em] text-indigo-400 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2 cursor-pointer"
 								onClick={() => setModalDelegacao(true)}
 							>
 								<GitBranch size={13} />
@@ -412,6 +475,16 @@ export function CardDetailModal({
 					</div>
 				</div>
 			</div>
+
+			{modalSolicitante && (
+				<ModalSolicitante
+					responsavel={solicitacao?.responsavel || "Não informado"}
+					setor={solicitacao?.setor || "Não informado"}
+					telefone={solicitacao?.telefone || "Não informado"}
+					email={solicitacao?.email || "Não informado"}
+					onClose={() => setModalSolicitante(false)}
+				/>
+			)}
 
 			{solicitacao?.id && (
 				<ModalDelegacaoEtapa

@@ -5,6 +5,7 @@ import { normalizePath } from "vite";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import { defineConfig } from "vitest/config";
 import tailwindcss from "@tailwindcss/vite";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -12,6 +13,8 @@ export default defineConfig({
 		react(),
 		tailwindcss(),
 		TanStackRouterVite(),
+		tsconfigPaths(),
+
 		viteStaticCopy({
 			targets: [
 				{
@@ -21,10 +24,12 @@ export default defineConfig({
 			],
 		}),
 	],
+
 	server: {
 		host: true,
 		strictPort: true,
 	},
+
 	test: {
 		environment: "jsdom",
 		setupFiles: ["./vitest.setup.ts"],

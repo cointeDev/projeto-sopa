@@ -39,7 +39,7 @@ export default function Step6() {
 			</div>
 
 			<h3 className="text-4xl font-black text-emerald-600 mb-6 uppercase tracking-tighter leading-none">
-				Solicitação enviada com sucesso
+				PRÉ-AGENDAMENTO REGISTRADO COM SUCESSO
 			</h3>
 
 			{protocolo && (
@@ -70,8 +70,10 @@ export default function Step6() {
 			)}
 
 			<p className="text-slate-500 font-medium mb-10 max-w-md mx-auto leading-relaxed">
-				Sua solicitação foi registrada. Você pode acompanhar o andamento usando
-				o{" "}
+				Sua solicitação foi registrada. Este registro é apenas um
+				pré-agendamento e ainda será analisado pela equipe responsável. A
+				gravação poderá ser aprovada ou reprovada.. Você pode acompanhar o
+				andamento usando o{" "}
 				<span className="text-[#334155] font-bold">
 					número de protocolo gerado acima
 				</span>

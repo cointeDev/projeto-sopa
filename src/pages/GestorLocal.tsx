@@ -32,7 +32,6 @@ import {
 import type { CampoComErro, SolicitacaoAPI } from "../common/types/solicitacao";
 import ModalRejeicaoGestor from "../components/modals/ModalRejeicaoGestor";
 import Agenda from "../components/management/Agenda";
-import Diario from "../components/management/Diario";
 
 export type Aba = "Dashboard" | "Quadro" | "Solicitações" | "Agenda" | "Diário";
 
@@ -92,10 +91,7 @@ export default function GestorLocal() {
 
 	const criarCardSolicitacao = (solicitacao: SolicitacaoAPI): Card => {
 		const etapaId = solicitacao.EtapaId ?? 1;
-
 		const etapaNome = ETAPAS_MAP[etapaId] ?? "STANDBY";
-
-		console.log("SOLICITAÇÃO RECEBIDA:", JSON.stringify(solicitacao, null, 2));
 
 		return {
 			id: solicitacao.id.toString(),
@@ -113,11 +109,9 @@ export default function GestorLocal() {
 		if (!solicitacaoSelecionada) return;
 
 		try {
-			const resposta = await devolverSolicitacao(solicitacaoSelecionada.id, {
+			await devolverSolicitacao(solicitacaoSelecionada.id, {
 				campos,
 			});
-
-			console.log("RESPOSTA DA API:", resposta);
 
 			setSolicitacoes((prev) =>
 				prev.filter((s) => s.id !== solicitacaoSelecionada.id)
@@ -131,9 +125,7 @@ export default function GestorLocal() {
 		async function carregarCards() {
 			try {
 				const data = await listarSolicitacoesAceitas();
-
 				const cardsFormatados = data.map(criarCardSolicitacao);
-
 				setCards(cardsFormatados);
 			} catch (error) {
 				console.error("Erro ao carregar cards:", error);
@@ -191,12 +183,11 @@ export default function GestorLocal() {
 			console.error("Erro ao atualizar solicitação", err);
 		}
 	};
+
 	async function enviarRejeicao(motivo: string) {
 		if (!solicitacaoSelecionada) return;
 
 		try {
-			// OBS: Certifique-se de que a função recusarSolicitacao no seu arquivo services/solicitacoes.ts
-			// foi atualizada para receber o 'motivo' como segundo parâmetro!
 			await recusarSolicitacao(solicitacaoSelecionada.id, motivo);
 
 			setSolicitacoes((previous) =>
@@ -204,7 +195,7 @@ export default function GestorLocal() {
 			);
 
 			setAbrirModalRejeicao(false);
-			setSolicitacaoSelecionada(null); // Fecha o modal principal também
+			setSolicitacaoSelecionada(null);
 		} catch (error) {
 			console.error("Erro ao recusar solicitação", error);
 		}
@@ -215,13 +206,7 @@ export default function GestorLocal() {
 			<header className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-white px-10 py-5">
 				<nav className="flex gap-10 font-black text-[11px] tracking-widest uppercase">
 					{(
-						[
-							"Dashboard",
-							"Quadro",
-							"Solicitações",
-							"Agenda",
-							"Diário",
-						] as Array<Aba>
+						["Dashboard", "Quadro", "Solicitações", "Agenda"] as Array<Aba>
 					).map((key) => (
 						<button
 							key={key}
@@ -237,7 +222,9 @@ export default function GestorLocal() {
 				<div className="flex items-center gap-4">
 					<button
 						className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-red-500 transition-colors"
-						onClick={() => { void handleLogout(); }}
+						onClick={() => {
+							void handleLogout();
+						}}
 					>
 						Sair
 					</button>
@@ -285,7 +272,6 @@ export default function GestorLocal() {
 						<Agenda scope="local" cards={cards} />
 					</div>
 				)}
-				{abaAtual === "Diário" && <Diario />}
 			</main>
 
 			{selectedCard && (
@@ -293,6 +279,16 @@ export default function GestorLocal() {
 					card={selectedCard}
 					onClose={() => {
 						setSelectedCard(null);
+					}}
+					onUpdateEtapa={(cardId, novaEtapa) => {
+						setCards((prevCards) =>
+							prevCards.map((c) =>
+								c.id === cardId ? { ...c, etapa: novaEtapa } : c
+							)
+						);
+						setSelectedCard((prev) =>
+							prev ? { ...prev, etapa: novaEtapa } : null
+						);
 					}}
 				/>
 			)}

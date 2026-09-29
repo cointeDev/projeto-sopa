@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+
 import { useFormContext } from "../../context/FormContext";
+
 import { Footer } from "../common/Footer";
+
 import {
 	OPCOES_ACESSIBILIDADE,
 	OPCOES_DISTRIBUICAO,
 	DISTRIBUICAO_LABELS,
+
 	//type Acessibilidade,
 	type Distribuicao,
 	ACESSIBILIDADE_LABELS,
@@ -14,6 +19,7 @@ import {
 export default function Step3() {
 	const { passo, setPassoAtual, updateField, validarPassoAtual } =
 		useFormContext();
+
 	const formData = useFormContext().formData;
 
 	return (
@@ -27,6 +33,7 @@ export default function Step3() {
 					<h2 className="text-[10px] pb-3 pl-1.5 font-black uppercase text-slate-400 tracking-widest">
 						Nome do projeto
 					</h2>
+
 					<input
 						className="w-full bg-[#F8FAFC] border border-slate-300 rounded-2xl px-6 py-5 text-sm font-bold text-[#334155] outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm placeholder:text-slate-300"
 						placeholder="Digite aqui o nome do projeto"
@@ -41,6 +48,7 @@ export default function Step3() {
 					<h2 className="text-[10px] pb-3 pl-1.5 font-black uppercase text-slate-400 tracking-widest">
 						Título do vídeo
 					</h2>
+
 					<input
 						className="w-full bg-[#F8FAFC] border border-slate-300 rounded-2xl px-6 py-5 text-sm font-bold text-[#334155] outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm placeholder:text-slate-300"
 						placeholder="Digite aqui o título do vídeo"
@@ -55,6 +63,7 @@ export default function Step3() {
 					<h2 className="text-[10px] pb-3 pl-1.5 font-black uppercase text-slate-400 tracking-widest">
 						Descrição do Material
 					</h2>
+
 					<textarea
 						className="w-full bg-[#F8FAFC] border border-slate-300 rounded-4xl px-6 py-5 text-sm font-bold text-[#334155] outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all min-h-40 shadow-sm placeholder:text-slate-300"
 						maxLength={144}
@@ -70,6 +79,7 @@ export default function Step3() {
 					<h2 className="text-[10px] pb-3 pl-1.5 font-black uppercase text-slate-400 tracking-widest">
 						Thumbnail (Capa)
 					</h2>
+
 					<label className="relative flex flex-col items-center justify-center w-full h-52 border-2 border-dashed border-slate-200 rounded-[2.5rem] cursor-pointer bg-[#F8FAFC] hover:bg-white transition-all group overflow-hidden shadow-inner">
 						{formData.thumbnail ? (
 							<div className="absolute inset-0 w-full h-full">
@@ -78,6 +88,7 @@ export default function Step3() {
 									className="w-full h-full object-cover opacity-60"
 									src={URL.createObjectURL(formData.thumbnail)}
 								/>
+
 								<div className="absolute inset-0 flex items-center justify-center">
 									<p className="text-[#334155] font-black bg-white/90 px-6 py-3 rounded-2xl text-[10px] uppercase shadow-xl tracking-widest">
 										Clique para alterar
@@ -101,11 +112,13 @@ export default function Step3() {
 										/>
 									</svg>
 								</div>
+
 								<p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">
 									Clique para enviar a capa
 								</p>
 							</div>
 						)}
+
 						<input
 							accept="image/*"
 							className="hidden"
@@ -138,6 +151,7 @@ export default function Step3() {
 										updateField("acessibilidade", item);
 									}}
 								/>
+
 								<span className="text-sm font-bold text-slate-600 group-hover:text-[#4f46e5] transition-colors">
 									{ACESSIBILIDADE_LABELS[item]}
 								</span>
@@ -145,22 +159,32 @@ export default function Step3() {
 						))}
 					</div>
 
-					{formData.acessibilidade === "INCLUIR_LIBRAS" && (
-						<div className="mt-4 pl-1.5 animate-in fade-in duration-300">
-							<p className="text-xs bg-indigo-50 border border-indigo-100 text-indigo-600 font-medium rounded-2xl p-4 italic">
-								⚠️ Atenção: a RIEH{" "}
-								<strong>não fornece intérpretes de Libras</strong>. Caso
-								necessário, a contratação deverá ser providenciada pelo
-								solicitante.
-							</p>
-						</div>
-					)}
+					{/* {formData.acessibilidade === "INCLUIR_LIBRAS" && (
+
+                        <div className="mt-4 pl-1.5 animate-in fade-in duration-300">
+
+                            <p className="text-xs bg-indigo-50 border border-indigo-100 text-indigo-600 font-medium rounded-2xl p-4 italic">
+
+                                ⚠️ Atenção: a RIEH{" "}
+
+                                <strong>não fornece intérpretes de Libras</strong>. Caso
+
+                                necessário, a contratação deverá ser providenciada pelo
+
+                                solicitante.
+
+                            </p>
+
+                        </div>
+
+                    )} */}
 				</div>
 
 				<div className="md:col-span-4 mt-2">
 					<h2 className="text-[10px] pb-4 pl-1.5 font-black uppercase text-slate-400 tracking-widest">
 						Distribuição de Material
 					</h2>
+
 					<div className="relative">
 						<select
 							className="w-full bg-[#F8FAFC] border border-slate-300 text-[#334155] text-sm font-bold rounded-2xl p-5 appearance-none cursor-pointer hover:bg-white transition-all shadow-sm focus:ring-2 focus:ring-indigo-500/20"
@@ -168,6 +192,7 @@ export default function Step3() {
 							onChange={(event_) => {
 								updateField(
 									"distribuicao",
+
 									event_.target.value as Distribuicao
 								);
 							}}
@@ -175,12 +200,14 @@ export default function Step3() {
 							<option disabled value="">
 								Selecione onde será distribuído...
 							</option>
+
 							{OPCOES_DISTRIBUICAO.map((item) => (
 								<option key={String(item)} value={item}>
 									{DISTRIBUICAO_LABELS[item]}
 								</option>
 							))}
 						</select>
+
 						<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-[#4f46e5]">
 							<svg
 								className="w-4 h-4"
@@ -197,6 +224,23 @@ export default function Step3() {
 							</svg>
 						</div>
 					</div>
+
+					{formData.distribuicao === "OUTRO" && (
+						<div className="mt-4">
+							<h2 className="text-[10px] pb-3 pl-1.5 font-black uppercase text-slate-400 tracking-widest">
+								Informe onde será distribuído
+							</h2>
+							<input
+								type="text"
+								value={formData.distribuicaoOutro}
+								onChange={(event) =>
+									updateField("distribuicaoOutro", event.target.value)
+								}
+								placeholder="Ex.: Youtube da Escola, site institucional..."
+								className="w-full bg-[#F8FAFC] border border-slate-300 text-[#334155] text-sm font-bold rounded-2xl p-5 hover:bg-white transition-all shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:outline-none"
+							/>
+						</div>
+					)}
 				</div>
 			</div>
 
@@ -209,6 +253,7 @@ export default function Step3() {
 				>
 					← Voltar
 				</button>
+
 				<button
 					className="rounded-[1.25rem] bg-[#4f46e5] px-14 py-5 text-xs font-black text-white shadow-xl shadow-indigo-100 uppercase tracking-widest active:scale-95 transition-all hover:bg-[#3730a3]"
 					onClick={() => {
@@ -224,6 +269,7 @@ export default function Step3() {
 					Continuar →
 				</button>
 			</div>
+
 			<Footer />
 		</div>
 	);
