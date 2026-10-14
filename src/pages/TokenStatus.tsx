@@ -56,7 +56,6 @@ export function TokenStatus() {
 	const [solicitacao, setSolicitacao] = useState<Solicitacao | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [erro, setErro] = useState("");
-
 	async function consultarToken() {
 		setErro("");
 		setSolicitacao(null);
