@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+import { useState } from "react";
 import { useFormContext } from "../../context/FormContext";
 import { Footer } from "../common/Footer";
 import { criarSolicitacao } from "../../services/solicitacoes";
@@ -18,10 +19,18 @@ interface ApiError {
 
 export default function Step5() {
 	const { formData, setPassoAtual, setProtocolo } = useFormContext();
+	// Estado para controlar se o envio está em andamento
+	const [carregando, setCarregando] = useState(false);
 
 	const isEdicao = formData.TipoProducao === "EDICAO";
 
 	async function handleConfirmar() {
+		// Se já estiver enviando, ignora novos cliques
+		if (carregando) return;
+
+		// Bloqueia novos envios
+		setCarregando(true);
+
 		try {
 			const payload = {
 				responsavel: formData.responsavel,
@@ -53,7 +62,6 @@ export default function Step5() {
 			}
 			setPassoAtual(6);
 		} catch (error: unknown) {
-			// Tratamento de erro tipado para remover o 'any'
 			const apiError = error as ApiError;
 			console.error("Erro ao enviar solicitação:", apiError);
 			console.error("Resposta da API:", apiError.response);
@@ -62,6 +70,9 @@ export default function Step5() {
 				apiError.response?.data?.message ||
 					"Ocorreu um erro ao enviar a solicitação. Por favor, tente novamente."
 			);
+
+			// Libera o botão novamente apenas em caso de erro para o usuário tentar denovo
+			setCarregando(false);
 		}
 	}
 
@@ -196,8 +207,9 @@ export default function Step5() {
 			{/* Navegação Inferior */}
 			<div className="flex justify-between mt-12 pt-8 border-t border-slate-100">
 				<button
-					className="rounded-2xl border border-slate-200 bg-white px-10 py-5 text-xs font-black text-slate-400 uppercase tracking-widest transition-all hover:bg-slate-50"
+					className="rounded-2xl border border-slate-200 bg-white px-10 py-5 text-xs font-black text-slate-400 uppercase tracking-widest transition-all hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
 					type="button"
+					disabled={carregando}
 					onClick={() => {
 						if (formData.TipoProducao === "EDICAO") {
 							setPassoAtual(7);
@@ -209,11 +221,19 @@ export default function Step5() {
 					← Ajustar
 				</button>
 				<button
-					className="rounded-[1.25rem] bg-[#4f46e5] px-14 py-5 text-xs font-black text-white shadow-xl shadow-indigo-100 uppercase tracking-widest active:scale-95 transition-all hover:bg-[#3730a3]"
+					className="rounded-[1.25rem] bg-[#4f46e5] px-14 py-5 text-xs font-black text-white shadow-xl shadow-indigo-100 uppercase tracking-widest active:scale-95 transition-all hover:bg-[#3730a3] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
 					type="button"
 					onClick={handleConfirmar}
+					disabled={carregando}
 				>
-					Confirmar e Gerar Card
+					{carregando ? (
+						<>
+							<span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full inline-block"></span>
+							Enviando...
+						</>
+					) : (
+						"Confirmar"
+					)}
 				</button>
 			</div>
 			<Footer />
